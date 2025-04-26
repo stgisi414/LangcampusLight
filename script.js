@@ -139,21 +139,21 @@ async function generatePartnerProfiles(prompt) {
 
             // Set skin tone based on native language
             const asianLanguages = ['Chinese', 'Japanese', 'Korean'];
-            const skinTone = asianLanguages.includes(profile.nativeLanguage) ? 
-                'yellow' : 'light,pale,brown,dark';
+            const skinColor = asianLanguages.includes(profile.nativeLanguage) ? 
+                'yellow' : ['light', 'pale', 'brown', 'dark'][Math.floor(Math.random() * 4)];
 
             // Add gender-specific features and skin tone
             if (profile.gender === 'male') {
-                avatarParams.push(`top=${shortHairStyles}`);
-                avatarParams.push('facialHair=beardLight,beardMajestic,beardMedium');
+                avatarParams.push(`topType=${shortHairStyles}`);
+                avatarParams.push('facialHairType=BeardLight,BeardMajestic,BeardMedium');
             } else if (profile.gender === 'female') {
-                avatarParams.push(`top=${longHairStyles}`);
-                avatarParams.push('facialHair=blank');
+                avatarParams.push(`topType=${longHairStyles}`);
+                avatarParams.push('facialHairType=Blank');
             }
-            avatarParams.push(`skinColor=${skinTone}`);
+            avatarParams.push(`skinColor=${skinColor}`);
 
             // Construct URL with fixed parameters
-            const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(profile.name)}&backgroundColor=b6e3f4,c0aede,d1d4f9&${avatarParams.join('&')}`;
+            const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(profile.name)}&${avatarParams.join('&')}`;
             
             return {
                  ...profile,
