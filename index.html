@@ -1,16 +1,60 @@
+
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>replit</title>
-  <link href="style.css" rel="stylesheet" type="text/css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Exchange Search</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
-
 <body>
-  Hello world
-  <script src="script.js"></script>
-</body>
+    <header>
+        <h1>Language Exchange</h1>
+    </header>
+    
+    <main>
+        <div class="search-container">
+            <div class="search-filters">
+                <select id="nativeLanguage">
+                    <option value="">I speak...</option>
+                    <option value="english">English</option>
+                    <option value="spanish">Spanish</option>
+                    <option value="french">French</option>
+                    <!-- Add more languages -->
+                </select>
+                
+                <select id="targetLanguage">
+                    <option value="">I want to learn...</option>
+                    <option value="english">English</option>
+                    <option value="spanish">Spanish</option>
+                    <option value="french">French</option>
+                    <!-- Add more languages -->
+                </select>
+                
+                <button id="searchButton">Find Partners</button>
+            </div>
+        </div>
 
+        <div id="results" class="results-container">
+            <!-- Results will be dynamically inserted here -->
+        </div>
+
+        <div id="chat-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div id="chat-messages"></div>
+                <div class="chat-input">
+                    <input type="text" id="message-input" placeholder="Type your message...">
+                    <button id="send-message">Send</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Find your perfect language exchange partner</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
 </html>
