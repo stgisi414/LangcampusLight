@@ -128,25 +128,29 @@ async function generatePartnerProfiles(prompt) {
         // Add avatars to the profiles
         return profiles.map(profile => {
             let avatarParams = [];
-            // Define hair styles
+            // Define hair styles by gender
             const shortHairStyles = [
                 'ShortHairShortFlat', 'ShortHairShortRound', 'ShortHairShortWaved',
                 'ShortHairSides', 'ShortHairTheCaesar', 'ShortHairTheCaesarSidePart'
             ].join(',');
             const longHairStyles = [
-                'LongHairBigHair', 'LongHairBob', 'LongHairCurly', 'LongHairCurvy',
-                'LongHairStraight', 'LongHairStraight2', 'LongHairNotTooLong'
+                'LongHairBob', 'LongHairStraight', 'LongHairStraight2'
             ].join(',');
 
-            // Add gender hinting for hair and facial hair
+            // Set skin tone based on native language
+            const asianLanguages = ['Chinese', 'Japanese', 'Korean'];
+            const skinColor = asianLanguages.includes(profile.nativeLanguage) ? 
+                'yellow' : ['light', 'pale', 'brown', 'dark'].join(',');
+            avatarParams.push(`skinColor=${skinColor}`);
+
+            // Add gender-specific features
             if (profile.gender === 'male') {
-                // Bias towards short hair, allow default facial hair
                 avatarParams.push(`topType=${shortHairStyles}`);
+                avatarParams.push("facialHairType=BeardLight,BeardMajestic,BeardMedium");
             } else if (profile.gender === 'female') {
-                // Bias towards long hair, ensure no facial hair
                 avatarParams.push(`topType=${longHairStyles}`);
                 avatarParams.push("facialHairType=Blank");
-            } // 'other' or undefined uses defaults
+            }
 
             // Construct URL
             const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(profile.name)}&${avatarParams.join('&')}`;
