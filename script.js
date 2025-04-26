@@ -137,24 +137,22 @@ async function generatePartnerProfiles(prompt) {
                 'LongHairBob', 'LongHairStraight', 'LongHairStraight2'
             ].join(',');
 
-            // Set avatar parameters
-            avatarParams.push('backgroundColor=b6e3f4,c0aede,d1d4f9');
-            
-            // Set gender-specific features
-            if (profile.gender === 'male') {
-                avatarParams.push('top=shortHair');
-                avatarParams.push('facialHair=beardMedium');
-            } else {
-                avatarParams.push('top=longHair');
-                avatarParams.push('facialHair=blank');
-            }
-
-            // Set skin tone based on language
+            // Set skin tone based on native language
             const asianLanguages = ['Chinese', 'Japanese', 'Korean'];
-            const skinColor = asianLanguages.includes(profile.nativeLanguage) ? 'yellow' : 'light';
+            const skinColor = asianLanguages.includes(profile.nativeLanguage) ? 
+                'yellow' : ['light', 'pale', 'brown', 'dark'].join(',');
             avatarParams.push(`skinColor=${skinColor}`);
 
-            // Construct avatar URL
+            // Add gender-specific features
+            if (profile.gender === 'male') {
+                avatarParams.push(`topType=${shortHairStyles}`);
+                avatarParams.push("facialHairType=BeardLight,BeardMajestic,BeardMedium");
+            } else if (profile.gender === 'female') {
+                avatarParams.push(`topType=${longHairStyles}`);
+                avatarParams.push("facialHairType=Blank");
+            }
+
+            // Construct URL
             const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(profile.name)}&${avatarParams.join('&')}`;
             
             return {
