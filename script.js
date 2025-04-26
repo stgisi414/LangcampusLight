@@ -7,7 +7,7 @@ async function searchPartners() {
     
     try {
         // This would be replaced with actual Gemini API call
-        const prompt = `Generate a language exchange partner profile who speaks ${nativeLanguage} and wants to learn ${targetLanguage}`;
+        const prompt = `Generate language exchange partner profiles who speaks ${nativeLanguage} and wants to learn ${targetLanguage}`;
         const partners = await generatePartnerProfiles(prompt);
         displayResults(partners);
     } catch (error) {
@@ -17,7 +17,7 @@ async function searchPartners() {
 
 async function generatePartnerProfiles(prompt) {
     try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + API_KEY, {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
