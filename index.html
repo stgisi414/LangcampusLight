@@ -4,10 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Language Exchange Search</title>
+    <link rel="icon" href="img/logo.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
     <header>
+        <img src="img/logo.png" alt="Logo" class="header-logo">
         <h1>Language Exchange</h1>
     </header>
 
@@ -16,22 +21,22 @@
             <div class="search-filters">
                 <select id="nativeLanguage">
                     <option value="">I speak...</option>
-                    <option value="english">English</option>
-                    <option value="spanish">Spanish</option>
-                    <option value="french">French</option>
-                    <option value="japanese">Japanese</option>
-                    <option value="chinese">Chinese</option>
-                    <option value="korean">Korean</option>
+                    <option value="English">English</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="French">French</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Korean">Korean</option>
                 </select>
 
                 <select id="targetLanguage">
                     <option value="">I want to learn...</option>
-                    <option value="english">English</option>
-                    <option value="spanish">Spanish</option>
-                    <option value="french">French</option>
-                    <option value="japanese">Japanese</option>
-                    <option value="chinese">Chinese</option>
-                    <option value="korean">Korean</option>
+                    <option value="English">English</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="French">French</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Korean">Korean</option>
                 </select>
 
                 <button id="searchButton">Find Partners</button>
@@ -40,15 +45,43 @@
 
         <div id="results" class="results-container">
             <!-- Results will be dynamically inserted here -->
+            <div id="loading-indicator" class="loading" style="display: none;">
+                <img src="img/loader.gif" alt="Loading..." /> 
+                <p>Finding partners...</p> 
+            </div>
         </div>
 
         <div id="chat-modal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
+                <div class="chat-header">
+                    <!-- Partner info will be populated here -->
+                </div>
                 <div id="chat-messages"></div>
-                <div class="chat-input">
-                    <input type="text" id="message-input" placeholder="Type your message...">
-                    <button id="send-message">Send</button>
+                <div class="chat-input-area">
+                    <div class="chat-input">
+                        <input type="text" id="message-input" placeholder="Type your message...">
+                        <button id="send-message" class="chat-button">Send</button>
+                    </div>
+                    <div class="chat-controls">
+                        <button id="teach-me-button" class="chat-button small-button">Teach Me</button>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="corrections-toggle">
+                            <span class="slider"></span>
+                            Corrections
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teach Me Modal -->
+        <div id="teach-me-modal" class="modal">
+            <div class="modal-content teach-me-content">
+                <span class="close teach-me-close">&times;</span>
+                <h2>Grammar Topics</h2>
+                <div id="grammar-topic-list">
+                    <!-- Grammar topics will be populated here -->
                 </div>
             </div>
         </div>
@@ -58,6 +91,7 @@
         <p>Find your perfect language exchange partner</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> 
     <script src="script.js"></script>
 </body>
 </html>
