@@ -1,6 +1,5 @@
 
-// Replace with your actual Gemini API key
-const API_KEY = '';
+const API_KEY = 'AIzaSyDjRnqcQmB1dudbtoO6urFYzd3RuK8Ee1U';
 
 async function searchPartners() {
     const nativeLanguage = document.getElementById('nativeLanguage').value;
@@ -17,19 +16,34 @@ async function searchPartners() {
 }
 
 async function generatePartnerProfiles(prompt) {
-    // Implement Gemini API call here
-    // This is a placeholder that returns mock data
-    return [
-        {
-            name: "Alex Thompson",
-            age: 25,
-            nativeLanguage: "English",
-            targetLanguage: "Spanish",
-            interests: ["travel", "music", "cooking"],
-            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex"
-        },
-        // Add more mock profiles as needed
-    ];
+    try {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: prompt + `. Return JSON array of 3 profiles with fields: name, age (20-45), nativeLanguage, targetLanguage, interests (array of 3 hobbies). Make it realistic and diverse.`
+                    }]
+                }]
+            })
+        });
+
+        const data = await response.json();
+        const generatedText = data.candidates[0].content.parts[0].text;
+        const profiles = JSON.parse(generatedText);
+        
+        // Add avatars to the profiles
+        return profiles.map(profile => ({
+            ...profile,
+            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.name}`
+        }));
+    } catch (error) {
+        console.error('Error generating profiles:', error);
+        return [];
+    }
 }
 
 function displayResults(partners) {
