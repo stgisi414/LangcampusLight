@@ -160,6 +160,8 @@ async function generatePartnerProfiles(prompt) {
             if (profile.gender === 'male') {
                 avatarParams.push(`topType=${maleHairStyles}`);
                 avatarParams.push(`hairColor=${maleHairColors}`);
+                avatarParams.push(`eyeType=Default`); // Force default eyes
+                avatarParams.push(`accessoriesType=Blank`); // Force no accessories
                 // Allow default facial hair based on seed
             } else if (profile.gender === 'female') {
                 avatarParams.push(`topType=${femaleHairStyles}`);
@@ -946,35 +948,34 @@ teachMeCloseBtn.onclick = () => {
 
 // Event delegation for topic selection
 grammarTopicList.addEventListener('click', async (event) => {
-    if (event.target && event.target.tagName === 'BUTTON') {
-        const topicTitle = event.target.dataset.title;
-        teachMeModal.style.display = 'none'; // Close modal
-        
-        // Add a message indicating the request
-        const chatMessages = document.getElementById('chat-messages');
-        chatMessages.innerHTML += `<p><em>Requesting explanation for: ${topicTitle}...</em></p>`;
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+    // Check if the clicked element is a button within the list
+    if (event.target && event.target.closest('button')) {
+        const button = event.target.closest('button');
+        const topicTitle = button.dataset.title;
+        const explanationContainer = document.getElementById('grammar-topic-list'); // Target the modal's content area
+
+        // Keep the modal open to show the explanation
+        // teachMeModal.style.display = 'none'; // Don't close the modal
+
+        // Show loading state within the modal's content area
+        explanationContainer.innerHTML = '<p>Loading explanation...</p>';
 
         try {
-            const explanation = await getGrammarExplanation(topicTitle, currentPartner.nativeLanguage);
-            
-            // Remove the requesting message (optional)
-            const requestMessages = chatMessages.querySelectorAll('p > em');
-            requestMessages.forEach(msg => {
-                if (msg.textContent.includes(`Requesting explanation for: ${topicTitle}`)) {
-                     msg.parentElement.remove();
-                }
-            });
+            // Find the topic level from embedded grammar data
+            const targetLang = currentPartner.nativeLanguage; // User is learning partner's language
+            const level = grammarData[targetLang]?.find(topic => topic.title === topicTitle)?.level || 'unknown';
 
-            // Display explanation
-            // We don't add explanations to history to keep chat flow clean
-            chatMessages.innerHTML += `<p><strong>Gemini (Teaching):</strong> ${explanation}</p>`; 
+            // Call the function to fetch and display the explanation IN THE MODAL
+            // This function updates explanationContainer.innerHTML directly.
+            await getGrammarExplanation(topicTitle, targetLang, level);
+
+            // NO NEED to add anything to the main chatMessages here,
+            // as the explanation is now shown inside the teachMeModal's explanationContainer.
 
         } catch (error) {
             console.error("Error getting grammar explanation:", error);
-            chatMessages.innerHTML += `<p><em>Sorry, couldn't get an explanation for ${topicTitle}.</em></p>`;
-        } finally {
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            // Display error within the modal's content area
+            explanationContainer.innerHTML = `<p style="color: red;">Failed to load explanation for "${topicTitle}". Please try again.</p>`;
         }
     }
 });
@@ -1006,7 +1007,7 @@ document.getElementById('corrections-toggle').addEventListener('change', (event)
 // Modified getGeminiChatResponse to include corrections instruction
 async function getGeminiChatResponse(partner, history) {
     console.log("Getting Gemini Response. History:", history);
-    const prompt = `You are ${partner.name}, a language exchange partner. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
+    const prompt = `You are ${partner.name}, a language exchange partner on the website http://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
 You are chatting with someone whose native language is ${partner.targetLanguage} and who is learning your language (${partner.nativeLanguage}).
 
 Here is the recent chat history (last 10 messages):
@@ -1074,18 +1075,17 @@ Your response should be ONLY the chat message text. Do not include your name or 
 
 // New function to get grammar explanation
 async function getGrammarExplanation(topicTitle, language, level = 'unknown') { // Added level parameter
-    console.log(`Requesting explanation for "${topicTitle}" in ${language} (Level: ${level})`);
+    const explanationContainer = document.getElementById('grammar-topic-list'); // Assuming this is where we show loading/result
+    explanationContainer.innerHTML = '<p>Loading explanation...</p>'; // Show loading state
 
-    const prompt = `You are a friendly language tutor. Explain the grammar topic "${topicTitle}" for the ${language} language clearly and concisely.
-Explain this for a learner at approximately Level ${level} proficiency in ${language}.
-Structure the explanation logically:
-1. Start with a brief definition or purpose of the topic.
-2. List key rules or usage points (use Markdown bullet points * or -).
-3. Provide 1-2 clear example sentences (use Markdown code ticks \`like this\` for examples or parts of examples).
+    console.log(`Requesting grammar explanation for: ${topicTitle} in ${language}, Level: ${level}`);
 
-Keep the explanation suitable for display in a chat interface - clear, focused, and not excessively long.
-Format the ENTIRE explanation using Markdown syntax (e.g., use headings like ## Subtopic, bold **text**, italics *text*, lists *, code \`examples\`).
-Your response must be ONLY the Markdown explanation. Do not include any introductory text like "Okay, here is the explanation...".`;
+    // Construct a more detailed prompt requesting Markdown
+    const prompt = `Explain the grammar topic "${topicTitle}" for a learner of ${language} (assume they are at a level suitable for this topic: ${level}).
+Provide a clear explanation with examples. 
+Use simple language suitable for a language learner.
+Format your entire response using Markdown. Use headings, bullet points, bold text, and code blocks for examples where appropriate to make the explanation clear and easy to read.
+Do NOT include any text before or after the Markdown content.`;
 
     try {
         const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
@@ -1104,27 +1104,28 @@ Your response must be ONLY the Markdown explanation. Do not include any introduc
 
         if (!response.ok) {
             const errorBody = await response.text();
-            console.error(`Gemini Grammar API request failed: ${response.statusText}. Body: ${errorBody}`);
-            throw new Error(`API request failed: ${response.statusText}`);
+            throw new Error(`API request failed with status ${response.status}: ${response.statusText}. Body: ${errorBody}`);
         }
 
         const data = await response.json();
-        console.log("Gemini Grammar API Response:", data);
 
-        if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
-            let generatedText = data.candidates[0].content.parts[0].text;
-            return generatedText.trim(); // Return the explanation
-        } else if (data && data.candidates && data.candidates[0] && data.candidates[0].finishReason === 'SAFETY') {
-             console.warn("Gemini grammar response blocked due to safety settings.");
-             return "I'm sorry, I can't provide an explanation for that topic due to safety constraints."; 
-        } else {
-            console.error("Unexpected Gemini Grammar API response:", data);
+        if (!data || !data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+            console.error("Unexpected API response structure for grammar explanation:", data);
             throw new Error("Unexpected API response structure for grammar explanation");
         }
 
+        let explanationMarkdown = data.candidates[0].content.parts[0].text;
+        console.log("Received Markdown explanation:", explanationMarkdown);
+
+        // Convert Markdown to HTML using marked.js
+        const explanationHtml = marked.parse(explanationMarkdown);
+
+        // Display the HTML content in the modal
+        explanationContainer.innerHTML = `<h2>Explanation: ${topicTitle}</h2> ${explanationHtml}`; // Display parsed HTML
+
     } catch (error) {
-        console.error('Error calling Gemini API for grammar:', error);
-        throw error;
+        console.error('Error getting grammar explanation:', error);
+        explanationContainer.innerHTML = `<p style="color: red;">Failed to load explanation for "${topicTitle}". Please try again.</p>`;
     }
 }
 
