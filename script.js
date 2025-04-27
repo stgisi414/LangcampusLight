@@ -16,7 +16,7 @@ async function searchPartners() {
 
     // Show loader first (if found)
     if (loadingIndicator) {
-        loadingIndicator.style.display = 'flex'; // Show loader
+    loadingIndicator.style.display = 'flex'; // Show loader
     } else {
         console.error("Loading indicator element with ID 'loading-indicator' not found in the HTML!");
         resultsContainer.innerHTML = '<p style="text-align:center; color: red;">Error: Loading indicator missing. Cannot search.</p>';
@@ -30,14 +30,14 @@ async function searchPartners() {
     resultsContainer.appendChild(loadingIndicator);
 
     try {
-// Define the expected JSON structure as an example
+        // Define the expected JSON structure as an example
         const exampleJson = `[
   {
-    "name": "Example Partner Name",
+    "name": "Example Partner Name", 
     "age": 28,
-    "gender": "male",
-    "nativeLanguage": "${targetLanguage}",
-    "targetLanguage": "${nativeLanguage}",
+    "gender": "male", 
+    "nativeLanguage": "${targetLanguage}", 
+    "targetLanguage": "${nativeLanguage}", 
     "interests": ["hiking", "photography", "cooking"]
   }
 ]`;
@@ -125,39 +125,60 @@ async function generatePartnerProfiles(prompt) {
             throw new Error("Failed to parse JSON response from API");
         }
         
-        // Add avatars to the profiles
+        // Add avatars to the profiles using DiceBear Avataaars with strict parameters
         return profiles.map(profile => {
             let avatarParams = [];
-            // Define hair styles by gender
-            const shortHairStyles = [
-                'ShortHairShortFlat', 'ShortHairShortRound', 'ShortHairShortWaved',
-                'ShortHairSides', 'ShortHairTheCaesar', 'ShortHairTheCaesarSidePart'
+
+            // --- Define styles and VALID HEX colors based on gender ---
+            // Using the stricter lists again
+            const maleHairStyles = [
+                'ShortHairShortFlat', 'ShortHairSides', 'ShortHairTheCaesar'
             ].join(',');
-            const longHairStyles = [
-                'LongHairBob', 'LongHairStraight', 'LongHairStraight2'
+            const femaleHairStyles = [
+                'LongHairStraight', 'LongHairStraight2', 'LongHairCurvy'
             ].join(',');
 
-            // Set skin tone based on native language
+            // Use HEX codes for colors - NO pink/bright colors for males
+            const maleHairColors = ['2C1B18', '4A312C', 'A55728', 'B58143', 'F5D6A1', '606060'].join(','); // Black, Browns, Blonde, Grey
+            const femaleHairColors = ['2C1B18', '4A312C', 'A55728', 'B58143', 'F5D6A1', '606060', 'E8E1E1', 'FFC0CB', 'C93305'].join(','); // Includes Platinum, Pink, Red
+
+            // --- Define skin tone HEX codes based on language origin ---
             const asianLanguages = ['Chinese', 'Japanese', 'Korean'];
-            const skinColor = asianLanguages.includes(profile.nativeLanguage) ? 
-                'yellow' : ['light', 'pale', 'brown', 'dark'].join(',');
-            avatarParams.push(`skinColor=${skinColor}`);
+            const europeanLanguages = ['English', 'Spanish', 'French'];
+            let skinColor = ''; // Default: Let seed decide if language doesn't match
 
-            // Add gender-specific features
-            if (profile.gender === 'male') {
-                avatarParams.push(`topType=${shortHairStyles}`);
-                avatarParams.push("facialHairType=BeardLight,BeardMajestic,BeardMedium");
-            } else if (profile.gender === 'female') {
-                avatarParams.push(`topType=${longHairStyles}`);
-                avatarParams.push("facialHairType=Blank");
+            if (asianLanguages.includes(profile.nativeLanguage)) {
+                skinColor = 'F9D46A'; // Yellow tone hex
+            } else if (europeanLanguages.includes(profile.nativeLanguage)) {
+                skinColor = ['EDB98A', 'FFDBAC', 'D08B5B', 'AE5D29'].join(','); // Light/Brown tones hex mix
+            }
+            if (skinColor) {
+                avatarParams.push(`skinColor=${skinColor}`);
             }
 
-            // Construct URL
-            const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(profile.name)}&${avatarParams.join('&')}`;
-            
+            // --- Apply styles based on gender ---
+            if (profile.gender === 'male') {
+                avatarParams.push(`topType=${maleHairStyles}`);
+                avatarParams.push(`hairColor=${maleHairColors}`);
+                // Allow default facial hair based on seed
+            } else if (profile.gender === 'female') {
+                avatarParams.push(`topType=${femaleHairStyles}`);
+                avatarParams.push(`hairColor=${femaleHairColors}`);
+                avatarParams.push("facialHairType=Blank"); // Explicitly no facial hair
+            }
+            // 'other' or undefined gender will use API defaults based on seed
+
+            // Add detailed logging before constructing URL
+            console.log(`[Avatar Generation] DiceBear Profile: ${profile.name}, Gender: ${profile.gender}, Params:`, avatarParams);
+
+            // Construct DiceBear Avataaars URL with query string
+            const seedParam = `seed=${encodeURIComponent(profile.name)}`; // Use 'seed' not 'Seed'
+            const otherParams = avatarParams.join('&'); // Combine other params like topType, facialHairType, skinColor, hairColor
+            const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?${seedParam}${otherParams ? '&' + otherParams : ''}`;
+
             return {
                  ...profile,
-                 avatar: avatarUrl
+                 avatar: avatarUrl // Assign the new DiceBear URL
             };
         });
     } catch (error) {
@@ -174,7 +195,7 @@ function displayResults(partners) {
     if (!loadingIndicator) {
         console.error("Loading indicator missing in displayResults. Cannot proceed.");
         resultsContainer.innerHTML = '<p style="text-align:center; color: red;">Internal error: Loading indicator state lost.</p>';
-        return; 
+        return;
     }
 
     // Hide loader first
@@ -187,21 +208,21 @@ function displayResults(partners) {
     if (!partners || partners.length === 0) {
         resultsContainer.innerHTML = '<p style="text-align:center;">No partners found matching your criteria.</p>';
     } else {
-        partners.forEach(partner => {
-            const card = document.createElement('div');
-            card.className = 'partner-card';
-            // Encode the partner object as a JSON string for the onclick handler
+    partners.forEach(partner => {
+        const card = document.createElement('div');
+        card.className = 'partner-card';
+        // Encode the partner object as a JSON string for the onclick handler
             const partnerJson = JSON.stringify(partner).replace(/'/g, "\\'"); // Escape single quotes
-            card.innerHTML = `
-                <img src="${partner.avatar}" alt="${partner.name}">
-                <h3>${partner.name}</h3>
-                <p>Speaks: ${partner.nativeLanguage}</p>
-                <p>Learning: ${partner.targetLanguage}</p>
-                <p>Interests: ${partner.interests.join(', ')}</p>
-                <button onclick='openChat(${partnerJson})'>Chat</button>
-            `;
-            resultsContainer.appendChild(card);
-        });
+        card.innerHTML = `
+            <img src="${partner.avatar}" alt="${partner.name}">
+            <h3>${partner.name}</h3>
+            <p>Speaks: ${partner.nativeLanguage}</p>
+            <p>Learning: ${partner.targetLanguage}</p>
+            <p>Interests: ${partner.interests.join(', ')}</p>
+            <button onclick='openChat(${partnerJson})'>Chat</button> 
+        `;
+        resultsContainer.appendChild(card);
+    });
     }
 
     // IMPORTANT: Re-append the (now hidden) loader so it exists for the next search
