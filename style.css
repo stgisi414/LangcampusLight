@@ -40,7 +40,7 @@ header {
         padding: 1.75rem;
         gap: 0.75rem;
     }
-    
+
     .header-logo {
         height: 48px;
         width: 48px;
@@ -186,7 +186,7 @@ footer {
     .search-filters {
         flex-direction: column;
     }
-    
+
     .modal-content {
         width: 95%;
         /* margin: 5% auto; Remove percentage margin */
@@ -379,4 +379,13 @@ input:checked + .slider:before {
     background-color: #eee;
     padding: 2px 6px;
     border-radius: 3px;
+}
+
+#interestSearch {
+    padding: 0.8rem 1.2rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+    width: 200px;
 }

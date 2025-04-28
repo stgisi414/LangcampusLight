@@ -189,9 +189,21 @@ async function generatePartnerProfiles(prompt) {
     }
 }
 
+function filterPartnersByInterest(partners, searchTerm) {
+    if (!searchTerm) return partners;
+    searchTerm = searchTerm.toLowerCase();
+    return partners.filter(partner => 
+        partner.interests.some(interest => 
+            interest.toLowerCase().includes(searchTerm)
+        )
+    );
+}
+
 function displayResults(partners) {
     const resultsContainer = document.getElementById('results');
-    const loadingIndicator = document.getElementById('loading-indicator'); // Get loader reference again
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const searchTerm = document.getElementById('interestSearch').value;
+    const filteredPartners = filterPartnersByInterest(partners, searchTerm);
 
     // Ensure loader exists before trying to manipulate it
     if (!loadingIndicator) {
@@ -1166,6 +1178,14 @@ document.getElementById('targetLanguage').addEventListener('change', (event) => 
     const valueToSave = event.target.value;
     console.log(`Saving targetLanguage: ${valueToSave}`);
     localStorage.setItem("selectedTargetLanguage", valueToSave);
+});
+
+// Add interest search filter
+document.getElementById('interestSearch').addEventListener('input', () => {
+    const searchButton = document.getElementById('searchButton');
+    if (searchButton) {
+        searchButton.click(); // Trigger a new search when the interest filter changes
+    }
 });
 
 // ... existing code ...
