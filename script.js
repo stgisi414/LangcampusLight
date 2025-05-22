@@ -1435,38 +1435,66 @@ function validateWebhookOrigin(url) {
   }
 }
 
-// Remove existing audio button if present
-function removeExistingAudioButton() {
-  const existingButton = document.querySelector('.audio-button');
-  if (existingButton) {
-    existingButton.remove();
+// Text selection and audio button logic
+let audioButton = null;
+
+// Handle text selection
+document.addEventListener('selectionchange', () => {
+  // Remove existing button
+  if (audioButton) {
+    audioButton.remove();
+    audioButton = null;
   }
-}
 
-// Create and position audio button
-function createAudioButton(rect) {
-  const button = document.createElement('button');
-  button.className = 'audio-button';
-  button.innerHTML = '🔊 Play Audio';
+  const selection = window.getSelection();
+  const text = selection.toString().trim();
   
-  // Calculate viewport-relative coordinates
-  const vpLeft = rect.left + window.pageXOffset;
-  const vpTop = rect.bottom + window.pageYOffset;
+  // Only show button if we have valid selection
+  if (text && text.length >= 2) {
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    
+    // Create and position button
+    audioButton = document.createElement('button');
+    audioButton.className = 'audio-button';
+    audioButton.innerHTML = '🔊 Play Audio';
+    audioButton.style.position = 'fixed';
+    audioButton.style.left = `${rect.left}px`;  
+    audioButton.style.top = `${rect.bottom + 5}px`;
+    audioButton.style.zIndex = '10000';
+    
+    // Add click handler
+    audioButton.onclick = async () => {
+      audioButton.innerHTML = '🔄 Loading...';
+      audioButton.disabled = true;
+      
+      try {
+        await handleTextToSpeech(text);
+        audioButton.innerHTML = '✅ Played';
+      } catch (error) {
+        console.error('Audio playback failed:', error);
+        audioButton.innerHTML = '❌ Error';
+      }
+      
+      setTimeout(() => {
+        if (audioButton) {
+          audioButton.remove();
+          audioButton = null;
+        }
+      }, 2000);
+    };
+    
+    document.body.appendChild(audioButton);
+  }
+});
 
-  // Position button below selected text
-  button.style.position = 'absolute';
-  button.style.left = `${vpLeft}px`;
-  button.style.top = `${vpTop + 5}px`;
-  button.style.zIndex = '9999';
-  
-  return button;
-}
-
-// Check if text contains at least two non-space/punctuation characters
-function isValidSelection(text) {
-  const nonSpaceChars = text.replace(/[\s\p{P}]/gu, '');
-  return nonSpaceChars.length >= 2;
-}
+// Clear button when clicking outside
+document.addEventListener('mousedown', (e) => {
+  if (audioButton && e.target !== audioButton) {
+    audioButton.remove();
+    audioButton = null;
+  }
+});
 
 // Function to handle text-to-speech conversion
 async function handleTextToSpeech(text) {
