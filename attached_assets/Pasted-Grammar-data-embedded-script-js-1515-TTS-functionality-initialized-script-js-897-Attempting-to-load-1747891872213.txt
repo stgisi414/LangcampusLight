@@ -1,0 +1,38 @@
+Grammar data embedded.
+script.js:1515 TTS functionality initialized
+script.js:897 Attempting to load preferences from localStorage...
+script.js:900 Loaded nativeLanguage from localStorage: English
+script.js:901 Loaded targetLanguage from localStorage: Italian
+script.js:912 Setting nativeLanguage dropdown to: English
+script.js:918 Setting targetLanguage dropdown to: Italian
+
+                
+          
+          
+          
+         Chrome is moving towards a new experience that allows users to choose to browse without third-party cookies.Understand this warning
+script.js:1665 Creating audio button for text: Nice to meet you!
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 124.03125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 0
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I see you're learning Japanese.
+script.js:1666 Button position: DOMRect {x: 192.5, y: 160.40625, width: 505.890625, height: 44.59375, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 0
+script.js:1742 Button positioned at: {left: 192.5, top: 207}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I see you're learning Japanese. M
+script.js:1666 Button position: DOMRect {x: 192.5, y: 160.40625, width: 505.890625, height: 44.59375, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 192.5, top: 207}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Hi! I'm Yuki Tanak
+script.js:1666 Button position: DOMRect {x: 283.859375, y: 160.40625, width: 129.15625, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 0
+script.js:1742 Button positioned at: {left: 283.859375, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Hi! I'm Yuki Tanak
+script.js:1666 Button position: DOMRect {x: 283.859375, y: 160.40625, width: 129.15625, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 283.859375, top: 181.40625}
+script.js:1853 Audio button created and appended to body
