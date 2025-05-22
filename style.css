@@ -42,6 +42,9 @@
   font-size: 14px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .audio-button:disabled {
@@ -60,12 +63,16 @@
   box-shadow: 0 3px 6px rgba(0,0,0,0.3);
 }
 
-.audio-button:hover {
-  background: #2980b9;
-}
-
 .audio-button.playing {
   background: #27ae60;
+}
+
+.audio-button .button-icon {
+  font-size: 16px;
+}
+
+.audio-button .button-text {
+  font-weight: 500;
 }
 
 body {

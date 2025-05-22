@@ -1441,20 +1441,46 @@ function createAudioButton(text, rect) {
     existingButtons.forEach(btn => btn.remove());
 
     const button = document.createElement('button');
-    button.className = 'audio-button';
-    button.innerHTML = '🔊 Play Audio';
+    button.className = 'audio-button icon-button';
+    button.innerHTML = `
+        <span class="button-icon">🔊</span>
+        <span class="button-text">Play Audio</span>
+    `;
     button.style.position = 'fixed';
     button.style.left = `${rect.left + window.scrollX}px`;
     button.style.top = `${rect.bottom + window.scrollY + 5}px`;
     button.style.zIndex = '10000';
 
+    let isPlaying = false;
     button.onclick = async () => {
+        if (isPlaying) return;
+        
         try {
+            isPlaying = true;
+            button.classList.add('playing');
+            button.innerHTML = `
+                <span class="button-icon">🔄</span>
+                <span class="button-text">Loading...</span>
+            `;
+            
             await playAudioFromText(text, button);
+            
+            button.innerHTML = `
+                <span class="button-icon">✅</span>
+                <span class="button-text">Played</span>
+            `;
+            
+            setTimeout(() => button.remove(), 2000);
         } catch (error) {
             console.error('Audio playback failed:', error);
-            button.innerHTML = '❌ Error';
+            button.classList.remove('playing');
+            button.innerHTML = `
+                <span class="button-icon">❌</span>
+                <span class="button-text">Error</span>
+            `;
             setTimeout(() => button.remove(), 2000);
+        } finally {
+            isPlaying = false;
         }
     };
 
