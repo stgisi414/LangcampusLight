@@ -1635,11 +1635,14 @@ async function playAudioFromText(text, button) {
 
 // Audio button controller 
 function createAudioButton(text, rect) {
-    console.log('Creating audio button for text:', text);
-    
-    // Remove any existing audio buttons first
-    const existingButtons = document.querySelectorAll('.audio-button');
-    existingButtons.forEach(btn => btn.remove());
+    try {
+        console.log('Creating audio button for text:', text);
+        console.log('Button position:', rect);
+        
+        // Remove any existing audio buttons first
+        const existingButtons = document.querySelectorAll('.audio-button');
+        console.log('Removing existing buttons:', existingButtons.length);
+        existingButtons.forEach(btn => btn.remove());
 
     const button = document.createElement('button');
     button.className = 'audio-button icon-button';
@@ -1700,10 +1703,17 @@ function createAudioButton(text, rect) {
     // Ensure left position isn't negative
     left = Math.max(10, left);
     
+    // Ensure button is visible and clickable
+    button.style.position = 'fixed';
     button.style.left = `${left}px`;
     button.style.top = `${top}px`;
     button.style.zIndex = '10000';
+    button.style.visibility = 'visible';
+    button.style.opacity = '1';
+    button.style.userSelect = 'none';
+    button.style.pointerEvents = 'auto';
 
+    console.log('Button positioned at:', { left, top });
     let isPlaying = false;
     // Add click event listener with preventDefault
     button.addEventListener('click', async (e) => {
@@ -1758,7 +1768,12 @@ function createAudioButton(text, rect) {
     });
 
     document.body.appendChild(button);
-    return button;
+        console.log('Audio button created and appended to body');
+        return button;
+    } catch (error) {
+        console.error('Error creating audio button:', error);
+        return null;
+    }
 }
 
 function removeAudioButton() {
@@ -1772,9 +1787,12 @@ function removeAudioButton() {
 
 // Text selection handler for both desktop and mobile
 document.addEventListener('selectionchange', function() {
+    console.log('Selection changed');
+    
     // Don't show audio button if selection is in input/textarea
     const activeElement = document.activeElement;
     if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') {
+        console.log('Selection in input/textarea, ignoring');
         return;
     }
 
