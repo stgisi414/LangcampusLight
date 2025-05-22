@@ -1,0 +1,283 @@
+Grammar data embedded.
+script.js:1515 TTS functionality initialized
+script.js:897 Attempting to load preferences from localStorage...
+script.js:900 Loaded nativeLanguage from localStorage: English
+script.js:901 Loaded targetLanguage from localStorage: Italian
+script.js:912 Setting nativeLanguage dropdown to: English
+script.js:918 Setting targetLanguage dropdown to: Italian
+
+                
+          
+          
+          
+         Chrome is moving towards a new experience that allows users to choose to browse without third-party cookies.Understand this warning
+script.js:1665 Creating audio button for text: Nic
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 23.6875, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 0
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 50.34375, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to m
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 68.34375, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to me
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 76.828125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to mee
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 85.3125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 90.546875, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 94.515625, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet y
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 101.96875, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet yo
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 111.09375, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet you
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 119.90625, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet you!
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 124.03125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1746 🎵 AUDIO BUTTON CLICK {text: 'Nice to meet you!', buttonState: {…}, audioContext: 'null'}
+script.js:1772 Attempting to initialize audio context...
+script.js:1775 Audio context initialized: success
+script.js:1783 Starting audio playback
+script.js:1557 Starting playAudioFromText with text: Nice to meet you!
+script.js:1572 Sending TTS request: {url: 'https://langcamp.us/elevenlbs-exchange-audio/exchange-audio', text: 'Nice to meet you!', voiceId: 'pNInz6obpgDQGcFmaJgB'}
+script.js:1578 Sending TTS request to: https://langcamp.us/elevenlbs-exchange-audio/exchange-audio
+script.js:1584 Request body: {text: 'Nice to meet you!', voice_id: 'pNInz6obpgDQGcFmaJgB', model_id: 'eleven_multilingual_v2'}
+script.js:1605 API response received, getting blob...
+script.js:1607 Received audio blob: {size: 19271, type: 'audio/mpeg'}
+script.js:1665 Creating audio button for text: I'
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 7, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 0
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 21.03125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 25, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Y
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 34.3125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yu
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 43.125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuk
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 51.234375, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 55.125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 58.78125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki T
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 67.453125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki Ta
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 76.15625, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki Tan
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 84.984375, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki Tana
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 93.6875, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki Tanak
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 101.796875, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki Tanaka
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 110.5, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 7, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 0
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 21.03125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 25, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Y
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 34.3125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yu
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 43.125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuk
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 51.234375, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 55.125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 58.78125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki T
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 67.453125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki Ta
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 76.15625, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki Tan
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 84.984375, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki Tana
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 93.6875, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki Tanak
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 101.796875, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: I'm Yuki Tanaka
+script.js:1666 Button position: DOMRect {x: 311.21875, y: 160.40625, width: 110.5, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 311.21875, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 54.3125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 0
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to m
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 68.34375, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to me
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 76.828125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to mee
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 85.3125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 90.546875, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 94.515625, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet y
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 101.96875, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet yo
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 111.09375, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet you
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 119.90625, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet you!
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 124.03125, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet you!
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 128, height: 19, top: 160.40625, …}
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet you!
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 124.03125, height: 19, top: 160.40625, …}bottom: 179.40625height: 19left: 429.90625right: 553.9375top: 160.40625width: 124.03125x: 429.90625y: 160.40625[[Prototype]]: DOMRectheight: (...)width: (...)x: (...)y: (...)constructor: ƒ DOMRect()Symbol(Symbol.toStringTag): "DOMRect"bottom: (...)left: (...)right: (...)top: (...)get height: ƒ height()set height: ƒ height()get width: ƒ width()set width: ƒ width()get x: ƒ x()length: 0name: "get x"arguments: (...)caller: (...)[[Prototype]]: ƒ ()[[Scopes]]: Scopes[0]set x: ƒ x()get y: ƒ y()set y: ƒ y()[[Prototype]]: DOMRectReadOnly
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
+script.js:1665 Creating audio button for text: Nice to meet you
+script.js:1666 Button position: DOMRect {x: 429.90625, y: 160.40625, width: 119.90625, height: 19, top: 160.40625, …}bottom: 179.40625height: 19left: 429.90625right: 549.8125top: 160.40625width: 119.90625x: 429.90625y: 160.40625[[Prototype]]: DOMRect
+script.js:1670 Removing existing buttons: 1
+script.js:1742 Button positioned at: {left: 429.90625, top: 181.40625}
+script.js:1853 Audio button created and appended to body
