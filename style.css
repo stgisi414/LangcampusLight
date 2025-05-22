@@ -4,6 +4,31 @@
     box-sizing: border-box;
 }
 
+.saved-partner-banner {
+    background-color: #f0f8ff;
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.banner-button {
+    margin: 0 5px;
+    padding: 5px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #3498db;
+    color: white;
+}
+
+.banner-button.delete {
+    background-color: #e74c3c;
+}
+
+.banner-button:hover {
+    opacity: 0.9;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     line-height: 1.6;

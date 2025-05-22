@@ -809,7 +809,7 @@ const grammarData = {
         { "title": "Using Formal Adverbs (e.g., 未免 wèimiǎn, 何必 hébì, 不禁 bùjīn)", "level": 5, "tags": ["adverbs", "formal language", "nuance"] },
         { "title": "Set Phrases & Chengyu (成语 - Idioms)", "level": 5, "tags": ["vocabulary", "idioms", "chengyu", "culture"] },
         { "title": "Topic-Comment Structures", "level": 5, "tags": ["sentence structure", "topic comment"] },
-        { "title": "Complex Sentence Structures & Clauses", "level": 5, "tags": ["sentence structure", "syntax", "clauses"] },
+        { "title": "Complex Sentence Structures & Clauses", "level": 5"level": 5, "tags": ["sentence structure", "syntax", "clauses"] },
         { "title": "Nuances of Aspect Particles (了 le, 着 zhe, 过 guo)", "level": 5, "tags": ["particles", "aspect", "nuances", "le", "zhe", "guo"] }
     ]
 };
@@ -1237,8 +1237,39 @@ Do NOT include any text before or after the Markdown content.`;
 // Grammar data is now embedded, no need to fetch it here.
 document.addEventListener('DOMContentLoaded', () => {
     loadPreferences();
-    // loadGrammarData(); // Removed call
+    checkSavedPartner();
 });
+
+function checkSavedPartner() {
+    const savedPartnerData = localStorage.getItem('savedPartner');
+    const banner = document.getElementById('saved-partner-banner');
+    const info = document.getElementById('saved-partner-info');
+
+    if (savedPartnerData) {
+        const data = JSON.parse(savedPartnerData);
+        banner.style.display = 'block';
+        info.textContent = `Saved chat with ${data.partner.name}`;
+
+        // Resume chat button
+        document.getElementById('resume-chat-btn').onclick = () => {
+            openChat(data.partner);
+            // Load saved messages
+            const chatMessages = document.getElementById('chat-messages');
+            chatHistory = data.messages;
+            chatMessages.innerHTML = chatHistory.map(msg => 
+                `<p><strong>${msg.sender}:</strong> ${msg.text}</p>`
+            ).join('');
+        };
+
+        // Delete saved partner button
+        document.getElementById('delete-partner-btn').onclick = () => {
+            if (confirm('Are you sure you want to delete the saved chat?')) {
+                localStorage.removeItem('savedPartner');
+                banner.style.display = 'none';
+            }
+        };
+    }
+}
 
 // Remove the old DOMContentLoaded listener for just loadPreferences
 // document.addEventListener('DOMContentLoaded', loadPreferences);
@@ -1272,7 +1303,7 @@ document.getElementById('save-partner-btn').addEventListener('click', () => {
         partner: currentPartner,
         messages: chatHistory.slice(-10)
     };
-    
+
     localStorage.setItem('savedPartner', JSON.stringify(dataToSave));
     alert('Partner and recent messages saved successfully!');
 });
