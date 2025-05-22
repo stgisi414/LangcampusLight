@@ -1836,7 +1836,8 @@ function createAudioButton(text, rect) {
         }
     });
 
-    document.body.appendChild(button);
+    try {
+        document.body.appendChild(button);
         console.log('Audio button created and appended to body');
         return button;
     } catch (error) {
