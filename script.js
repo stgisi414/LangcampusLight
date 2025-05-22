@@ -1290,21 +1290,26 @@ document.getElementById('targetLanguage').addEventListener('change', (event) => 
 document.getElementById('save-partner-btn').addEventListener('click', () => {
     if (!currentPartner) return;
 
-    const savedPartner = localStorage.getItem('savedPartner');
-    if (savedPartner) {
-        if (!confirm('Do you want to overwrite the previously saved partner?')) {
-            return;
+    try {
+        const savedPartner = localStorage.getItem('savedPartner');
+        if (savedPartner) {
+            if (!confirm('Do you want to overwrite the previously saved partner?')) {
+                return;
+            }
         }
+
+        // Save partner and last 10 messages
+        const dataToSave = {
+            partner: currentPartner,
+            messages: chatHistory.slice(-10)
+        };
+
+        localStorage.setItem('savedPartner', JSON.stringify(dataToSave));
+        alert('Partner and recent messages saved successfully!');
+    } catch (error) {
+        console.error('Error saving partner:', error);
+        alert('Could not save partner. Please ensure you are using HTTPS in production.');
     }
-
-    // Save partner and last 10 messages
-    const dataToSave = {
-        partner: currentPartner,
-        messages: chatHistory.slice(-10)
-    };
-
-    localStorage.setItem('savedPartner', JSON.stringify(dataToSave));
-    alert('Partner and recent messages saved successfully!');
 });
 
 // Add interest search filter
@@ -1385,7 +1390,13 @@ var audioContext = null;
 // Initialize audio context on user interaction
 function initAudioContext() {
     if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (error) {
+            console.error('Could not initialize audio context:', error);
+            // Return null to indicate initialization failed
+            return null;
+        }
     }
     return audioContext;
 }
