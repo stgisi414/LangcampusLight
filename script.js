@@ -1378,114 +1378,67 @@ chatMessages.addEventListener('click', async (event) => {
     }
 });
 
-// Webhook configuration with domain restriction
-const ALLOWED_DOMAIN = 'practicefor.fun';
-const WEBHOOK_URL = 'https://api.elevenlabs.io/v1/text-to-speech/add/webhook';
+// Text-to-speech configuration
+const TTS_API_URL = 'https://api.elevenlabs.io/v1/text-to-speech';
+let activeAudioButton = null;
 
-// Function to validate webhook request origin
-function validateWebhookOrigin(url) {
-  try {
-    const webhookDomain = new URL(url).hostname;
-    return webhookDomain === ALLOWED_DOMAIN;
-  } catch (error) {
-    console.error('Invalid URL:', error);
-    return false;
-  }
-}
+// Text selection handler for audio playback
+document.addEventListener('mouseup', () => {
+    const selection = window.getSelection();
+    const selectedText = selection?.toString().trim();
 
-// Text selection and audio button logic
-let audioButton = null;
+    // Remove any existing audio button
+    if (activeAudioButton) {
+        activeAudioButton.remove();
+        activeAudioButton = null;
+    }
 
-// Handle text selection
-document.addEventListener('selectionchange', () => {
-  // Remove existing button
-  if (audioButton) {
-    audioButton.remove();
-    audioButton = null;
-  }
+    // Only proceed if we have a valid text selection
+    if (selectedText && selectedText.length >= 2) {
+        const range = selection?.getRangeAt(0);
+        const rect = range?.getBoundingClientRect();
 
-  const selection = window.getSelection();
-  const text = selection.toString().trim();
+        if (rect) {
+            // Create new audio button
+            const button = document.createElement('button');
+            button.className = 'audio-button';
+            button.innerHTML = '🔊 Play Audio';
+            button.style.position = 'fixed';
+            button.style.left = `${rect.left}px`;
+            button.style.top = `${rect.bottom + 5}px`;
+            button.style.zIndex = '10000';
 
-  // Only show button if we have valid selection
-  if (text && text.length >= 2) {
-    const range = selection.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
+            // Handle click event
+            button.onclick = async () => {
+                button.disabled = true;
+                button.innerHTML = '🔄 Loading...';
 
-    // Create and position button
-    audioButton = document.createElement('button');
-    audioButton.className = 'audio-button';
-    audioButton.innerHTML = '🔊 Play Audio';
-    audioButton.style.position = 'fixed';
-    audioButton.style.left = `${rect.left}px`;  
-    audioButton.style.top = `${rect.bottom + 5}px`;
-    audioButton.style.zIndex = '10000';
+                try {
+                    const audio = new Audio();
+                    audio.src = `${TTS_API_URL}?text=${encodeURIComponent(selectedText)}`;
+                    
+                    await audio.play();
+                    button.innerHTML = '✅ Played';
+                } catch (error) {
+                    console.error('Audio playback failed:', error);
+                    button.innerHTML = '❌ Error';
+                }
 
-    // Add click handler
-    audioButton.onclick = async () => {
-      audioButton.innerHTML = '🔄 Loading...';
-      audioButton.disabled = true;
+                // Remove button after delay
+                setTimeout(() => button.remove(), 2000);
+            };
 
-      try {
-        await handleTextToSpeech(text);
-        audioButton.innerHTML = '✅ Played';
-      } catch (error) {
-        console.error('Audio playback failed:', error);
-        audioButton.innerHTML = '❌ Error';
-      }
-
-      setTimeout(() => {
-        if (audioButton) {
-          audioButton.remove();
-          audioButton = null;
+            // Add button to page and track it
+            document.body.appendChild(button);
+            activeAudioButton = button;
         }
-      }, 2000);
-    };
-
-    document.body.appendChild(audioButton);
-  }
+    }
 });
 
-// Clear button when clicking outside
-document.addEventListener('mousedown', (e) => {
-  if (audioButton && e.target !== audioButton) {
-    audioButton.remove();
-    audioButton = null;
-  }
+// Remove audio button when clicking outside
+document.addEventListener('mousedown', (event) => {
+    if (activeAudioButton && event.target !== activeAudioButton) {
+        activeAudioButton.remove();
+        activeAudioButton = null;
+    }
 });
-
-// Function to handle text-to-speech conversion
-async function handleTextToSpeech(text) {
-  try {
-    const selectedText = window.getSelection().toString();
-    if (selectedText.length < 2) {
-      alert('Please select at least 2 characters of text');
-      return;
-    }
-
-    // Validate request origin
-    if (!validateWebhookOrigin(window.location.href)) {
-      alert('Unauthorized domain');
-      return;
-    }
-
-    // Create audio element
-    const audio = new Audio();
-    audio.src = `${WEBHOOK_URL}?text=${encodeURIComponent(selectedText)}`;
-
-    // Play audio when ready
-    audio.addEventListener('canplaythrough', () => {
-      audio.play();
-    });
-
-    // Error handling
-    audio.addEventListener('error', () => {
-      console.error('Error playing audio');
-      alert('Error playing audio. Please try again.');
-    });
-
-  } catch (error) {
-    console.error('Text-to-speech error:', error);
-    alert('Error processing text-to-speech request');
-  }
-}
