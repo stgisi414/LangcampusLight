@@ -1339,10 +1339,10 @@ document.getElementById('save-partner-btn').addEventListener('click', () => {
             }
         }
 
-        // Save partner and last 10 messages
+        // Save partner and last 50 messages
         const dataToSave = {
             partner: currentPartner,
-            messages: chatHistory.slice(-10)
+            messages: chatHistory.slice(-50)
         };
 
         localStorage.setItem('savedPartner', JSON.stringify(dataToSave));
