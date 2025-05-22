@@ -1666,9 +1666,6 @@ function createAudioButton(text, rect) {
     
     // Create new button
     const button = document.createElement('button');
-    button.className = 'audio-button';
-
-    const button = document.createElement('button');
     button.className = 'audio-button icon-button';
     button.style.position = 'fixed';
     button.style.background = '#3498db';
