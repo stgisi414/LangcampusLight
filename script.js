@@ -1442,11 +1442,25 @@ function createAudioButton(text, rect) {
 
     const button = document.createElement('button');
     button.className = 'audio-button icon-button';
-    button.innerHTML = `
-        <span class="button-icon">🔊</span>
-        <span class="button-text">Play Audio</span>
-    `;
     button.style.position = 'fixed';
+    button.style.background = '#3498db';
+    button.style.color = 'white';
+    button.style.border = 'none';
+    button.style.padding = '4px 12px';
+    button.style.borderRadius = '4px';
+    button.style.cursor = 'pointer';
+    button.style.zIndex = '10000';
+    button.style.fontSize = '14px';
+    button.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+    button.style.transition = 'all 0.2s ease';
+    button.style.display = 'flex';
+    button.style.alignItems = 'center';
+    button.style.gap = '8px';
+    
+    button.innerHTML = `
+        <span class="button-icon" style="font-size: 16px;">🔊</span>
+        <span class="button-text" style="font-weight: 500;">Play Audio</span>
+    `;
     
     // Get chat modal for scroll handling
     const chatModal = document.getElementById('chat-modal');
