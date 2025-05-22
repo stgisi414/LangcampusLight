@@ -1497,7 +1497,7 @@ async function sendWebhookRequest(data) {
     }
 }
 
-const TTS_API_URL = 'https://practicefor.fun/webhook';
+const TTS_API_URL = 'https://langcamp.us/elevenlbs-exchange-audio/exchange-audio';
 var audioContext = null;
 
 // Debug logging
