@@ -1447,8 +1447,17 @@ function createAudioButton(text, rect) {
         <span class="button-text">Play Audio</span>
     `;
     button.style.position = 'fixed';
-    button.style.left = `${rect.left + window.scrollX}px`;
-    button.style.top = `${rect.bottom + window.scrollY + 5}px`;
+    const viewportBottom = window.innerHeight;
+    let left = rect.left + window.scrollX;
+    let top = rect.bottom + window.scrollY + 5;
+    
+    // Keep button within viewport bounds
+    if (top > viewportBottom - 50) {
+        top = rect.top + window.scrollY - 40; // Position above text if near bottom
+    }
+    
+    button.style.left = `${left}px`;
+    button.style.top = `${top}px`;
     button.style.zIndex = '10000';
 
     let isPlaying = false;
