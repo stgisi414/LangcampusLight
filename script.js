@@ -1104,7 +1104,7 @@ Here is the recent chat history (last 10 messages):
 ${history.map(msg => `${msg.sender}: ${msg.text}`).join('\n')}
 
 Respond naturally to the last message in the chat.
-Respond in a friendly, encouraging, and informal chat style. Keep your response relatively short, like a typical chat message (1-3 sentences).
+Respond in a friendly, encouraging, and informal chat style. Keep your response relatively short, like a typical chat message (1-3 sentences), unless directly asked to explain something in detail or to provide a long story or explanation. The max amount of sentences should be 4-7 for special messages.
 
 ${enableCorrections ? `
 IMPORTANT: The user wants corrections. If their last message (sender: 'You') contains grammar or spelling errors in ${partner.nativeLanguage}, provide a brief, friendly correction AFTER your main conversational reply.
