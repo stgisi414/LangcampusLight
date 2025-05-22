@@ -1436,22 +1436,27 @@ function removeExistingAudioButton() {
 
 // Create and position audio button
 function createAudioButton(rect) {
-  removeExistingAudioButton();
-  
   const button = document.createElement('button');
   button.className = 'audio-button';
   button.innerHTML = '🔊 Play Audio';
   
+  // Calculate viewport-relative coordinates
+  const vpLeft = rect.left + window.pageXOffset;
+  const vpTop = rect.bottom + window.pageYOffset;
+
   // Position button below selected text
-  button.style.left = `${window.scrollX + rect.left}px`;
-  button.style.top = `${window.scrollY + rect.bottom + 5}px`;
+  button.style.position = 'absolute';
+  button.style.left = `${vpLeft}px`;
+  button.style.top = `${vpTop + 5}px`;
+  button.style.zIndex = '9999';
   
   return button;
 }
 
 // Check if text contains at least two non-space/punctuation characters
 function isValidSelection(text) {
-  return text.replace(/[\s\p{P}]/gu, '').length >= 2;
+  const nonSpaceChars = text.replace(/[\s\p{P}]/gu, '');
+  return nonSpaceChars.length >= 2;
 }
 
 // Function to handle text-to-speech conversion

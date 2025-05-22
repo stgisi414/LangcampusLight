@@ -31,18 +31,26 @@
 
 
 .audio-button {
-  position: absolute;
+  position: fixed;
   background: #3498db;
   color: white;
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
-  z-index: 1000;
+  z-index: 9999;
   display: flex;
   align-items: center;
   gap: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  pointer-events: auto;
+  transition: all 0.2s ease;
+}
+
+.audio-button:hover {
+  background: #2980b9;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
 }
 
 .audio-button:hover {
