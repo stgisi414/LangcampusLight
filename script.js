@@ -1633,18 +1633,20 @@ document.getElementById('interestSearch').addEventListener('input', () => {
 });
 
 // Event listener for grammar topic links
-document.getElementById('chat-messages')?.addEventListener('click', async (event) => {
-    if (event.target.classList.contains('grammar-topic-link')) {
-        event.preventDefault();
-        const topicTitle = event.target.dataset.topic;
-        const language = currentPartner.nativeLanguage; // Teach in partner's native language
+document.addEventListener('DOMContentLoaded', () => {
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages?.addEventListener('click', async (event) => {
+        if (event.target.classList.contains('grammar-topic-link')) {
+            event.preventDefault();
+            const topicTitle = event.target.dataset.topic;
+            const language = currentPartner.nativeLanguage; // Teach in partner's native language
 
-        // Add a "requesting explanation" message
-        const requestingMsg = document.createElement('p');
-        requestingMsg.innerHTML = `<em>Requesting explanation for "${topicTitle}"...</em>`;
-        requestingMsg.style.fontStyle = 'italic';
-        chatMessages.appendChild(requestingMsg);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+            // Add a "requesting explanation" message
+            const requestingMsg = document.createElement('p');
+            requestingMsg.innerHTML = `<em>Requesting explanation for "${topicTitle}"...</em>`;
+            requestingMsg.style.fontStyle = 'italic';
+            chatMessages.appendChild(requestingMsg);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
 
         try {
             // Find the topic level from grammarData
