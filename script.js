@@ -994,43 +994,7 @@ document.getElementById('message-input')?.addEventListener('keydown', (event) =>
     }
 });
 
-// Text selection handler
-document.addEventListener('mouseup', () => {
-    const selection = window.getSelection();
-    const text = selection?.toString().trim();
-
-    if (text && text.length >= 2) {
-        const range = selection?.getRangeAt(0);
-        const rect = range?.getBoundingClientRect();
-
-        if (rect) {
-            const button = document.createElement('button');
-            button.className = 'audio-button';
-            button.innerHTML = '🔊 Play Audio';
-            button.style.position = 'fixed';
-            button.style.left = `${rect.left}px`;
-            button.style.top = `${rect.bottom + 5}px`;
-            button.style.zIndex = '10000';
-
-            button.onclick = async () => {
-                button.innerHTML = '🔄 Loading...';
-                button.disabled = true;
-
-                try {
-                    await handleTextToSpeech(text);
-                    button.innerHTML = '✅ Played';
-                } catch (error) {
-                    console.error('Audio playback failed:', error);
-                    button.innerHTML = '❌ Error';
-                }
-
-                setTimeout(() => button.remove(), 2000);
-            };
-
-            document.body.appendChild(button);
-        }
-    }
-});
+// Text selection handler - Removed redundant code
 
 // --- Teach Me Modal Logic ---
 const teachMeModal = document.getElementById('teach-me-modal');
