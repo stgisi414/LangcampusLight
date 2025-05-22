@@ -1549,6 +1549,12 @@ async function playAudioFromText(text, button) {
         const detectedLang = detectLanguage(text);
         const voiceId = VOICE_MAPPING[detectedLang] || VOICE_MAPPING.en;
 
+        console.log('Sending TTS request:', {
+            url: TTS_API_URL,
+            text: text,
+            voiceId: voiceId
+        });
+
         const response = await fetch(TTS_API_URL, {
             method: 'POST',
             headers: {
@@ -1563,32 +1569,57 @@ async function playAudioFromText(text, button) {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorText = await response.text();
+            console.error('TTS API Error:', {
+                status: response.status,
+                statusText: response.statusText,
+                errorBody: errorText
+            });
+            throw new Error(`TTS API error: ${response.status} ${response.statusText}`);
         }
 
         const audioBlob = await response.blob();
+        console.log('Received audio blob:', {
+            size: audioBlob.size,
+            type: audioBlob.type
+        });
+
+        if (audioBlob.size === 0) {
+            throw new Error('Received empty audio response');
+        }
+
         const audioUrl = URL.createObjectURL(audioBlob);
         const audio = new Audio(audioUrl);
 
         audio.onerror = (e) => {
             console.error('Audio playback error:', e);
             button.innerHTML = '❌ Error';
-            setTimeout(() => button.remove(), 2000);
+            button.style.display = 'flex';
+            setTimeout(() => button.remove(), 3000);
         };
 
         audio.onended = () => {
             button.innerHTML = '✅ Played';
-            setTimeout(() => button.remove(), 2000);
-            URL.revokeObjectURL(audioUrl);
+            button.style.display = 'flex';
+            setTimeout(() => {
+                URL.revokeObjectURL(audioUrl);
+                button.remove();
+            }, 2000);
         };
 
-        await audio.play();
-        button.innerHTML = '🔊 Playing...';
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            await playPromise;
+            button.innerHTML = '🔊 Playing...';
+            button.style.display = 'flex';
+        }
 
     } catch (error) {
         console.error('Audio playback failed:', error);
+        button.disabled = false;
         button.innerHTML = '❌ Error';
-        setTimeout(() => button.remove(), 2000);
+        button.style.display = 'flex';
+        setTimeout(() => button.remove(), 3000);
     }
 }
 
