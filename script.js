@@ -1743,28 +1743,15 @@ function createAudioButton(text, rect) {
         
         console.log('Audio button clicked');
         
-        if (button.disabled) {
-            console.log('Button is disabled, ignoring click');
+        if (button.disabled || isPlaying) {
+            console.log('Button is disabled or already playing, ignoring click');
             return;
         }
         
+        isPlaying = true;
         button.disabled = true;
         button.innerHTML = '🔄 Loading...';
         
-        try {
-            console.log('Starting audio playback');
-            await playAudioFromText(text, button);
-        } catch (error) {
-            console.error('Audio playback failed:', error);
-            button.innerHTML = '❌ Error - Click to retry';
-            button.disabled = false;
-        }
-        
-        if (isPlaying) {
-            console.error('Already playing state detected - preventing duplicate playback');
-            return;
-        }
-
         try {
             console.log('Attempting to initialize audio context...');
             if (!audioContext) {
