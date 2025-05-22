@@ -1682,10 +1682,13 @@ function createAudioButton(text, rect) {
     button.style.alignItems = 'center';
     button.style.gap = '8px';
     button.style.pointerEvents = 'auto'; // Ensure clicks are registered
+    button.style.userSelect = 'none'; // Prevent text selection
+    button.style.webkitUserSelect = 'none'; // For Safari
+    button.style.msUserSelect = 'none'; // For IE/Edge
     
     button.innerHTML = `
-        <span class="button-icon" style="font-size: 16px;">🔊</span>
-        <span class="button-text" style="font-weight: 500;">Play Audio</span>
+        <span class="button-icon" style="font-size: 16px; pointer-events: none;">🔊</span>
+        <span class="button-text" style="font-weight: 500; pointer-events: none;">Play Audio</span>
     `;
     
     // Get chat modal for scroll handling
