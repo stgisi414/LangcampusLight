@@ -1867,9 +1867,17 @@ function removeAudioButton() {
     if (chatMessages) chatMessages.style.overflow = '';
 }
 
+// Create a debounce function to rate limit selection handling
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
 // Text selection handler for both desktop and mobile
-document.addEventListener('selectionchange', function() {
-    
+document.addEventListener('selectionchange', debounce(function() {
     // Don't show audio button if selection is in input/textarea
     const activeElement = document.activeElement;
     if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') {
@@ -1895,7 +1903,14 @@ document.addEventListener('selectionchange', function() {
         }
 
         createAudioButton(selectedText, rect);
-    } else {
+    }
+    // Don't remove the button immediately on selection change
+}, 300));
+
+// Only remove audio button on specific events
+document.addEventListener('mousedown', (event) => {
+    // Don't remove if clicking the audio button itself
+    if (!event.target.closest('.audio-button')) {
         removeAudioButton();
     }
 });
