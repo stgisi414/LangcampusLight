@@ -1730,8 +1730,12 @@ function createAudioButton(text, rect) {
         try {
             console.log('Starting audio playback');
             isPlaying = true;
+            button.style.opacity = '1';
+            button.style.visibility = 'visible';
+            button.style.display = 'flex';
             button.disabled = true; // Disable button while processing
             button.classList.add('playing');
+            button.style.pointerEvents = 'none'; // Prevent additional clicks
             button.innerHTML = `
                 <span class="button-icon">🔄</span>
                 <span class="button-text">Loading...</span>
@@ -1757,11 +1761,20 @@ function createAudioButton(text, rect) {
             console.error('Audio playback failed:', error);
             button.disabled = false;
             button.classList.remove('playing');
+            button.style.opacity = '1';
+            button.style.visibility = 'visible';
+            button.style.display = 'flex';
+            button.style.pointerEvents = 'auto';
             button.innerHTML = `
                 <span class="button-icon">❌</span>
                 <span class="button-text">Error: ${error.message}</span>
             `;
-            setTimeout(() => button.remove(), 3000);
+            // Keep the error visible longer
+            setTimeout(() => {
+                if (button && button.parentNode) {
+                    button.remove();
+                }
+            }, 5000);
         } finally {
             isPlaying = false;
         }
