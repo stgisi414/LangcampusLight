@@ -809,7 +809,7 @@ const grammarData = {
         { "title": "Using Formal Adverbs (e.g., 未免 wèimiǎn, 何必 hébì, 不禁 bùjīn)", "level": 5, "tags": ["adverbs", "formal language", "nuance"] },
         { "title": "Set Phrases & Chengyu (成语 - Idioms)", "level": 5, "tags": ["vocabulary", "idioms", "chengyu", "culture"] },
         { "title": "Topic-Comment Structures", "level": 5, "tags": ["sentence structure", "topic comment"] },
-        { "title": "Complex Sentence Structures & Clauses", "level": 5"level": 5, "tags": ["sentence structure", "syntax", "clauses"] },
+        { "title": "Complex Sentence Structures & Clauses", "level": 5, "tags": ["sentence structure", "syntax", "clauses"] },
         { "title": "Nuances of Aspect Particles (了 le, 着 zhe, 过 guo)", "level": 5, "tags": ["particles", "aspect", "nuances", "le", "zhe", "guo"] }
     ]
 };
