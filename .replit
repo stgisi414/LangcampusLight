@@ -8,6 +8,7 @@ channel = "stable-23_11"
 [deployment]
 publicDir = "/"
 deploymentTarget = "static"
+run = ["sh", "-c", "python3 -m http.server 5000"]
 
 [workflows]
 runButton = "Run"
