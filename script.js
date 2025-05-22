@@ -1378,28 +1378,78 @@ chatMessages.addEventListener('click', async (event) => {
     }
 });
 
-// Text-to-speech configuration
+// Text-to-speech configuration with retry mechanism
 const TTS_API_URL = 'https://api.elevenlabs.io/v1/text-to-speech';
 let activeAudioButton = null;
+let audioContext = null;
 
-// Text selection handler for audio playback
+// Initialize audio context on user interaction
+function initAudioContext() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioContext;
+}
+
+// Function to play audio with better error handling
+async function playAudioFromText(text, button) {
+    try {
+        initAudioContext();
+        button.disabled = true;
+        button.innerHTML = '🔄 Loading...';
+
+        const response = await fetch(`${TTS_API_URL}?text=${encodeURIComponent(text)}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'audio/*'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+
+        audio.onerror = (e) => {
+            console.error('Audio playback error:', e);
+            button.innerHTML = '❌ Error';
+            setTimeout(() => button.remove(), 2000);
+        };
+
+        audio.onended = () => {
+            button.innerHTML = '✅ Played';
+            setTimeout(() => button.remove(), 2000);
+            URL.revokeObjectURL(audioUrl);
+        };
+
+        await audio.play();
+        button.innerHTML = '🔊 Playing...';
+
+    } catch (error) {
+        console.error('Audio playback failed:', error);
+        button.innerHTML = '❌ Error';
+        setTimeout(() => button.remove(), 2000);
+    }
+}
+
+// Text selection handler
 document.addEventListener('mouseup', () => {
     const selection = window.getSelection();
     const selectedText = selection?.toString().trim();
 
-    // Remove any existing audio button
     if (activeAudioButton) {
         activeAudioButton.remove();
         activeAudioButton = null;
     }
 
-    // Only proceed if we have a valid text selection
     if (selectedText && selectedText.length >= 2) {
         const range = selection?.getRangeAt(0);
         const rect = range?.getBoundingClientRect();
 
         if (rect) {
-            // Create new audio button
             const button = document.createElement('button');
             button.className = 'audio-button';
             button.innerHTML = '🔊 Play Audio';
@@ -1408,27 +1458,8 @@ document.addEventListener('mouseup', () => {
             button.style.top = `${rect.bottom + 5}px`;
             button.style.zIndex = '10000';
 
-            // Handle click event
-            button.onclick = async () => {
-                button.disabled = true;
-                button.innerHTML = '🔄 Loading...';
+            button.onclick = () => playAudioFromText(selectedText, button);
 
-                try {
-                    const audio = new Audio();
-                    audio.src = `${TTS_API_URL}?text=${encodeURIComponent(selectedText)}`;
-                    
-                    await audio.play();
-                    button.innerHTML = '✅ Played';
-                } catch (error) {
-                    console.error('Audio playback failed:', error);
-                    button.innerHTML = '❌ Error';
-                }
-
-                // Remove button after delay
-                setTimeout(() => button.remove(), 2000);
-            };
-
-            // Add button to page and track it
             document.body.appendChild(button);
             activeAudioButton = button;
         }
