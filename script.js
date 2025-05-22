@@ -1767,6 +1767,10 @@ function createAudioButton(text, rect) {
                 audioContext = initAudioContext();
                 console.log('Audio context initialized:', audioContext ? 'success' : 'failed');
             }
+        } catch (error) {
+            console.error('Error initializing audio context:', error);
+            throw error;
+        }
         
         try {
             console.log('Starting audio playback');
