@@ -1477,10 +1477,14 @@ async function sendWebhookRequest(data) {
             encoder.encode(message)
         );
         console.log('Signature generated successfully');
-    
-    const signatureHex = Array.from(new Uint8Array(signature))
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
+        
+        const signatureHex = Array.from(new Uint8Array(signature))
+            .map(b => b.toString(16).padStart(2, '0'))
+            .join('');
+    } catch (error) {
+        console.error('Error creating HMAC signature:', error);
+        throw error;
+    }
 
     try {
         const response = await fetch(WEBHOOK_URL, {
