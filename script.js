@@ -1380,8 +1380,7 @@ document.getElementById('chat-messages')?.addEventListener('click', async (event
 
 // Text-to-speech configuration with retry mechanism
 const TTS_API_URL = 'https://api.elevenlabs.io/v1/text-to-speech';
-let activeAudioButton = null;
-let audioContext = null;
+var audioContext = null;
 
 // Initialize audio context on user interaction
 function initAudioContext() {
@@ -1435,8 +1434,10 @@ async function playAudioFromText(text, button) {
     }
 }
 
+let activeAudioButton = null;
+
 // Text selection handler
-document.addEventListener('mouseup', (event) => {
+document.addEventListener('mouseup', function(event) {
     // Don't show audio button when selecting inside input fields
     if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
         return;
