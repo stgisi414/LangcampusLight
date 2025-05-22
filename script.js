@@ -2118,7 +2118,7 @@ document.addEventListener('selectionchange', debounce(function() {
     const selection = window.getSelection();
     const selectedText = selection?.toString().trim();
 
-    if (selectedText && selectedText.length >= 2) {
+    if (selectedText && selectedText.length >= 2 && selectedText.length <= 200) {
         const range = selection?.getRangeAt(0);
         if (!range) return;
         
@@ -2158,7 +2158,7 @@ document.addEventListener('touchend', function(e) {
         const selection = window.getSelection();
         const selectedText = selection?.toString().trim();
         
-        if (selectedText && selectedText.length >= 2) {
+        if (selectedText && selectedText.length >= 2 && selectedText.length <= 200) {
             const range = selection?.getRangeAt(0);
             if (!range) return;
             
