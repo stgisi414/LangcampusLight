@@ -1635,6 +1635,8 @@ async function playAudioFromText(text, button) {
 
 // Audio button controller 
 function createAudioButton(text, rect) {
+    console.log('Creating audio button for text:', text);
+    
     // Remove any existing audio buttons first
     const existingButtons = document.querySelectorAll('.audio-button');
     existingButtons.forEach(btn => btn.remove());
@@ -1655,6 +1657,7 @@ function createAudioButton(text, rect) {
     button.style.display = 'flex';
     button.style.alignItems = 'center';
     button.style.gap = '8px';
+    button.style.pointerEvents = 'auto'; // Ensure clicks are registered
     
     button.innerHTML = `
         <span class="button-icon" style="font-size: 16px;">🔊</span>
@@ -1702,8 +1705,13 @@ function createAudioButton(text, rect) {
     button.style.zIndex = '10000';
 
     let isPlaying = false;
-    button.onclick = async () => {
-        console.log('Audio button clicked');
+    // Add click event listener with preventDefault
+    button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('Audio button clicked for text:', text);
+        
         if (isPlaying) {
             console.log('Already playing, ignoring click');
             return;
@@ -1712,11 +1720,20 @@ function createAudioButton(text, rect) {
         try {
             console.log('Starting audio playback');
             isPlaying = true;
+            button.disabled = true; // Disable button while processing
             button.classList.add('playing');
             button.innerHTML = `
                 <span class="button-icon">🔄</span>
                 <span class="button-text">Loading...</span>
             `;
+            
+            // Initialize audio context on user interaction
+            if (!audioContext) {
+                audioContext = initAudioContext();
+                if (!audioContext) {
+                    throw new Error('Could not initialize audio context');
+                }
+            }
             
             await playAudioFromText(text, button);
             
@@ -1728,16 +1745,17 @@ function createAudioButton(text, rect) {
             setTimeout(() => button.remove(), 2000);
         } catch (error) {
             console.error('Audio playback failed:', error);
+            button.disabled = false;
             button.classList.remove('playing');
             button.innerHTML = `
                 <span class="button-icon">❌</span>
-                <span class="button-text">Error</span>
+                <span class="button-text">Error: ${error.message}</span>
             `;
-            setTimeout(() => button.remove(), 2000);
+            setTimeout(() => button.remove(), 3000);
         } finally {
             isPlaying = false;
         }
-    };
+    });
 
     document.body.appendChild(button);
     return button;
