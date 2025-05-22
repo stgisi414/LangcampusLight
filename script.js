@@ -1446,6 +1446,54 @@ document.getElementById('chat-messages')?.addEventListener('click', async (event
 });
 
 // Text-to-speech configuration with retry mechanism
+const WEBHOOK_SECRET = 'wsec_01bd5c39d5578c3b569001b062a2532ab49c657fc7af3ca10c4926968cfe46ef';
+const WEBHOOK_URL = 'https://practicefor.fun/webhook';
+
+async function sendWebhookRequest(data) {
+    const timestamp = Date.now().toString();
+    const message = timestamp + JSON.stringify(data);
+    
+    // Create HMAC signature
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(WEBHOOK_SECRET),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+    );
+    const signature = await crypto.subtle.sign(
+        'HMAC',
+        key,
+        encoder.encode(message)
+    );
+    
+    const signatureHex = Array.from(new Uint8Array(signature))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+
+    try {
+        const response = await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Signature': signatureHex,
+                'X-Timestamp': timestamp
+            },
+            body: JSON.stringify(data)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Webhook request failed: ${response.status}`);
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Webhook error:', error);
+        throw error;
+    }
+}
+
 const TTS_API_URL = 'https://api.elevenlabs.io/v1/text-to-speech';
 var audioContext = null;
 
