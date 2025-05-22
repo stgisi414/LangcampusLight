@@ -1550,6 +1550,7 @@ function detectLanguage(text) {
 
 // Function to play audio with better error handling
 async function playAudioFromText(text, button) {
+    console.log('Starting playAudioFromText with text:', text);
     try {
         if (window.location.protocol !== 'https:') {
             throw new Error('Audio functionality requires HTTPS');
@@ -1557,6 +1558,8 @@ async function playAudioFromText(text, button) {
         
         initAudioContext();
         button.disabled = true;
+        button.style.visibility = 'visible';
+        button.style.display = 'flex';
         button.innerHTML = '🔄 Loading...';
 
         const detectedLang = detectLanguage(text);
@@ -1595,6 +1598,7 @@ async function playAudioFromText(text, button) {
             throw new Error(`TTS API error: ${response.status} ${response.statusText}`);
         }
 
+        console.log('API response received, getting blob...');
         const audioBlob = await response.blob();
         console.log('Received audio blob:', {
             size: audioBlob.size,
@@ -1602,6 +1606,7 @@ async function playAudioFromText(text, button) {
         });
 
         if (audioBlob.size === 0) {
+            console.error('Empty audio blob received');
             throw new Error('Received empty audio response');
         }
 
@@ -1633,10 +1638,20 @@ async function playAudioFromText(text, button) {
 
     } catch (error) {
         console.error('Audio playback failed:', error);
-        button.disabled = false;
-        button.innerHTML = '❌ Error';
-        button.style.display = 'flex';
-        setTimeout(() => button.remove(), 3000);
+        if (button && button.parentNode) {
+            button.disabled = false;
+            button.style.visibility = 'visible';
+            button.style.display = 'flex';
+            button.innerHTML = `❌ Error: ${error.message}`;
+            
+            // Add retry functionality instead of removing button
+            setTimeout(() => {
+                if (button && button.parentNode) {
+                    button.innerHTML = '🔊 Try Again';
+                    button.disabled = false;
+                }
+            }, 3000);
+        }
     }
 }
 
