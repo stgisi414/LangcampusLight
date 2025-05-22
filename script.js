@@ -1315,8 +1315,8 @@ document.getElementById('interestSearch').addEventListener('input', () => {
     }
 });
 
-// ... existing code ...
-chatMessages.addEventListener('click', async (event) => {
+// Event listener for grammar topic links
+document.getElementById('chat-messages')?.addEventListener('click', async (event) => {
     if (event.target.classList.contains('grammar-topic-link')) {
         event.preventDefault();
         const topicTitle = event.target.dataset.topic;
@@ -1434,9 +1434,6 @@ async function playAudioFromText(text, button) {
         setTimeout(() => button.remove(), 2000);
     }
 }
-
-// Global variable for audio button
-let activeAudioButton = null;
 
 // Text selection handler
 document.addEventListener('mouseup', (event) => {
