@@ -986,32 +986,41 @@ document.getElementById('send-message').addEventListener('click', async () => { 
     }
 });
 
-// Handle text selection
-document.addEventListener('mouseup', (event) => {
+// Handle text selection inside chat modal
+document.getElementById('chat-modal').addEventListener('mouseup', (event) => {
   removeExistingAudioButton();
   
   const selection = window.getSelection();
   const text = selection.toString().trim();
   
-  if (isValidSelection(text)) {
+  if (text.length >= 2) {
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
+    const modalRect = document.getElementById('chat-modal').getBoundingClientRect();
     
-    const button = createAudioButton(rect);
+    const button = document.createElement('button');
+    button.className = 'audio-button';
+    button.innerHTML = '🔊 Play Audio';
+    
+    // Position relative to modal
+    button.style.position = 'fixed';
+    button.style.left = `${rect.left}px`;
+    button.style.top = `${rect.bottom + 5}px`;
+    button.style.zIndex = '10000';
+    
     button.onclick = async () => {
       button.innerHTML = '🔄 Loading...';
-      button.classList.add('playing');
+      button.disabled = true;
       
       try {
         await handleTextToSpeech(text);
+        button.innerHTML = '✅ Played';
       } catch (error) {
         console.error('Audio playback failed:', error);
         button.innerHTML = '❌ Error';
       }
       
-      setTimeout(() => {
-        button.remove();
-      }, 2000);
+      setTimeout(() => button.remove(), 2000);
     };
     
     document.body.appendChild(button);

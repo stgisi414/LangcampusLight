@@ -38,13 +38,20 @@
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  z-index: 10000;
+  font-size: 14px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  pointer-events: auto;
   transition: all 0.2s ease;
+}
+
+.audio-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.audio-button:not(:disabled):hover {
+  background: #2980b9;
+  transform: translateY(-1px);
 }
 
 .audio-button:hover {
