@@ -253,8 +253,8 @@ footer {
     color: white;
 }
 
-footer a {
-    color: #3498db !important;
+footer p a {
+    color: #3498db;
     text-decoration: none;
     font-weight: normal;
     opacity: 1;
