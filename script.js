@@ -1712,7 +1712,7 @@ function createAudioButton(text, rect) {
     button.style.zIndex = '10000';
 
     let isPlaying = false;
-    button.addEventListener('click', async () => {
+    const clickHandler = async () => {
         console.log('Audio button clicked');
         if (isPlaying) {
             console.log('Already playing, ignoring click');
@@ -1756,7 +1756,17 @@ function createAudioButton(text, rect) {
         }
     };
 
+    button.addEventListener('click', clickHandler);
     document.body.appendChild(button);
+    
+    // Auto-cleanup after 30 seconds if not used
+    setTimeout(() => {
+        if (document.body.contains(button)) {
+            button.removeEventListener('click', clickHandler);
+            button.remove();
+        }
+    }, 30000);
+    
     return button;
 }
 
