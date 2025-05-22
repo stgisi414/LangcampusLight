@@ -43,7 +43,7 @@ async function searchPartners() {
 ]`;
 
         // Create a more formal prompt with clear instructions and the example
-        const prompt = `Please generate a list of four distinct language exchange partner profiles.
+        const prompt = `Please generate a list of six distinct language exchange partner profiles.
 The goal is to find partners for someone who speaks ${nativeLanguage} and wants to learn ${targetLanguage}.
 Therefore, each generated profile should represent a person whose native language is ${targetLanguage} and who wants to learn ${nativeLanguage}.
 
@@ -813,222 +813,222 @@ const grammarData = {
         { "title": "Nuances of Aspect Particles (了 le, 着 zhe, 过 guo)", "level": 5, "tags": ["particles", "aspect", "nuances", "le", "zhe", "guo"] }
     ],
     "Portuguese": [
-    // Beginner (Level 1 - A1 equivalent)
-    { "title": "Alphabet & Pronunciation (Alfabeto e Pronúncia)", "level": 1, "tags": ["basics", "pronunciation", "alphabet"] },
-    { "title": "Definite Articles (Artigos Definidos - o, a, os, as)", "level": 1, "tags": ["basics", "articles", "definite articles", "gender", "number"] },
-    { "title": "Indefinite Articles (Artigos Indefinidos - um, uma, uns, umas)", "level": 1, "tags": ["basics", "articles", "indefinite articles", "gender", "number"] },
-    { "title": "Nouns: Gender & Number (Substantivos: Gênero e Número)", "level": 1, "tags": ["basics", "nouns", "gender", "number"] },
-    { "title": "Subject Pronouns (Pronomes Pessoais do Caso Reto - eu, você/tu, ele/ela, nós, vocês/vós, eles/elas)", "level": 1, "tags": ["basics", "pronouns", "subject pronouns"] },
-    { "title": "Present Tense: Ser (Ser - Presente do Indicativo)", "level": 1, "tags": ["basics", "verbs", "present tense", "ser", "to be"] },
-    { "title": "Present Tense: Estar (Estar - Presente do Indicativo)", "level": 1, "tags": ["basics", "verbs", "present tense", "estar", "to be"] },
-    { "title": "Present Tense: Regular -AR Verbs (Verbos Regulares em -AR)", "level": 1, "tags": ["basics", "verbs", "present tense", "regular verbs", "-ar verbs"] },
-    { "title": "Adjectives: Agreement (Adjetivos: Concordância)", "level": 1, "tags": ["basics", "adjectives", "agreement", "gender", "number"] },
-    { "title": "Basic Negation (Não)", "level": 1, "tags": ["basics", "negation", "não"] },
-    { "title": "Basic Question Formation", "level": 1, "tags": ["basics", "questions"] },
-    { "title": "Numbers 0-100 (Números)", "level": 1, "tags": ["basics", "numbers", "vocabulary"] },
-    { "title": "Telling Time (Dizer as Horas)", "level": 1, "tags": ["basics", "time", "vocabulary"] },
-    { "title": "Days, Months, Seasons (Dias, Meses, Estações)", "level": 1, "tags": ["basics", "time", "vocabulary"] },
-    { "title": "Basic Prepositions (Preposições Essenciais - de, em, a, com, por, para)", "level": 1, "tags": ["basics", "prepositions"] },
-    // Pre-Intermediate (Level 2 - A2 equivalent)
-    { "title": "Present Tense: Regular -ER Verbs (Verbos Regulares em -ER)", "level": 2, "tags": ["verbs", "present tense", "regular verbs", "-er verbs"] },
-    { "title": "Present Tense: Regular -IR Verbs (Verbos Regulares em -IR)", "level": 2, "tags": ["verbs", "present tense", "regular verbs", "-ir verbs"] },
-    { "title": "Contractions of Prepositions with Articles (Contrações de Preposições com Artigos - do, da, no, na, ao, à)", "level": 2, "tags": ["prepositions", "articles", "contractions"] },
-    { "title": "Possessive Adjectives & Pronouns (Adjetivos e Pronomes Possessivos)", "level": 2, "tags": ["adjectives", "pronouns", "possessives"] },
-    { "title": "Demonstrative Pronouns & Adjectives (Pronomes e Adjetivos Demonstrativos - este, esse, aquele)", "level": 2, "tags": ["pronouns", "adjectives", "demonstratives"] },
-    { "title": "Common Irregular Verbs (Present Tense: ter, ir, vir, fazer, dizer, poder, querer, saber)", "level": 2, "tags": ["verbs", "present tense", "irregular verbs"] },
-    { "title": "Pretérito Perfeito (Simple Past Tense)", "level": 2, "tags": ["verbs", "past tense", "pretérito perfeito"] },
-    { "title": "Pretérito Perfeito: Irregular Verbs", "level": 2, "tags": ["verbs", "past tense", "pretérito perfeito", "irregular verbs"] },
-    { "title": "Direct Object Pronouns (Pronomes Oblíquos Átonos - me, te, o, a, nos, vos, os, as)", "level": 2, "tags": ["pronouns", "object pronouns", "direct objects"] },
-    { "title": "Indirect Object Pronouns (Pronomes Oblíquos Átonos - me, te, lhe, nos, vos, lhes)", "level": 2, "tags": ["pronouns", "object pronouns", "indirect objects"] },
-    { "title": "Placement of Object Pronouns (Colocação Pronominal - Próclise, Mesóclise, Ênclise - Basic BP focus)", "level": 2, "tags": ["pronouns", "object pronouns", "syntax", "colocação pronominal"] },
-    { "title": "Reflexive Verbs (Verbos Reflexivos - Present Tense)", "level": 2, "tags": ["verbs", "reflexive", "present tense"] },
-    { "title": "Adverbs of Frequency (Advérbios de Frequência)", "level": 2, "tags": ["adverbs", "frequency"] },
-    { "title": "Expressing 'there is/are': Ter vs. Haver (BP vs. Formal/EP)", "level": 2, "tags": ["verbs", "existence", "ter", "haver"] },
-    { "title": "Using 'Gostar de' (To like)", "level": 2, "tags": ["verbs", "expressions", "gostar de"] },
-    // Intermediate (Level 3 - B1 equivalent)
-    { "title": "Pretérito Imperfeito (Imperfect Past Tense)", "level": 3, "tags": ["verbs", "past tense", "pretérito imperfeito"] },
-    { "title": "Pretérito Perfeito vs. Pretérito Imperfeito", "level": 3, "tags": ["verbs", "past tense", "usage", "pretérito perfeito", "pretérito imperfeito"] },
-    { "title": "Futuro do Presente (Simple Future Tense)", "level": 3, "tags": ["verbs", "future tense", "futuro do presente"] },
-    { "title": "Futuro Imediato (ir + Infinitivo - Immediate Future)", "level": 3, "tags": ["verbs", "future tense", "ir + infinitive"] },
-    { "title": "Condicional Simples / Futuro do Pretérito (Conditional)", "level": 3, "tags": ["verbs", "conditional", "futuro do pretérito", "mood"] },
-    { "title": "Reflexive Verbs (Pretérito Perfeito)", "level": 3, "tags": ["verbs", "reflexive", "past tense"] },
-    { "title": "Combined Object Pronouns (Combinação de Pronomes Oblíquos)", "level": 3, "tags": ["pronouns", "object pronouns", "combined pronouns"] },
-    { "title": "Comparatives & Superlatives (Comparativos e Superlativos)", "level": 3, "tags": ["adjectives", "adverbs", "comparisons", "superlatives"] },
-    { "title": "Relative Pronouns (Pronomes Relativos - que, quem, onde, cujo)", "level": 3, "tags": ["pronouns", "relative clauses"] },
-    { "title": "Present Subjunctive (Presente do Subjuntivo - Formation)", "level": 3, "tags": ["verbs", "subjunctive", "presente do subjuntivo", "mood"] },
-    { "title": "Uses of Present Subjunctive (Opinions, Desires, Doubts)", "level": 3, "tags": ["verbs", "subjunctive", "presente do subjuntivo", "usage"] },
-    { "title": "Impersonal 'se' (Partícula Apassivadora/Índice de Indeterminação do Sujeito)", "level": 3, "tags": ["verbs", "impersonal", "passive voice", "se"] },
-    { "title": "Passive Voice with 'ser' (Voz Passiva Analítica com 'ser')", "level": 3, "tags": ["verbs", "passive voice", "ser"] },
-    { "title": "Gerund (Gerúndio - -ando, -endo, -indo) & Progressive Constructions (estar + gerúndio)", "level": 3, "tags": ["verbs", "progressive", "gerund", "estar"] },
-    // Upper-Intermediate (Level 4 - B2 equivalent)
-    { "title": "Pretérito Mais-que-Perfeito Composto (Past Perfect / Pluperfect)", "level": 4, "tags": ["verbs", "past tense", "perfect tenses", "pretérito mais-que-perfeito"] },
-    { "title": "Futuro Composto (Future Perfect)", "level": 4, "tags": ["verbs", "future tense", "perfect tenses", "futuro composto"] },
-    { "title": "Condicional Composto (Conditional Perfect / Futuro do Pretérito Composto)", "level": 4, "tags": ["verbs", "conditional", "past tense", "perfect tenses", "condicional composto", "mood"] },
-    { "title": "Imperfect Subjunctive (Imperfeito do Subjuntivo)", "level": 4, "tags": ["verbs", "subjunctive", "past tense", "imperfeito do subjuntivo", "mood"] },
-    { "title": "Future Subjunctive (Futuro do Subjuntivo)", "level": 4, "tags": ["verbs", "subjunctive", "future tense", "futuro do subjuntivo", "mood"] },
-    { "title": "Personal Infinitive (Infinitivo Pessoal)", "level": 4, "tags": ["verbs", "infinitive", "personal infinitive"] },
-    { "title": "Hypothetical Sentences / Si Clauses (Orações Condicionais)", "level": 4, "tags": ["conditionals", "if clauses", "subjunctive", "indicative"] },
-    { "title": "Sequence of Tenses (Correlação Verbal)", "level": 4, "tags": ["syntax", "sequence of tenses", "indicative", "subjunctive"] },
-    { "title": "Discourse Markers (Conectivos Discursivos Avançados)", "level": 4, "tags": ["conjunctions", "linking words", "discourse markers"] },
-    { "title": "Reported Speech (Discurso Indireto)", "level": 4, "tags": ["reported speech", "syntax"] },
-    { "title": "Crases (Uso da Crase - a + a(s))", "level": 4, "tags": ["prepositions", "articles", "crase"] },
-    // Advanced (Level 5 - C1/C2 equivalent)
-    { "title": "Pretérito Mais-que-Perfeito Simples (Simple Pluperfect - Literary)", "level": 5, "tags": ["verbs", "past tense", "pretérito mais-que-perfeito simples", "literary"] },
-    { "title": "Advanced Uses of Subjunctive (Concessive, Purpose, etc.)", "level": 5, "tags": ["verbs", "subjunctive", "nuances", "advanced"] },
-    { "title": "Subjunctive in Independent Clauses (Optative, Dubitative)", "level": 5, "tags": ["verbs", "subjunctive", "independent clauses", "wishes"] },
-    { "title": "Participle Clauses (Orações Reduzidas de Particípio)", "level": 5, "tags": ["verbs", "participle", "clauses"] },
-    { "title": "Gerund Clauses (Orações Reduzidas de Gerúndio)", "level": 5, "tags": ["verbs", "gerund", "clauses"] },
-    { "title": "Infinitive Clauses (Orações Reduzidas de Infinitivo)", "level": 5, "tags": ["verbs", "infinitive", "clauses"] },
-    { "title": "Figurative Language & Idioms (Linguagem Figurada e Expressões Idiomáticas)", "level": 5, "tags": ["vocabulary", "idioms", "figurative language"] },
-    { "title": "Formal vs. Informal Registers (Registros Formais e Informais)", "level": 5, "tags": ["style", "register", "formal language", "informal language"] },
-    { "title": "Colocação Pronominal (Advanced - EP vs BP differences, literary uses)", "level": 5, "tags": ["pronouns", "syntax", "colocação pronominal", "european portuguese", "brazilian portuguese"] },
-    { "title": "Nominalization (Nominalização)", "level": 5, "tags": ["syntax", "nominalization", "word formation"] },
-    { "title": "Differences between European & Brazilian Portuguese (Principais Diferenças PT-BR / PT-PT)", "level": 5, "tags": ["dialects", "european portuguese", "brazilian portuguese", "syntax", "vocabulary"] }
-  ],
+        // Beginner (Level 1 - A1 equivalent)
+        { "title": "Alphabet & Pronunciation (Alfabeto e Pronúncia)", "level": 1, "tags": ["basics", "pronunciation", "alphabet"] },
+        { "title": "Definite Articles (Artigos Definidos - o, a, os, as)", "level": 1, "tags": ["basics", "articles", "definite articles", "gender", "number"] },
+        { "title": "Indefinite Articles (Artigos Indefinidos - um, uma, uns, umas)", "level": 1, "tags": ["basics", "articles", "indefinite articles", "gender", "number"] },
+        { "title": "Nouns: Gender & Number (Substantivos: Gênero e Número)", "level": 1, "tags": ["basics", "nouns", "gender", "number"] },
+        { "title": "Subject Pronouns (Pronomes Pessoais do Caso Reto - eu, você/tu, ele/ela, nós, vocês/vós, eles/elas)", "level": 1, "tags": ["basics", "pronouns", "subject pronouns"] },
+        { "title": "Present Tense: Ser (Ser - Presente do Indicativo)", "level": 1, "tags": ["basics", "verbs", "present tense", "ser", "to be"] },
+        { "title": "Present Tense: Estar (Estar - Presente do Indicativo)", "level": 1, "tags": ["basics", "verbs", "present tense", "estar", "to be"] },
+        { "title": "Present Tense: Regular -AR Verbs (Verbos Regulares em -AR)", "level": 1, "tags": ["basics", "verbs", "present tense", "regular verbs", "-ar verbs"] },
+        { "title": "Adjectives: Agreement (Adjetivos: Concordância)", "level": 1, "tags": ["basics", "adjectives", "agreement", "gender", "number"] },
+        { "title": "Basic Negation (Não)", "level": 1, "tags": ["basics", "negation", "não"] },
+        { "title": "Basic Question Formation", "level": 1, "tags": ["basics", "questions"] },
+        { "title": "Numbers 0-100 (Números)", "level": 1, "tags": ["basics", "numbers", "vocabulary"] },
+        { "title": "Telling Time (Dizer as Horas)", "level": 1, "tags": ["basics", "time", "vocabulary"] },
+        { "title": "Days, Months, Seasons (Dias, Meses, Estações)", "level": 1, "tags": ["basics", "time", "vocabulary"] },
+        { "title": "Basic Prepositions (Preposições Essenciais - de, em, a, com, por, para)", "level": 1, "tags": ["basics", "prepositions"] },
+        // Pre-Intermediate (Level 2 - A2 equivalent)
+        { "title": "Present Tense: Regular -ER Verbs (Verbos Regulares em -ER)", "level": 2, "tags": ["verbs", "present tense", "regular verbs", "-er verbs"] },
+        { "title": "Present Tense: Regular -IR Verbs (Verbos Regulares em -IR)", "level": 2, "tags": ["verbs", "present tense", "regular verbs", "-ir verbs"] },
+        { "title": "Contractions of Prepositions with Articles (Contrações de Preposições com Artigos - do, da, no, na, ao, à)", "level": 2, "tags": ["prepositions", "articles", "contractions"] },
+        { "title": "Possessive Adjectives & Pronouns (Adjetivos e Pronomes Possessivos)", "level": 2, "tags": ["adjectives", "pronouns", "possessives"] },
+        { "title": "Demonstrative Pronouns & Adjectives (Pronomes e Adjetivos Demonstrativos - este, esse, aquele)", "level": 2, "tags": ["pronouns", "adjectives", "demonstratives"] },
+        { "title": "Common Irregular Verbs (Present Tense: ter, ir, vir, fazer, dizer, poder, querer, saber)", "level": 2, "tags": ["verbs", "present tense", "irregular verbs"] },
+        { "title": "Pretérito Perfeito (Simple Past Tense)", "level": 2, "tags": ["verbs", "past tense", "pretérito perfeito"] },
+        { "title": "Pretérito Perfeito: Irregular Verbs", "level": 2, "tags": ["verbs", "past tense", "pretérito perfeito", "irregular verbs"] },
+        { "title": "Direct Object Pronouns (Pronomes Oblíquos Átonos - me, te, o, a, nos, vos, os, as)", "level": 2, "tags": ["pronouns", "object pronouns", "direct objects"] },
+        { "title": "Indirect Object Pronouns (Pronomes Oblíquos Átonos - me, te, lhe, nos, vos, lhes)", "level": 2, "tags": ["pronouns", "object pronouns", "indirect objects"] },
+        { "title": "Placement of Object Pronouns (Colocação Pronominal - Próclise, Mesóclise, Ênclise - Basic BP focus)", "level": 2, "tags": ["pronouns", "object pronouns", "syntax", "colocação pronominal"] },
+        { "title": "Reflexive Verbs (Verbos Reflexivos - Present Tense)", "level": 2, "tags": ["verbs", "reflexive", "present tense"] },
+        { "title": "Adverbs of Frequency (Advérbios de Frequência)", "level": 2, "tags": ["adverbs", "frequency"] },
+        { "title": "Expressing 'there is/are': Ter vs. Haver (BP vs. Formal/EP)", "level": 2, "tags": ["verbs", "existence", "ter", "haver"] },
+        { "title": "Using 'Gostar de' (To like)", "level": 2, "tags": ["verbs", "expressions", "gostar de"] },
+        // Intermediate (Level 3 - B1 equivalent)
+        { "title": "Pretérito Imperfeito (Imperfect Past Tense)", "level": 3, "tags": ["verbs", "past tense", "pretérito imperfeito"] },
+        { "title": "Pretérito Perfeito vs. Pretérito Imperfeito", "level": 3, "tags": ["verbs", "past tense", "usage", "pretérito perfeito", "pretérito imperfeito"] },
+        { "title": "Futuro do Presente (Simple Future Tense)", "level": 3, "tags": ["verbs", "future tense", "futuro do presente"] },
+        { "title": "Futuro Imediato (ir + Infinitivo - Immediate Future)", "level": 3, "tags": ["verbs", "future tense", "ir + infinitive"] },
+        { "title": "Condicional Simples / Futuro do Pretérito (Conditional)", "level": 3, "tags": ["verbs", "conditional", "futuro do pretérito", "mood"] },
+        { "title": "Reflexive Verbs (Pretérito Perfeito)", "level": 3, "tags": ["verbs", "reflexive", "past tense"] },
+        { "title": "Combined Object Pronouns (Combinação de Pronomes Oblíquos)", "level": 3, "tags": ["pronouns", "object pronouns", "combined pronouns"] },
+        { "title": "Comparatives & Superlatives (Comparativos e Superlativos)", "level": 3, "tags": ["adjectives", "adverbs", "comparisons", "superlatives"] },
+        { "title": "Relative Pronouns (Pronomes Relativos - que, quem, onde, cujo)", "level": 3, "tags": ["pronouns", "relative clauses"] },
+        { "title": "Present Subjunctive (Presente do Subjuntivo - Formation)", "level": 3, "tags": ["verbs", "subjunctive", "presente do subjuntivo", "mood"] },
+        { "title": "Uses of Present Subjunctive (Opinions, Desires, Doubts)", "level": 3, "tags": ["verbs", "subjunctive", "presente do subjuntivo", "usage"] },
+        { "title": "Impersonal 'se' (Partícula Apassivadora/Índice de Indeterminação do Sujeito)", "level": 3, "tags": ["verbs", "impersonal", "passive voice", "se"] },
+        { "title": "Passive Voice with 'ser' (Voz Passiva Analítica com 'ser')", "level": 3, "tags": ["verbs", "passive voice", "ser"] },
+        { "title": "Gerund (Gerúndio - -ando, -endo, -indo) & Progressive Constructions (estar + gerúndio)", "level": 3, "tags": ["verbs", "progressive", "gerund", "estar"] },
+        // Upper-Intermediate (Level 4 - B2 equivalent)
+        { "title": "Pretérito Mais-que-Perfeito Composto (Past Perfect / Pluperfect)", "level": 4, "tags": ["verbs", "past tense", "perfect tenses", "pretérito mais-que-perfeito"] },
+        { "title": "Futuro Composto (Future Perfect)", "level": 4, "tags": ["verbs", "future tense", "perfect tenses", "futuro composto"] },
+        { "title": "Condicional Composto (Conditional Perfect / Futuro do Pretérito Composto)", "level": 4, "tags": ["verbs", "conditional", "past tense", "perfect tenses", "condicional composto", "mood"] },
+        { "title": "Imperfect Subjunctive (Imperfeito do Subjuntivo)", "level": 4, "tags": ["verbs", "subjunctive", "past tense", "imperfeito do subjuntivo", "mood"] },
+        { "title": "Future Subjunctive (Futuro do Subjuntivo)", "level": 4, "tags": ["verbs", "subjunctive", "future tense", "futuro do subjuntivo", "mood"] },
+        { "title": "Personal Infinitive (Infinitivo Pessoal)", "level": 4, "tags": ["verbs", "infinitive", "personal infinitive"] },
+        { "title": "Hypothetical Sentences / Si Clauses (Orações Condicionais)", "level": 4, "tags": ["conditionals", "if clauses", "subjunctive", "indicative"] },
+        { "title": "Sequence of Tenses (Correlação Verbal)", "level": 4, "tags": ["syntax", "sequence of tenses", "indicative", "subjunctive"] },
+        { "title": "Discourse Markers (Conectivos Discursivos Avançados)", "level": 4, "tags": ["conjunctions", "linking words", "discourse markers"] },
+        { "title": "Reported Speech (Discurso Indireto)", "level": 4, "tags": ["reported speech", "syntax"] },
+        { "title": "Crases (Uso da Crase - a + a(s))", "level": 4, "tags": ["prepositions", "articles", "crase"] },
+        // Advanced (Level 5 - C1/C2 equivalent)
+        { "title": "Pretérito Mais-que-Perfeito Simples (Simple Pluperfect - Literary)", "level": 5, "tags": ["verbs", "past tense", "pretérito mais-que-perfeito simples", "literary"] },
+        { "title": "Advanced Uses of Subjunctive (Concessive, Purpose, etc.)", "level": 5, "tags": ["verbs", "subjunctive", "nuances", "advanced"] },
+        { "title": "Subjunctive in Independent Clauses (Optative, Dubitative)", "level": 5, "tags": ["verbs", "subjunctive", "independent clauses", "wishes"] },
+        { "title": "Participle Clauses (Orações Reduzidas de Particípio)", "level": 5, "tags": ["verbs", "participle", "clauses"] },
+        { "title": "Gerund Clauses (Orações Reduzidas de Gerúndio)", "level": 5, "tags": ["verbs", "gerund", "clauses"] },
+        { "title": "Infinitive Clauses (Orações Reduzidas de Infinitivo)", "level": 5, "tags": ["verbs", "infinitive", "clauses"] },
+        { "title": "Figurative Language & Idioms (Linguagem Figurada e Expressões Idiomáticas)", "level": 5, "tags": ["vocabulary", "idioms", "figurative language"] },
+        { "title": "Formal vs. Informal Registers (Registros Formais e Informais)", "level": 5, "tags": ["style", "register", "formal language", "informal language"] },
+        { "title": "Colocação Pronominal (Advanced - EP vs BP differences, literary uses)", "level": 5, "tags": ["pronouns", "syntax", "colocação pronominal", "european portuguese", "brazilian portuguese"] },
+        { "title": "Nominalization (Nominalização)", "level": 5, "tags": ["syntax", "nominalization", "word formation"] },
+        { "title": "Differences between European & Brazilian Portuguese (Principais Diferenças PT-BR / PT-PT)", "level": 5, "tags": ["dialects", "european portuguese", "brazilian portuguese", "syntax", "vocabulary"] }
+    ],
     "Vietnamese": [
-    // Beginner (Level 1)
-    { "title": "Vietnamese Alphabet & Pronunciation (Bảng chữ cái và Phát âm)", "level": 1, "tags": ["basics", "pronunciation", "alphabet"] },
-    { "title": "The Six Tones (Sáu thanh điệu)", "level": 1, "tags": ["basics", "pronunciation", "tones"] },
-    { "title": "Basic Greetings & Introductions (Chào hỏi và Giới thiệu Cơ bản)", "level": 1, "tags": ["basics", "phrases", "vocabulary"] },
-    { "title": "Personal Pronouns (Đại từ Nhân xưng - tôi, bạn, anh, chị, em, nó, chúng tôi, chúng ta, etc.)", "level": 1, "tags": ["basics", "pronouns", "kinship terms"] },
-    { "title": "Basic Sentence Structure (SVO - Chủ ngữ + Vị ngữ + Tân ngữ)", "level": 1, "tags": ["basics", "sentence structure"] },
-    { "title": "Using 'là' (to be - identification)", "level": 1, "tags": ["basics", "verbs", "to be", "là"] },
-    { "title": "Using 'ở' (to be at a place, to live)", "level": 1, "tags": ["basics", "verbs", "location", "ở"] },
-    { "title": "Using 'có' (to have, there is/are)", "level": 1, "tags": ["basics", "verbs", "possession", "existence", "có"] },
-    { "title": "Negation with 'không' (not)", "level": 1, "tags": ["basics", "negation", "không"] },
-    { "title": "Forming Yes/No Questions (Câu hỏi Có/Không - with 'không' at the end)", "level": 1, "tags": ["basics", "questions"] },
-    { "title": "Question Words (Từ để hỏi - ai, cái gì, ở đâu, khi nào, tại sao, như thế nào)", "level": 1, "tags": ["basics", "questions", "question words"] },
-    { "title": "Numbers 0-100 (Số đếm)", "level": 1, "tags": ["basics", "numbers", "vocabulary"] },
-    { "title": "Telling Time (Nói giờ)", "level": 1, "tags": ["basics", "time", "vocabulary"] },
-    { "title": "Days of the Week, Months (Ngày trong tuần, Tháng)", "level": 1, "tags": ["basics", "time", "vocabulary"] },
-    { "title": "Basic Classifiers (Từ loại chung - cái, con, người)", "level": 1, "tags": ["basics", "nouns", "classifiers"] },
-    { "title": "Using 'và' (and - for nouns)", "level": 1, "tags": ["basics", "conjunctions", "và"] },
-    // Pre-Intermediate (Level 2)
-    { "title": "Adjectives & Position (Tính từ và Vị trí)", "level": 2, "tags": ["adjectives", "syntax"] },
-    { "title": "Making Comparisons (So sánh - hơn, nhất, bằng)", "level": 2, "tags": ["comparisons", "adjectives", "hơn", "nhất"] },
-    { "title": "Using 'rất' (very) with Adjectives", "level": 2, "tags": ["adverbs", "degree", "rất"] },
-    { "title": "Demonstratives (Đại từ chỉ định - này, đó, kia)", "level": 2, "tags": ["demonstratives", "pronouns"] },
-    { "title": "Expressing 'want': 'muốn'", "level": 2, "tags": ["verbs", "desire", "muốn"] },
-    { "title": "Expressing ability: 'có thể'", "level": 2, "tags": ["verbs", "ability", "có thể"] },
-    { "title": "Past Tense Marker 'đã'", "level": 2, "tags": ["verbs", "tense", "past tense", "đã"] },
-    { "title": "Future Tense Marker 'sẽ'", "level": 2, "tags": ["verbs", "tense", "future tense", "sẽ"] },
-    { "title": "Present Progressive Marker 'đang'", "level": 2, "tags": ["verbs", "tense", "progressive", "đang"] },
-    { "title": "Using 'của' (possessive particle)", "level": 2, "tags": ["particles", "possessive", "của"] },
-    { "title": "More Classifiers (cuốn, bức, tờ, etc.)", "level": 2, "tags": ["nouns", "classifiers"] },
-    { "title": "Prepositions of Location (Giới từ chỉ địa điểm - trên, dưới, trong, ngoài, trước, sau, giữa)", "level": 2, "tags": ["prepositions", "location"] },
-    { "title": "Connecting Verbs with 'và' (and), 'rồi' (then)", "level": 2, "tags": ["conjunctions", "linking verbs", "và", "rồi"] },
-    { "title": "Expressing 'also': 'cũng'", "level": 2, "tags": ["adverbs", "also", "cũng"] },
-    { "title": "Expressing 'only': 'chỉ'", "level": 2, "tags": ["adverbs", "restriction", "chỉ"] },
-    // Intermediate (Level 3)
-    { "title": "Using 'nên' (should, so)", "level": 3, "tags": ["verbs", "modals", "advice", "conjunctions", "nên"] },
-    { "title": "Using 'phải' (must, have to)", "level": 3, "tags": ["verbs", "modals", "obligation", "phải"] },
-    { "title": "Expressing 'because': 'vì / bởi vì'", "level": 3, "tags": ["conjunctions", "reason", "vì"] },
-    { "title": "Expressing 'although': 'mặc dù / dù'", "level": 3, "tags": ["conjunctions", "concession", "mặc dù"] },
-    { "title": "Expressing 'if...then...': 'nếu...thì...'", "level": 3, "tags": ["conditionals", "if clauses", "nếu", "thì"] },
-    { "title": "Aspect Particle 'xong' (finish doing)", "level": 3, "tags": ["particles", "aspect", "completion", "xong"] },
-    { "title": "Using 'được' (to get, can, be okay)", "level": 3, "tags": ["verbs", "particles", "ability", "permission", "được"] },
-    { "title": "Using 'bị' (passive, negative connotation)", "level": 3, "tags": ["verbs", "passive voice", "negative connotation", "bị"] },
-    { "title": "Using 'cho' (to give, for)", "level": 3, "tags": ["verbs", "prepositions", "benefactive", "cho"] },
-    { "title": "Reduplication of Adjectives & Verbs (Từ láy)", "level": 3, "tags": ["adjectives", "verbs", "reduplication", "emphasis"] },
-    { "title": "Relative Clauses (Mệnh đề quan hệ - using 'mà')", "level": 3, "tags": ["relative clauses", "mà"] },
-    { "title": "Expressing 'how long': 'bao lâu'", "level": 3, "tags": ["questions", "duration", "bao lâu"] },
-    { "title": "Expressing 'how much/many': 'bao nhiêu'", "level": 3, "tags": ["questions", "quantity", "bao nhiêu"] },
-    { "title": "Particles for emphasis and mood (nhé, nhé, đi, thôi, ạ)", "level": 3, "tags": ["particles", "pragmatics", "mood", "politeness"] },
-    // Upper-Intermediate (Level 4)
-    { "title": "Using 'còn' (still, remaining, as for)", "level": 4, "tags": ["particles", "adverbs", "contrast", "còn"] },
-    { "title": "Using 'hết' (all gone, to finish)", "level": 4, "tags": ["verbs", "particles", "completion", "hết"] },
-    { "title": "Using 'mới' (only then, just)", "level": 4, "tags": ["particles", "adverbs", "temporal", "mới"] },
-    { "title": "Using 'lại' (again, on the contrary)", "level": 4, "tags": ["particles", "adverbs", "repetition", "contrast", "lại"] },
-    { "title": "Passive constructions with 'được' and 'bị'", "level": 4, "tags": ["verbs", "passive voice", "được", "bị", "nuances"] },
-    { "title": "Causative constructions: 'làm cho', 'khiến'", "level": 4, "tags": ["verbs", "causative", "làm cho", "khiến"] },
-    { "title": "Expressing 'ever since': 'từ khi'", "level": 4, "tags": ["conjunctions", "time", "từ khi"] },
-    { "title": "Expressing 'as soon as': 'vừa mới...thì / ngay khi'", "level": 4, "tags": ["conjunctions", "time", "immediacy"] },
-    { "title": "Expressing 'not only... but also': 'không những/chỉ...mà còn...'", "level": 4, "tags": ["conjunctions", "addition"] },
-    { "title": "Complex sentences with multiple clauses", "level": 4, "tags": ["syntax", "clauses"] },
-    { "title": "Nuances of different question words and structures", "level": 4, "tags": ["questions", "nuances"] },
-    { "title": "Formal vs. Informal Language (Ngôn ngữ trang trọng và thân mật)", "level": 4, "tags": ["style", "register", "politeness"] },
-    // Advanced (Level 5)
-    { "title": "Advanced use of particles (thì, là, mà - for focus and contrast)", "level": 5, "tags": ["particles", "focus", "contrast", "pragmatics"] },
-    { "title": "Complex conditional sentences (Giá mà, giả sử)", "level": 5, "tags": ["conditionals", "subjunctive mood", "hypothetical"] },
-    { "title": "Literary and idiomatic expressions (Thành ngữ, Tục ngữ)", "level": 5, "tags": ["vocabulary", "idioms", "literature"] },
-    { "title": "Nuances of Tense and Aspect (Sự khác biệt tinh tế về Thì và Thể)", "level": 5, "tags": ["tense", "aspect", "nuances"] },
-    { "title": "Sino-Vietnamese vocabulary (Từ Hán Việt)", "level": 5, "tags": ["vocabulary", "etymology", "sino-vietnamese"] },
-    { "title": "Rhetorical devices in Vietnamese (Biện pháp tu từ)", "level": 5, "tags": ["style", "rhetoric"] },
-    { "title": "Understanding different regional dialects (Phương ngữ)", "level": 5, "tags": ["dialects", "sociolinguistics"] },
-    { "title": "Advanced classifiers and their connotations", "level": 5, "tags": ["nouns", "classifiers", "connotations"] },
-    { "title": "Discourse markers and cohesion in extended texts (Phương tiện liên kết)", "level": 5, "tags": ["discourse markers", "linking words", "cohesion"] }
-  ],
+        // Beginner (Level 1)
+        { "title": "Vietnamese Alphabet & Pronunciation (Bảng chữ cái và Phát âm)", "level": 1, "tags": ["basics", "pronunciation", "alphabet"] },
+        { "title": "The Six Tones (Sáu thanh điệu)", "level": 1, "tags": ["basics", "pronunciation", "tones"] },
+        { "title": "Basic Greetings & Introductions (Chào hỏi và Giới thiệu Cơ bản)", "level": 1, "tags": ["basics", "phrases", "vocabulary"] },
+        { "title": "Personal Pronouns (Đại từ Nhân xưng - tôi, bạn, anh, chị, em, nó, chúng tôi, chúng ta, etc.)", "level": 1, "tags": ["basics", "pronouns", "kinship terms"] },
+        { "title": "Basic Sentence Structure (SVO - Chủ ngữ + Vị ngữ + Tân ngữ)", "level": 1, "tags": ["basics", "sentence structure"] },
+        { "title": "Using 'là' (to be - identification)", "level": 1, "tags": ["basics", "verbs", "to be", "là"] },
+        { "title": "Using 'ở' (to be at a place, to live)", "level": 1, "tags": ["basics", "verbs", "location", "ở"] },
+        { "title": "Using 'có' (to have, there is/are)", "level": 1, "tags": ["basics", "verbs", "possession", "existence", "có"] },
+        { "title": "Negation with 'không' (not)", "level": 1, "tags": ["basics", "negation", "không"] },
+        { "title": "Forming Yes/No Questions (Câu hỏi Có/Không - with 'không' at the end)", "level": 1, "tags": ["basics", "questions"] },
+        { "title": "Question Words (Từ để hỏi - ai, cái gì, ở đâu, khi nào, tại sao, như thế nào)", "level": 1, "tags": ["basics", "questions", "question words"] },
+        { "title": "Numbers 0-100 (Số đếm)", "level": 1, "tags": ["basics", "numbers", "vocabulary"] },
+        { "title": "Telling Time (Nói giờ)", "level": 1, "tags": ["basics", "time", "vocabulary"] },
+        { "title": "Days of the Week, Months (Ngày trong tuần, Tháng)", "level": 1, "tags": ["basics", "time", "vocabulary"] },
+        { "title": "Basic Classifiers (Từ loại chung - cái, con, người)", "level": 1, "tags": ["basics", "nouns", "classifiers"] },
+        { "title": "Using 'và' (and - for nouns)", "level": 1, "tags": ["basics", "conjunctions", "và"] },
+        // Pre-Intermediate (Level 2)
+        { "title": "Adjectives & Position (Tính từ và Vị trí)", "level": 2, "tags": ["adjectives", "syntax"] },
+        { "title": "Making Comparisons (So sánh - hơn, nhất, bằng)", "level": 2, "tags": ["comparisons", "adjectives", "hơn", "nhất"] },
+        { "title": "Using 'rất' (very) with Adjectives", "level": 2, "tags": ["adverbs", "degree", "rất"] },
+        { "title": "Demonstratives (Đại từ chỉ định - này, đó, kia)", "level": 2, "tags": ["demonstratives", "pronouns"] },
+        { "title": "Expressing 'want': 'muốn'", "level": 2, "tags": ["verbs", "desire", "muốn"] },
+        { "title": "Expressing ability: 'có thể'", "level": 2, "tags": ["verbs", "ability", "có thể"] },
+        { "title": "Past Tense Marker 'đã'", "level": 2, "tags": ["verbs", "tense", "past tense", "đã"] },
+        { "title": "Future Tense Marker 'sẽ'", "level": 2, "tags": ["verbs", "tense", "future tense", "sẽ"] },
+        { "title": "Present Progressive Marker 'đang'", "level": 2, "tags": ["verbs", "tense", "progressive", "đang"] },
+        { "title": "Using 'của' (possessive particle)", "level": 2, "tags": ["particles", "possessive", "của"] },
+        { "title": "More Classifiers (cuốn, bức, tờ, etc.)", "level": 2, "tags": ["nouns", "classifiers"] },
+        { "title": "Prepositions of Location (Giới từ chỉ địa điểm - trên, dưới, trong, ngoài, trước, sau, giữa)", "level": 2, "tags": ["prepositions", "location"] },
+        { "title": "Connecting Verbs with 'và' (and), 'rồi' (then)", "level": 2, "tags": ["conjunctions", "linking verbs", "và", "rồi"] },
+        { "title": "Expressing 'also': 'cũng'", "level": 2, "tags": ["adverbs", "also", "cũng"] },
+        { "title": "Expressing 'only': 'chỉ'", "level": 2, "tags": ["adverbs", "restriction", "chỉ"] },
+        // Intermediate (Level 3)
+        { "title": "Using 'nên' (should, so)", "level": 3, "tags": ["verbs", "modals", "advice", "conjunctions", "nên"] },
+        { "title": "Using 'phải' (must, have to)", "level": 3, "tags": ["verbs", "modals", "obligation", "phải"] },
+        { "title": "Expressing 'because': 'vì / bởi vì'", "level": 3, "tags": ["conjunctions", "reason", "vì"] },
+        { "title": "Expressing 'although': 'mặc dù / dù'", "level": 3, "tags": ["conjunctions", "concession", "mặc dù"] },
+        { "title": "Expressing 'if...then...': 'nếu...thì...'", "level": 3, "tags": ["conditionals", "if clauses", "nếu", "thì"] },
+        { "title": "Aspect Particle 'xong' (finish doing)", "level": 3, "tags": ["particles", "aspect", "completion", "xong"] },
+        { "title": "Using 'được' (to get, can, be okay)", "level": 3, "tags": ["verbs", "particles", "ability", "permission", "được"] },
+        { "title": "Using 'bị' (passive, negative connotation)", "level": 3, "tags": ["verbs", "passive voice", "negative connotation", "bị"] },
+        { "title": "Using 'cho' (to give, for)", "level": 3, "tags": ["verbs", "prepositions", "benefactive", "cho"] },
+        { "title": "Reduplication of Adjectives & Verbs (Từ láy)", "level": 3, "tags": ["adjectives", "verbs", "reduplication", "emphasis"] },
+        { "title": "Relative Clauses (Mệnh đề quan hệ - using 'mà')", "level": 3, "tags": ["relative clauses", "mà"] },
+        { "title": "Expressing 'how long': 'bao lâu'", "level": 3, "tags": ["questions", "duration", "bao lâu"] },
+        { "title": "Expressing 'how much/many': 'bao nhiêu'", "level": 3, "tags": ["questions", "quantity", "bao nhiêu"] },
+        { "title": "Particles for emphasis and mood (nhé, nhé, đi, thôi, ạ)", "level": 3, "tags": ["particles", "pragmatics", "mood", "politeness"] },
+        // Upper-Intermediate (Level 4)
+        { "title": "Using 'còn' (still, remaining, as for)", "level": 4, "tags": ["particles", "adverbs", "contrast", "còn"] },
+        { "title": "Using 'hết' (all gone, to finish)", "level": 4, "tags": ["verbs", "particles", "completion", "hết"] },
+        { "title": "Using 'mới' (only then, just)", "level": 4, "tags": ["particles", "adverbs", "temporal", "mới"] },
+        { "title": "Using 'lại' (again, on the contrary)", "level": 4, "tags": ["particles", "adverbs", "repetition", "contrast", "lại"] },
+        { "title": "Passive constructions with 'được' and 'bị'", "level": 4, "tags": ["verbs", "passive voice", "được", "bị", "nuances"] },
+        { "title": "Causative constructions: 'làm cho', 'khiến'", "level": 4, "tags": ["verbs", "causative", "làm cho", "khiến"] },
+        { "title": "Expressing 'ever since': 'từ khi'", "level": 4, "tags": ["conjunctions", "time", "từ khi"] },
+        { "title": "Expressing 'as soon as': 'vừa mới...thì / ngay khi'", "level": 4, "tags": ["conjunctions", "time", "immediacy"] },
+        { "title": "Expressing 'not only... but also': 'không những/chỉ...mà còn...'", "level": 4, "tags": ["conjunctions", "addition"] },
+        { "title": "Complex sentences with multiple clauses", "level": 4, "tags": ["syntax", "clauses"] },
+        { "title": "Nuances of different question words and structures", "level": 4, "tags": ["questions", "nuances"] },
+        { "title": "Formal vs. Informal Language (Ngôn ngữ trang trọng và thân mật)", "level": 4, "tags": ["style", "register", "politeness"] },
+        // Advanced (Level 5)
+        { "title": "Advanced use of particles (thì, là, mà - for focus and contrast)", "level": 5, "tags": ["particles", "focus", "contrast", "pragmatics"] },
+        { "title": "Complex conditional sentences (Giá mà, giả sử)", "level": 5, "tags": ["conditionals", "subjunctive mood", "hypothetical"] },
+        { "title": "Literary and idiomatic expressions (Thành ngữ, Tục ngữ)", "level": 5, "tags": ["vocabulary", "idioms", "literature"] },
+        { "title": "Nuances of Tense and Aspect (Sự khác biệt tinh tế về Thì và Thể)", "level": 5, "tags": ["tense", "aspect", "nuances"] },
+        { "title": "Sino-Vietnamese vocabulary (Từ Hán Việt)", "level": 5, "tags": ["vocabulary", "etymology", "sino-vietnamese"] },
+        { "title": "Rhetorical devices in Vietnamese (Biện pháp tu từ)", "level": 5, "tags": ["style", "rhetoric"] },
+        { "title": "Understanding different regional dialects (Phương ngữ)", "level": 5, "tags": ["dialects", "sociolinguistics"] },
+        { "title": "Advanced classifiers and their connotations", "level": 5, "tags": ["nouns", "classifiers", "connotations"] },
+        { "title": "Discourse markers and cohesion in extended texts (Phương tiện liên kết)", "level": 5, "tags": ["discourse markers", "linking words", "cohesion"] }
+    ],
     "Mongolian": [
-    // Beginner (Level 1)
-    { "title": "Mongolian Cyrillic Alphabet & Pronunciation (Монгол Цагаан Толгой ба Дуудлага)", "level": 1, "tags": ["basics", "pronunciation", "alphabet", "cyrillic"] },
-    { "title": "Vowel Harmony (Эгшиг Зохицох Ёс)", "level": 1, "tags": ["basics", "pronunciation", "vowel harmony"] },
-    { "title": "Basic Greetings & Introductions (Мэндчилгээ ба Танилцуулга)", "level": 1, "tags": ["basics", "phrases", "vocabulary"] },
-    { "title": "Personal Pronouns (Биеийн Төлөөний Үг - би, чи, та, тэр, бид, та нар, тэд)", "level": 1, "tags": ["basics", "pronouns"] },
-    { "title": "Basic Sentence Structure (SOV - Өгүүлэгдэхүүн + Тусагдахуун + Өгүүлэхүүн)", "level": 1, "tags": ["basics", "sentence structure"] },
-    { "title": "Copula 'юм / билээ / байна / байхгүй' (to be / to not be - юм, билээ, байна, байхгүй)", "level": 1, "tags": ["basics", "verbs", "to be", "copula"] },
-    { "title": "Noun Plural Suffixes (-ууд, -үүд, -нууд, -нүүд, -д, -с, -чууд, -чүд)", "level": 1, "tags": ["basics", "nouns", "plural", "suffixes"] },
-    { "title": "Yes/No Questions (Тийм/Үгүй Асуулт - using - уу/-үү, -гүй)", "level": 1, "tags": ["basics", "questions", "interrogative particles"] },
-    { "title": "Question Words (Асуух Үг - хэн, юу, хаана, хэзээ, яагаад, яаж, хэд)", "level": 1, "tags": ["basics", "questions", "question words"] },
-    { "title": "Numbers 0-100 (Тоо)", "level": 1, "tags": ["basics", "numbers", "vocabulary"] },
-    { "title": "Telling Time (Цаг Хэлэх)", "level": 1, "tags": ["basics", "time", "vocabulary"] },
-    { "title": "Days of the Week, Months (Долоо Хоногийн Өдрүүд, Сар)", "level": 1, "tags": ["basics", "time", "vocabulary"] },
-    { "title": "Basic Noun Cases: Nominative (Нэрлэхийн Тийн Ялгал - no suffix)", "level": 1, "tags": ["basics", "nouns", "cases", "nominative"] },
-    { "title": "Simple Postpositions (Үгсийн Арын Байрлал - -д, -т, -тай, -тэй, -той, -руу, -рүү, -руй)", "level": 1, "tags": ["basics", "postpositions", "particles"] },
-    { "title": "Present/Future Tense Suffix (-на/-нэ/-но/-нө)", "level": 1, "tags": ["basics", "verbs", "tense", "present tense", "future tense", "suffixes"] },
-    // Pre-Intermediate (Level 2)
-    { "title": "Genitive Case (Харьяалахын Тийн Ялгал - -ын/-ийн/-ы/-ий/-н)", "level": 2, "tags": ["nouns", "cases", "genitive", "possessive"] },
-    { "title": "Dative-Locative Case (Өгөх Оршихын Тийн Ялгал - -д/-т)", "level": 2, "tags": ["nouns", "cases", "dative", "locative"] },
-    { "title": "Accusative Case (Заахын Тийн Ялгал - -ыг/-ийг/-г)", "level": 2, "tags": ["nouns", "cases", "accusative", "direct object"] },
-    { "title": "Ablative Case (Гарахын Тийн Ялгал - -аас/-ээс/-оос/-өөс)", "level": 2, "tags": ["nouns", "cases", "ablative", "from"] },
-    { "title": "Instrumental Case (Үйлдэхийн Тийн Ялгал - -аар/-ээр/-оор/-өөр)", "level": 2, "tags": ["nouns", "cases", "instrumental", "by means of"] },
-    { "title": "Comitative Case (Хамтрахын Тийн Ялгал - -тай/-тэй/-той)", "level": 2, "tags": ["nouns", "cases", "comitative", "with"] },
-    { "title": "Past Tense Suffixes (-сан/-сэн/-сон/-сөн, -жээ/-чээ, -в/-лаа)", "level": 2, "tags": ["verbs", "tense", "past tense", "suffixes"] },
-    { "title": "Adjectives & Agreement (Тэмдэг Нэр ба Зохицол)", "level": 2, "tags": ["adjectives", "agreement"] },
-    { "title": "Comparatives & Superlatives ( Харьцуулсан ба Давуу Зэрэг)", "level": 2, "tags": ["comparisons", "adjectives", "superlatives"] },
-    { "title": "Demonstrative Pronouns (Заах Төлөөний Үг - энэ, тэр, эдгээр, тэдгээр)", "level": 2, "tags": ["pronouns", "demonstratives"] },
-    { "title": "Reflexive Pronouns (Өөрөө, өөрсдөө)", "level": 2, "tags": ["pronouns", "reflexive"] },
-    { "title": "Possessive Suffixes (Хамаатуулах Нөхцөл - минь, чинь, нь, маань, тань, нь)", "level": 2, "tags": ["nouns", "possessive", "suffixes"] },
-    { "title": "Verb 'байх' (to be) in different tenses", "level": 2, "tags": ["verbs", "to be", "tense", "conjugation"] },
-    { "title": "Modal Verbs/Particles (Боломж ба Хүсэл - -ж чадах, -х хэрэгтэй, -маар)", "level": 2, "tags": ["verbs", "modals", "ability", "necessity", "desire"] },
-    { "title": "Basic Conjunctions (Холбох Үгс - ба, бас, бөгөөд, эсвэл, гэвч)", "level": 2, "tags": ["conjunctions", "linking words"] },
-    // Intermediate (Level 3)
-    { "title": "Directional Case (-руу/-рүү/-руй)", "level": 3, "tags": ["nouns", "cases", "directional", "to"] },
-    { "title": "Verbal Nouns (Үйлийн Нэр Үг - -х, -гч, -лт, -дал, -л)", "level": 3, "tags": ["verbs", "nouns", "verbal nouns", "nominalization"] },
-    { "title": "Participles (Нөхцөлт Үйл Үг - -сан/-сэн, -даг/-дэг, -аа/-ээ, -ж/-ч, -магц/-мэгц)", "level": 3, "tags": ["verbs", "participles", "relative clauses"] },
-    { "title": "Conditional Mood (-вал/-вэл/-вол/-вөл)", "level": 3, "tags": ["verbs", "mood", "conditional", "if clauses"] },
-    { "title": "Concessive Mood (-вч/-вч/-овч/-өвч, -лаа ч / -сан ч)", "level": 3, "tags": ["verbs", "mood", "concessive", "although"] },
-    { "title": "Purpose Clauses (-хын тулд, -хаар)", "level": 3, "tags": ["clauses", "purpose"] },
-    { "title": "Reported Speech (Дам Яриа - гэж хэлэх)", "level": 3, "tags": ["reported speech", "quotation", "гэж"] },
-    { "title": "Passive Voice (-гд-/-гд-)", "level": 3, "tags": ["verbs", "voice", "passive voice"] },
-    { "title": "Causative Voice (-уул-/-үүл-, -лга-/-лгэ-)", "level": 3, "tags": ["verbs", "voice", "causative"] },
-    { "title": "Reciprocal Voice (-лд-/-лд-)", "level": 3, "tags": ["verbs", "voice", "reciprocal"] },
-    { "title": "Politeness & Honorifics (Хүндэтгэлийн Хэллэг)", "level": 3, "tags": ["politeness", "honorifics", "register"] },
-    { "title": "Numbers (Ordinal, Collective)", "level": 3, "tags": ["numbers", "ordinal", "collective"] },
-    { "title": "Adverbs of Manner, Time, Place (Байц Дэлгэрүүлэгч)", "level": 3, "tags": ["adverbs", "manner", "time", "place"] },
-    // Upper-Intermediate (Level 4)
-    { "title": "Perfective & Imperfective Aspect (Төгс ба Төгс бус Байдал)", "level": 4, "tags": ["verbs", "aspect", "perfective", "imperfective"] },
-    { "title": "Complex Sentence Structures (Нийлмэл Өгүүлбэр)", "level": 4, "tags": ["syntax", "clauses", "complex sentences"] },
-    { "title": "Volitional Mood & Intentional Forms (-я / -е / -ё, -х гэж байна)", "level": 4, "tags": ["verbs", "mood", "volitional", "intention"] },
-    { "title": "Evidentiality ( প্রত্যক্ষ ба дам баталгаа - -сан байна, -сан гэнэ, -жээ)", "level": 4, "tags": ["verbs", "mood", "evidentiality"] },
-    { "title": "Idiomatic Expressions & Proverbs (Хэвшмэл Хэллэг ба Зүйр Цэцэн Үг)", "level": 4, "tags": ["vocabulary", "idioms", "proverbs"] },
-    { "title": "Different Styles of Speech (Ярианы Хэв Маяг - formal, informal, literary)", "level": 4, "tags": ["style", "register", "formal language", "informal language"] },
-    { "title": "Advanced Postpositional Phrases", "level": 4, "tags": ["postpositions", "phrases", "syntax"] },
-    { "title": "Particles for Emphasis & Nuance (Жижиг Үгс - шүү, даа, биз, л)", "level": 4, "tags": ["particles", "emphasis", "pragmatics"] },
-    // Advanced (Level 5)
-    { "title": "Classical Mongolian Script & its Influence (Монгол Бичиг ба Нөлөө)", "level": 5, "tags": ["writing system", "classical mongolian", "history"] },
-    { "title": "Linguistic Features of Different Dialects (Аялгууны Онцлог)", "level": 5, "tags": ["dialects", "sociolinguistics"] },
-    { "title": "Archaic Grammatical Forms (Хуучны Хэлзүйн Хэлбэрүүд)", "level": 5, "tags": ["grammar history", "archaic", "literary"] },
-    { "title": "Advanced Nominalization & Subordination Techniques", "level": 5, "tags": ["nominalization", "syntax", "subordination"] },
-    { "title": "Rhetorical Devices in Mongolian (Уран Сайхны Хэрэглүүр)", "level": 5, "tags": ["style", "rhetoric", "literature"] },
-    { "title": "Etymology & Word Formation (Үгийн Үүсэл ба Бүтэц)", "level": 5, "tags": ["vocabulary", "etymology", "word formation"] }
-  ]
+        // Beginner (Level 1)
+        { "title": "Mongolian Cyrillic Alphabet & Pronunciation (Монгол Цагаан Толгой ба Дуудлага)", "level": 1, "tags": ["basics", "pronunciation", "alphabet", "cyrillic"] },
+        { "title": "Vowel Harmony (Эгшиг Зохицох Ёс)", "level": 1, "tags": ["basics", "pronunciation", "vowel harmony"] },
+        { "title": "Basic Greetings & Introductions (Мэндчилгээ ба Танилцуулга)", "level": 1, "tags": ["basics", "phrases", "vocabulary"] },
+        { "title": "Personal Pronouns (Биеийн Төлөөний Үг - би, чи, та, тэр, бид, та нар, тэд)", "level": 1, "tags": ["basics", "pronouns"] },
+        { "title": "Basic Sentence Structure (SOV - Өгүүлэгдэхүүн + Тусагдахуун + Өгүүлэхүүн)", "level": 1, "tags": ["basics", "sentence structure"] },
+        { "title": "Copula 'юм / билээ / байна / байхгүй' (to be / to not be - юм, билээ, байна, байхгүй)", "level": 1, "tags": ["basics", "verbs", "to be", "copula"] },
+        { "title": "Noun Plural Suffixes (-ууд, -үүд, -нууд, -нүүд, -д, -с, -чууд, -чүд)", "level": 1, "tags": ["basics", "nouns", "plural", "suffixes"] },
+        { "title": "Yes/No Questions (Тийм/Үгүй Асуулт - using - уу/-үү, -гүй)", "level": 1, "tags": ["basics", "questions", "interrogative particles"] },
+        { "title": "Question Words (Асуух Үг - хэн, юу, хаана, хэзээ, яагаад, яаж, хэд)", "level": 1, "tags": ["basics", "questions", "question words"] },
+        { "title": "Numbers 0-100 (Тоо)", "level": 1, "tags": ["basics", "numbers", "vocabulary"] },
+        { "title": "Telling Time (Цаг Хэлэх)", "level": 1, "tags": ["basics", "time", "vocabulary"] },
+        { "title": "Days of the Week, Months (Долоо Хоногийн Өдрүүд, Сар)", "level": 1, "tags": ["basics", "time", "vocabulary"] },
+        { "title": "Basic Noun Cases: Nominative (Нэрлэхийн Тийн Ялгал - no suffix)", "level": 1, "tags": ["basics", "nouns", "cases", "nominative"] },
+        { "title": "Simple Postpositions (Үгсийн Арын Байрлал - -д, -т, -тай, -тэй, -той, -руу, -рүү, -руй)", "level": 1, "tags": ["basics", "postpositions", "particles"] },
+        { "title": "Present/Future Tense Suffix (-на/-нэ/-но/-нө)", "level": 1, "tags": ["basics", "verbs", "tense", "present tense", "future tense", "suffixes"] },
+        // Pre-Intermediate (Level 2)
+        { "title": "Genitive Case (Харьяалахын Тийн Ялгал - -ын/-ийн/-ы/-ий/-н)", "level": 2, "tags": ["nouns", "cases", "genitive", "possessive"] },
+        { "title": "Dative-Locative Case (Өгөх Оршихын Тийн Ялгал - -д/-т)", "level": 2, "tags": ["nouns", "cases", "dative", "locative"] },
+        { "title": "Accusative Case (Заахын Тийн Ялгал - -ыг/-ийг/-г)", "level": 2, "tags": ["nouns", "cases", "accusative", "direct object"] },
+        { "title": "Ablative Case (Гарахын Тийн Ялгал - -аас/-ээс/-оос/-өөс)", "level": 2, "tags": ["nouns", "cases", "ablative", "from"] },
+        { "title": "Instrumental Case (Үйлдэхийн Тийн Ялгал - -аар/-ээр/-оор/-өөр)", "level": 2, "tags": ["nouns", "cases", "instrumental", "by means of"] },
+        { "title": "Comitative Case (Хамтрахын Тийн Ялгал - -тай/-тэй/-той)", "level": 2, "tags": ["nouns", "cases", "comitative", "with"] },
+        { "title": "Past Tense Suffixes (-сан/-сэн/-сон/-сөн, -жээ/-чээ, -в/-лаа)", "level": 2, "tags": ["verbs", "tense", "past tense", "suffixes"] },
+        { "title": "Adjectives & Agreement (Тэмдэг Нэр ба Зохицол)", "level": 2, "tags": ["adjectives", "agreement"] },
+        { "title": "Comparatives & Superlatives ( Харьцуулсан ба Давуу Зэрэг)", "level": 2, "tags": ["comparisons", "adjectives", "superlatives"] },
+        { "title": "Demonstrative Pronouns (Заах Төлөөний Үг - энэ, тэр, эдгээр, тэдгээр)", "level": 2, "tags": ["pronouns", "demonstratives"] },
+        { "title": "Reflexive Pronouns (Өөрөө, өөрсдөө)", "level": 2, "tags": ["pronouns", "reflexive"] },
+        { "title": "Possessive Suffixes (Хамаатуулах Нөхцөл - минь, чинь, нь, маань, тань, нь)", "level": 2, "tags": ["nouns", "possessive", "suffixes"] },
+        { "title": "Verb 'байх' (to be) in different tenses", "level": 2, "tags": ["verbs", "to be", "tense", "conjugation"] },
+        { "title": "Modal Verbs/Particles (Боломж ба Хүсэл - -ж чадах, -х хэрэгтэй, -маар)", "level": 2, "tags": ["verbs", "modals", "ability", "necessity", "desire"] },
+        { "title": "Basic Conjunctions (Холбох Үгс - ба, бас, бөгөөд, эсвэл, гэвч)", "level": 2, "tags": ["conjunctions", "linking words"] },
+        // Intermediate (Level 3)
+        { "title": "Directional Case (-руу/-рүү/-руй)", "level": 3, "tags": ["nouns", "cases", "directional", "to"] },
+        { "title": "Verbal Nouns (Үйлийн Нэр Үг - -х, -гч, -лт, -дал, -л)", "level": 3, "tags": ["verbs", "nouns", "verbal nouns", "nominalization"] },
+        { "title": "Participles (Нөхцөлт Үйл Үг - -сан/-сэн, -даг/-дэг, -аа/-ээ, -ж/-ч, -магц/-мэгц)", "level": 3, "tags": ["verbs", "participles", "relative clauses"] },
+        { "title": "Conditional Mood (-вал/-вэл/-вол/-вөл)", "level": 3, "tags": ["verbs", "mood", "conditional", "if clauses"] },
+        { "title": "Concessive Mood (-вч/-вч/-овч/-өвч, -лаа ч / -сан ч)", "level": 3, "tags": ["verbs", "mood", "concessive", "although"] },
+        { "title": "Purpose Clauses (-хын тулд, -хаар)", "level": 3, "tags": ["clauses", "purpose"] },
+        { "title": "Reported Speech (Дам Яриа - гэж хэлэх)", "level": 3, "tags": ["reported speech", "quotation", "гэж"] },
+        { "title": "Passive Voice (-гд-/-гд-)", "level": 3, "tags": ["verbs", "voice", "passive voice"] },
+        { "title": "Causative Voice (-уул-/-үүл-, -лга-/-лгэ-)", "level": 3, "tags": ["verbs", "voice", "causative"] },
+        { "title": "Reciprocal Voice (-лд-/-лд-)", "level": 3, "tags": ["verbs", "voice", "reciprocal"] },
+        { "title": "Politeness & Honorifics (Хүндэтгэлийн Хэллэг)", "level": 3, "tags": ["politeness", "honorifics", "register"] },
+        { "title": "Numbers (Ordinal, Collective)", "level": 3, "tags": ["numbers", "ordinal", "collective"] },
+        { "title": "Adverbs of Manner, Time, Place (Байц Дэлгэрүүлэгч)", "level": 3, "tags": ["adverbs", "manner", "time", "place"] },
+        // Upper-Intermediate (Level 4)
+        { "title": "Perfective & Imperfective Aspect (Төгс ба Төгс бус Байдал)", "level": 4, "tags": ["verbs", "aspect", "perfective", "imperfective"] },
+        { "title": "Complex Sentence Structures (Нийлмэл Өгүүлбэр)", "level": 4, "tags": ["syntax", "clauses", "complex sentences"] },
+        { "title": "Volitional Mood & Intentional Forms (-я / -е / -ё, -х гэж байна)", "level": 4, "tags": ["verbs", "mood", "volitional", "intention"] },
+        { "title": "Evidentiality ( প্রত্যক্ষ ба дам баталгаа - -сан байна, -сан гэнэ, -жээ)", "level": 4, "tags": ["verbs", "mood", "evidentiality"] },
+        { "title": "Idiomatic Expressions & Proverbs (Хэвшмэл Хэллэг ба Зүйр Цэцэн Үг)", "level": 4, "tags": ["vocabulary", "idioms", "proverbs"] },
+        { "title": "Different Styles of Speech (Ярианы Хэв Маяг - formal, informal, literary)", "level": 4, "tags": ["style", "register", "formal language", "informal language"] },
+        { "title": "Advanced Postpositional Phrases", "level": 4, "tags": ["postpositions", "phrases", "syntax"] },
+        { "title": "Particles for Emphasis & Nuance (Жижиг Үгс - шүү, даа, биз, л)", "level": 4, "tags": ["particles", "emphasis", "pragmatics"] },
+        // Advanced (Level 5)
+        { "title": "Classical Mongolian Script & its Influence (Монгол Бичиг ба Нөлөө)", "level": 5, "tags": ["writing system", "classical mongolian", "history"] },
+        { "title": "Linguistic Features of Different Dialects (Аялгууны Онцлог)", "level": 5, "tags": ["dialects", "sociolinguistics"] },
+        { "title": "Archaic Grammatical Forms (Хуучны Хэлзүйн Хэлбэрүүд)", "level": 5, "tags": ["grammar history", "archaic", "literary"] },
+        { "title": "Advanced Nominalization & Subordination Techniques", "level": 5, "tags": ["nominalization", "syntax", "subordination"] },
+        { "title": "Rhetorical Devices in Mongolian (Уран Сайхны Хэрэглүүр)", "level": 5, "tags": ["style", "rhetoric", "literature"] },
+        { "title": "Etymology & Word Formation (Үгийн Үүсэл ба Бүтэц)", "level": 5, "tags": ["vocabulary", "etymology", "word formation"] }
+    ]
 };
 console.log("Grammar data embedded."); // Log to confirm it's loaded
 
 function openChat(partner) { // Now accepts the full partner object
     // Clean up any existing audio buttons
     removeAudioButton();
-    
+
     const modal = document.getElementById('chat-modal');
     const chatHeader = modal.querySelector('.chat-header'); // Get the header element
     const chatMessages = document.getElementById('chat-messages');
@@ -1505,7 +1505,7 @@ function checkSavedPartner() {
             // Load saved messages
             const chatMessages = document.getElementById('chat-messages');
             chatHistory = data.messages;
-            chatMessages.innerHTML = chatHistory.map(msg => 
+            chatMessages.innerHTML = chatHistory.map(msg =>
                 `<p><strong>${msg.sender}:</strong> ${msg.text}</p>`
             ).join('');
         };
@@ -1572,7 +1572,7 @@ document.getElementById('save-partner-btn').addEventListener('click', () => {
         };
 
         localStorage.setItem('savedPartner', JSON.stringify(dataToSave));
-        
+
         // Show success message
         if (isMobile) {
             // Create a temporary success message element
@@ -1587,9 +1587,9 @@ document.getElementById('save-partner-btn').addEventListener('click', () => {
             successMsg.style.borderRadius = '5px';
             successMsg.style.zIndex = '10000';
             successMsg.textContent = 'Partner saved successfully!';
-            
+
             document.body.appendChild(successMsg);
-            
+
             // Remove after 2 seconds
             setTimeout(() => {
                 successMsg.remove();
@@ -1612,9 +1612,9 @@ document.getElementById('save-partner-btn').addEventListener('click', () => {
             errorMsg.style.borderRadius = '5px';
             errorMsg.style.zIndex = '10000';
             errorMsg.textContent = 'Could not save partner. Please ensure HTTPS is enabled.';
-            
+
             document.body.appendChild(errorMsg);
-            
+
             setTimeout(() => {
                 errorMsg.remove();
             }, 3000);
@@ -1705,7 +1705,7 @@ async function sendWebhookRequest(data) {
     console.log('Generated timestamp:', timestamp);
     const message = timestamp + JSON.stringify(data);
     console.log('Created message for signature:', message);
-    
+
     try {
         // Create HMAC signature
         console.log('Creating HMAC signature...');
@@ -1724,7 +1724,7 @@ async function sendWebhookRequest(data) {
             encoder.encode(message)
         );
         console.log('Signature generated successfully');
-        
+
         const signatureHex = Array.from(new Uint8Array(signature))
             .map(b => b.toString(16).padStart(2, '0'))
             .join('');
@@ -1743,11 +1743,11 @@ async function sendWebhookRequest(data) {
             },
             body: JSON.stringify(data)
         });
-        
+
         if (!response.ok) {
             throw new Error(`Webhook request failed: ${response.status}`);
         }
-        
+
         return await response.json();
     } catch (error) {
         console.error('Webhook error:', error);
@@ -1806,7 +1806,7 @@ async function playAudioFromText(text, button) {
         if (window.location.protocol !== 'https:') {
             throw new Error('Audio functionality requires HTTPS');
         }
-        
+
         initAudioContext();
         button.disabled = true;
         button.style.visibility = 'visible';
@@ -1894,7 +1894,7 @@ async function playAudioFromText(text, button) {
             button.style.visibility = 'visible';
             button.style.display = 'flex';
             button.innerHTML = `❌ Error: ${error.message}`;
-            
+
             // Add retry functionality instead of removing button
             setTimeout(() => {
                 if (button && button.parentNode) {
@@ -1910,7 +1910,7 @@ async function playAudioFromText(text, button) {
 function createAudioButton(text, rect) {
     // Remove existing buttons
     removeAudioButton();
-    
+
     // Create new button
     const button = document.createElement('button');
     button.className = 'audio-button icon-button';
@@ -1932,31 +1932,31 @@ function createAudioButton(text, rect) {
     button.style.userSelect = 'none'; // Prevent text selection
     button.style.webkitUserSelect = 'none'; // For Safari
     button.style.msUserSelect = 'none'; // For IE/Edge
-    
+
     button.innerHTML = `
         <span class="button-icon" style="font-size: 16px; pointer-events: none;">🔊</span>
         <span class="button-text" style="font-weight: 500; pointer-events: none;">Play Audio</span>
     `;
-    
+
     // Get chat modal for scroll handling
     const chatModal = document.getElementById('chat-modal');
     const chatMessages = document.getElementById('chat-messages');
     const modalRect = chatModal?.getBoundingClientRect() || { top: 0, left: 0 };
-    
+
     // Calculate viewport dimensions
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
-    
+
     // Calculate initial position relative to viewport
     let left = Math.min(rect.left, viewportWidth - 120); // Use viewport-relative position
     let top = rect.bottom + 2; // Use viewport-relative position
-    
+
     // Adjust if selection is inside chat modal
     if (chatModal && chatModal.contains(window.getSelection().anchorNode)) {
         // Keep chat modal scrollable but lock main page
         document.body.style.overflow = 'hidden';
         chatMessages.style.overflow = 'auto';
-        
+
         // Adjust position relative to chat modal
         top += modalRect.top;
         left += modalRect.left;
@@ -1964,16 +1964,16 @@ function createAudioButton(text, rect) {
         // Lock page scroll for selections outside chat
         document.body.style.overflow = 'hidden';
     }
-    
+
     // Adjust for bottom of viewport
     const buttonHeight = 36;
     if (top + buttonHeight > viewportHeight) {
         top = rect.top - buttonHeight - 2;
     }
-    
+
     // Ensure left position isn't negative
     left = Math.max(10, left);
-    
+
     // Ensure button is visible and clickable
     button.style.position = 'fixed';
     button.style.left = `${left}px`;
@@ -1990,17 +1990,17 @@ function createAudioButton(text, rect) {
     button.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        
+
         console.log('Audio button clicked');
-        
+
         if (button.disabled) {
             console.log('Button is disabled, ignoring click');
             return;
         }
-        
+
         button.disabled = true;
         button.innerHTML = '🔄 Loading...';
-        
+
         try {
             console.log('Attempting to initialize audio context...');
             if (!audioContext) {
@@ -2011,17 +2011,17 @@ function createAudioButton(text, rect) {
             console.error('Error initializing audio context:', error);
             throw error;
         }
-        
+
         try {
             console.log('Starting audio playback');
             isPlaying = true;
-            
+
             // Keep button visible and interactive
             button.style.opacity = '1';
             button.style.visibility = 'visible';
             button.style.display = 'flex';
             button.style.pointerEvents = 'auto';
-            
+
             // Update button state
             button.disabled = true;
             button.classList.add('playing');
@@ -2029,7 +2029,7 @@ function createAudioButton(text, rect) {
                 <span class="button-icon">🔄</span>
                 <span class="button-text">Loading...</span>
             `;
-            
+
             // Initialize audio context on user interaction
             if (!audioContext) {
                 audioContext = initAudioContext();
@@ -2037,14 +2037,14 @@ function createAudioButton(text, rect) {
                     throw new Error('Could not initialize audio context');
                 }
             }
-            
+
             await playAudioFromText(text, button);
-            
+
             button.innerHTML = `
                 <span class="button-icon">✅</span>
                 <span class="button-text">Played</span>
             `;
-            
+
             setTimeout(() => button.remove(), 2000);
         } catch (error) {
             console.error('Audio playback failed:', error);
@@ -2059,7 +2059,7 @@ function createAudioButton(text, rect) {
                     <span class="button-icon">❌</span>
                     <span class="button-text">Error: ${error.message}</span>
                 `;
-                
+
                 // Keep error visible and allow retry
                 const retryTimeout = setTimeout(() => {
                     if (button && button.parentNode) {
@@ -2069,7 +2069,7 @@ function createAudioButton(text, rect) {
                         `;
                     }
                 }, 3000);
-                
+
                 // Store timeout ID on button element
                 button.dataset.retryTimeout = retryTimeout;
             }
@@ -2121,7 +2121,7 @@ document.addEventListener('selectionchange', debounce(function() {
     if (selectedText && selectedText.length >= 2 && selectedText.length <= 200) {
         const range = selection?.getRangeAt(0);
         if (!range) return;
-        
+
         const rect = range.getBoundingClientRect();
         if (!rect) return;
 
@@ -2157,14 +2157,14 @@ document.addEventListener('touchend', function(e) {
     setTimeout(() => {
         const selection = window.getSelection();
         const selectedText = selection?.toString().trim();
-        
+
         if (selectedText && selectedText.length >= 2 && selectedText.length <= 200) {
             const range = selection?.getRangeAt(0);
             if (!range) return;
-            
+
             const rect = range.getBoundingClientRect();
             if (!rect) return;
-            
+
             // Adjust position for mobile
             const scrollY = window.pageYOffset || document.documentElement.scrollTop;
             const adjustedRect = new DOMRect(
@@ -2173,7 +2173,7 @@ document.addEventListener('touchend', function(e) {
                 rect.width,
                 rect.height
             );
-            
+
             // Remove any existing audio buttons before creating new one
             removeAudioButton();
             createAudioButton(selectedText, adjustedRect);
