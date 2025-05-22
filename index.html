@@ -8,6 +8,61 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .audio-button {
+            position: fixed;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 10000;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .audio-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .audio-button:not(:disabled):hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+        .audio-button.playing {
+            background: #27ae60;
+        }
+        .chat-input {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Roboto', sans-serif;
+        }
+        .chat-button {
+            padding: 0.8rem 1.2rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .chat-button:hover {
+            background-color: #2980b9;
+        }
+    </style>
     <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
