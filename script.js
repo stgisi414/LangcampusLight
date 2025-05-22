@@ -1743,12 +1743,11 @@ function createAudioButton(text, rect) {
         
         console.log('Audio button clicked');
         
-        if (button.disabled || isPlaying) {
-            console.log('Button is disabled or already playing, ignoring click');
+        if (button.disabled) {
+            console.log('Button is disabled, ignoring click');
             return;
         }
         
-        isPlaying = true;
         button.disabled = true;
         button.innerHTML = '🔄 Loading...';
         
@@ -1765,10 +1764,6 @@ function createAudioButton(text, rect) {
         
         try {
             console.log('Starting audio playback');
-            if (isPlaying) {
-                console.log('Already playing, preventing duplicate playback');
-                return;
-            }
             isPlaying = true;
             
             // Keep button visible and interactive
