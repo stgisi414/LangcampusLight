@@ -1633,66 +1633,65 @@ document.getElementById('interestSearch').addEventListener('input', () => {
 });
 
 // Event listener for grammar topic links
-document.getElementById('chat-messages')?.addEventListener('click', async (event) => {
-    if (event.target.classList.contains('grammar-topic-link')) {
-        event.preventDefault();
-        const topicTitle = event.target.dataset.topic;
-        const language = currentPartner.nativeLanguage; // Teach in partner's native language
+document.addEventListener('DOMContentLoaded', () => {
+    const chatMessages = document.getElementById('chat-messages');
+    
+    chatMessages?.addEventListener('click', async (event) => {
+        if (event.target.classList.contains('grammar-topic-link')) {
+            event.preventDefault();
+            const topicTitle = event.target.dataset.topic;
+            const language = currentPartner.nativeLanguage; // Teach in partner's native language
 
-        // Add a "requesting explanation" message
-        const requestingMsg = document.createElement('p');
-        requestingMsg.innerHTML = `<em>Requesting explanation for "${topicTitle}"...</em>`;
-        requestingMsg.style.fontStyle = 'italic';
-        chatMessages.appendChild(requestingMsg);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-
-        try {
-            // Find the topic level from grammarData
-            const level = grammarData[language]?.find(topic => topic.title === topicTitle)?.level || 'unknown';
-            const explanationMarkdown = await getGrammarExplanation(topicTitle, language, level);
-
-            // Remove the requesting message
-            chatMessages.removeChild(requestingMsg);
-
-            // **NEW:** Parse the Markdown explanation to HTML using Marked.js
-            // Ensure marked.parse() is available (CDN should be loaded in HTML)
-            if (typeof marked === 'undefined') {
-                console.error("Marked.js library not loaded!");
-                throw new Error("Markdown library not available.");
-            }
-            const explanationHtml = marked.parse(explanationMarkdown);
-
-            // Display the parsed HTML
-            const explanationDiv = document.createElement('div');
-            explanationDiv.className = 'message grammar-explanation'; // Add 'message' class
-            // Add sender info consistent with other messages
-            const senderSpan = document.createElement('span');
-            senderSpan.className = 'sender';
-            senderSpan.textContent = `Gemini (Teaching ${topicTitle}):`;
-            explanationDiv.appendChild(senderSpan);
-            // Append the parsed HTML content
-            const contentDiv = document.createElement('div');
-            contentDiv.innerHTML = explanationHtml;
-            explanationDiv.appendChild(contentDiv);
-
-            chatMessages.appendChild(explanationDiv);
-
-
-        } catch (error) {
-            // Remove the requesting message even if there's an error
-            if (chatMessages.contains(requestingMsg)) {
-                chatMessages.removeChild(requestingMsg);
-            }
-            console.error("Error getting or parsing grammar explanation:", error);
-            const errorMsg = document.createElement('p');
-            errorMsg.innerHTML = `<p><em>Sorry, couldn't get an explanation for ${topicTitle}. Error: ${error.message}</em></p>`;
-            errorMsg.style.color = 'red';
-            errorMsg.style.fontStyle = 'italic';
-            chatMessages.appendChild(errorMsg);
-        } finally {
+            // Add a "requesting explanation" message
+            const requestingMsg = document.createElement('p');
+            requestingMsg.innerHTML = `<em>Requesting explanation for "${topicTitle}"...</em>`;
+            requestingMsg.style.fontStyle = 'italic';
+            chatMessages.appendChild(requestingMsg);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                // Find the topic level from grammarData
+                const level = grammarData[language]?.find(topic => topic.title === topicTitle)?.level || 'unknown';
+                const explanationMarkdown = await getGrammarExplanation(topicTitle, language, level);
+
+                // Remove the requesting message
+                chatMessages.removeChild(requestingMsg);
+
+                // Parse the Markdown explanation to HTML using Marked.js
+                if (typeof marked === 'undefined') {
+                    console.error("Marked.js library not loaded!");
+                    throw new Error("Markdown library not available.");
+                }
+                const explanationHtml = marked.parse(explanationMarkdown);
+
+                // Display the parsed HTML
+                const explanationDiv = document.createElement('div');
+                explanationDiv.className = 'message grammar-explanation';
+                const senderSpan = document.createElement('span');
+                senderSpan.className = 'sender';
+                senderSpan.textContent = `Gemini (Teaching ${topicTitle}):`;
+                explanationDiv.appendChild(senderSpan);
+                const contentDiv = document.createElement('div');
+                contentDiv.innerHTML = explanationHtml;
+                explanationDiv.appendChild(contentDiv);
+
+                chatMessages.appendChild(explanationDiv);
+            } catch (error) {
+                // Remove the requesting message even if there's an error
+                if (chatMessages.contains(requestingMsg)) {
+                    chatMessages.removeChild(requestingMsg);
+                }
+                console.error("Error getting or parsing grammar explanation:", error);
+                const errorMsg = document.createElement('p');
+                errorMsg.innerHTML = `<p><em>Sorry, couldn't get an explanation for ${topicTitle}. Error: ${error.message}</em></p>`;
+                errorMsg.style.color = 'red';
+                errorMsg.style.fontStyle = 'italic';
+                chatMessages.appendChild(errorMsg);
+            } finally {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
         }
-    }
+    });
 });
 
 // Text-to-speech configuration with retry mechanism
