@@ -999,33 +999,34 @@ document.addEventListener('mouseup', (event) => {
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
     
-    const button = document.createElement('button');
-    button.className = 'audio-button';
-    button.innerHTML = '🔊 Play Audio';
-    
-    // Position relative to modal
-    button.style.position = 'fixed';
-    button.style.left = `${rect.left}px`;
-    button.style.top = `${rect.bottom + 5}px`;
-    button.style.zIndex = '10000';
-    
-    button.onclick = async () => {
-      button.innerHTML = '🔄 Loading...';
-      button.disabled = true;
+      const button = document.createElement('button');
+      button.className = 'audio-button';
+      button.innerHTML = '🔊 Play Audio';
       
-      try {
-        await handleTextToSpeech(text);
-        button.innerHTML = '✅ Played';
-      } catch (error) {
-        console.error('Audio playback failed:', error);
-        button.innerHTML = '❌ Error';
-      }
+      // Position relative to modal
+      button.style.position = 'fixed';
+      button.style.left = `${rect.left}px`;
+      button.style.top = `${rect.bottom + 5}px`;
+      button.style.zIndex = '10000';
       
-      setTimeout(() => button.remove(), 2000);
-    };
-    
-    document.body.appendChild(button);
-  }
+      button.onclick = async () => {
+        button.innerHTML = '🔄 Loading...';
+        button.disabled = true;
+        
+        try {
+          await handleTextToSpeech(text);
+          button.innerHTML = '✅ Played';
+        } catch (error) {
+          console.error('Audio playback failed:', error);
+          button.innerHTML = '❌ Error';
+        }
+        
+        setTimeout(() => button.remove(), 2000);
+      };
+      
+      document.body.appendChild(button);
+    }
+  }, 100);
 });
 
 // Add event listener for Enter key on message input
