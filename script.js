@@ -1434,7 +1434,16 @@ async function playAudioFromText(text, button) {
     }
 }
 
-let activeAudioButton = null;
+// Audio button state
+const audioButtonState = {
+    active: null,
+    remove() {
+        if (this.active) {
+            this.active.remove();
+            this.active = null;
+        }
+    }
+};
 
 // Text selection handler
 document.addEventListener('mouseup', function(event) {
@@ -1447,10 +1456,7 @@ document.addEventListener('mouseup', function(event) {
     const selectedText = selection?.toString().trim();
 
     // Remove existing audio button
-    if (activeAudioButton) {
-        activeAudioButton.remove();
-        activeAudioButton = null;
-    }
+    audioButtonState.remove();
 
     if (selectedText && selectedText.length >= 2) {
         const range = selection?.getRangeAt(0);
@@ -1486,14 +1492,13 @@ document.addEventListener('mouseup', function(event) {
         };
 
         document.body.appendChild(button);
-        activeAudioButton = button;
+        audioButtonState.active = button;
     }
 });
 
 // Remove audio button when clicking outside
 document.addEventListener('mousedown', (event) => {
-    if (activeAudioButton && event.target !== activeAudioButton) {
-        activeAudioButton.remove();
-        activeAudioButton = null;
+    if (audioButtonState.active && event.target !== audioButtonState.active) {
+        audioButtonState.remove();
     }
 });
