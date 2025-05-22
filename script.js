@@ -1453,23 +1453,30 @@ const WEBHOOK_SECRET = 'wsec_01bd5c39d5578c3b569001b062a2532ab49c657fc7af3ca10c4
 const WEBHOOK_URL = 'https://practicefor.fun/webhook';
 
 async function sendWebhookRequest(data) {
+    console.log('Starting webhook request with data:', data);
     const timestamp = Date.now().toString();
+    console.log('Generated timestamp:', timestamp);
     const message = timestamp + JSON.stringify(data);
+    console.log('Created message for signature:', message);
     
-    // Create HMAC signature
-    const encoder = new TextEncoder();
-    const key = await crypto.subtle.importKey(
-        'raw',
-        encoder.encode(WEBHOOK_SECRET),
-        { name: 'HMAC', hash: 'SHA-256' },
-        false,
-        ['sign']
-    );
-    const signature = await crypto.subtle.sign(
-        'HMAC',
-        key,
-        encoder.encode(message)
-    );
+    try {
+        // Create HMAC signature
+        console.log('Creating HMAC signature...');
+        const encoder = new TextEncoder();
+        const key = await crypto.subtle.importKey(
+            'raw',
+            encoder.encode(WEBHOOK_SECRET),
+            { name: 'HMAC', hash: 'SHA-256' },
+            false,
+            ['sign']
+        );
+        console.log('Key imported successfully');
+        const signature = await crypto.subtle.sign(
+            'HMAC',
+            key,
+            encoder.encode(message)
+        );
+        console.log('Signature generated successfully');
     
     const signatureHex = Array.from(new Uint8Array(signature))
         .map(b => b.toString(16).padStart(2, '0'))
@@ -1717,15 +1724,30 @@ function createAudioButton(text, rect) {
     let isPlaying = false;
     // Add click event listener with preventDefault
     button.addEventListener('click', async (e) => {
+        console.log('========= AUDIO BUTTON CLICK START =========');
+        console.log('Button clicked with text:', text);
+        console.log('Button state:', {
+            disabled: button.disabled,
+            isPlaying,
+            classList: Array.from(button.classList),
+            display: button.style.display,
+            visibility: button.style.visibility
+        });
+
         e.preventDefault();
         e.stopPropagation();
         
-        console.log('Audio button clicked for text:', text);
-        
         if (isPlaying) {
-            console.log('Already playing, ignoring click');
+            console.error('Already playing state detected - preventing duplicate playback');
             return;
         }
+
+        try {
+            console.log('Attempting to initialize audio context...');
+            if (!audioContext) {
+                audioContext = initAudioContext();
+                console.log('Audio context initialized:', audioContext ? 'success' : 'failed');
+            }
         
         try {
             console.log('Starting audio playback');
