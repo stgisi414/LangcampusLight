@@ -1453,12 +1453,12 @@ function createAudioButton(text, rect) {
     
     // Calculate initial position
     let left = Math.min(rect.left + window.scrollX, viewportWidth - 120); // Ensure button doesn't go off right edge
-    let top = rect.bottom + window.scrollY + 5;
+    let top = rect.bottom + window.scrollY + 2; // Reduced spacing from 5px to 2px
     
     // Adjust for bottom of viewport
-    const buttonHeight = 40; // Approximate button height
+    const buttonHeight = 36; // Reduced button height
     if (top + buttonHeight > window.scrollY + viewportHeight) {
-        top = rect.top + window.scrollY - buttonHeight - 5; // Position above text
+        top = rect.top + window.scrollY - buttonHeight - 2; // Reduced spacing when above text
     }
     
     // Ensure left position isn't negative
