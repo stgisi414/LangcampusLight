@@ -615,7 +615,7 @@ const grammarData = {
         { "title": "Conditional: ば (ba - hypothetical)", "level": 3, "tags": ["conditionals", "ba form"] },
         { "title": "Conditional: なら (nara - contextual condition)", "level": 3, "tags": ["conditionals", "nara"] },
         { "title": "Expressing 'Easy/Hard To Do' (~yasui, ~nikui)", "level": 3, "tags": ["verbs", "suffixes", "yasui", "nikui"] },
-        { "title": "Expressing 'Only' (だけ dake, しか~ない shika...nai)", "level": 3, "tags": ["particles", "adverbs", "restriction", "dake", "shika"] },
+        { "title": "Expressing 'Only' (だけ dake, しか~ない shika...nai)", "level": 3, "tags": ["particles", "adverbs", "restriction", "dake", "shikanai"] },
         { "title": "Purpose (~ni iku/kuru/kaeru)", "level": 3, "tags": ["verbs", "particles", "purpose", "ni"] },
         { "title": "Making Requests (Polite Forms - ~te itadakemasen ka)", "level": 3, "tags": ["verbs", "te form", "requests", "politeness"] },
         { "title": "Formal Language Introduction (Keigo Basics - Sonkeigo, Kenjougo)", "level": 3, "tags": ["keigo", "politeness", "formal language", "sonkeigo", "kenjougo"] },
@@ -809,7 +809,7 @@ const grammarData = {
         { "title": "Using Formal Adverbs (e.g., 未免 wèimiǎn, 何必 hébì, 不禁 bùjīn)", "level": 5, "tags": ["adverbs", "formal language", "nuance"] },
         { "title": "Set Phrases & Chengyu (成语 - Idioms)", "level": 5, "tags": ["vocabulary", "idioms", "chengyu", "culture"] },
         { "title": "Topic-Comment Structures", "level": 5, "tags": ["sentence structure", "topic comment"] },
-        { "title": "Complex Sentence Structures & Clauses", "level": 5, "tags": ["sentence structure", "syntax", "clauses"] },
+        { "title": "Complex Sentence Structures & Clauses", "level": 4, "tags": ["sentence structure", "syntax", "clauses"] },
         { "title": "Nuances of Aspect Particles (了 le, 着 zhe, 过 guo)", "level": 5, "tags": ["particles", "aspect", "nuances", "le", "zhe", "guo"] }
     ]
 };
@@ -986,55 +986,49 @@ document.getElementById('send-message').addEventListener('click', async () => { 
     }
 });
 
-// Handle text selection
-document.addEventListener('mouseup', function(event) {
-    const selection = window.getSelection();
-    const text = selection.toString().trim();
-    
-    if (text.length >= 2) {
-        alert('Selected text: ' + text);
-        
-        const range = selection.getRangeAt(0);
-        const rect = range.getBoundingClientRect();
-        
-        const button = document.createElement('button');
-        button.className = 'audio-button';
-      button.innerHTML = '🔊 Play Audio';
-      
-      // Position relative to modal
-      button.style.position = 'fixed';
-      button.style.left = `${rect.left}px`;
-      button.style.top = `${rect.bottom + 5}px`;
-      button.style.zIndex = '10000';
-      
-      button.onclick = async () => {
-        button.innerHTML = '🔄 Loading...';
-        button.disabled = true;
-        
-        try {
-          await handleTextToSpeech(text);
-          button.innerHTML = '✅ Played';
-        } catch (error) {
-          console.error('Audio playback failed:', error);
-          button.innerHTML = '❌ Error';
-        }
-        
-        setTimeout(() => button.remove(), 2000);
-      };
-      
-      document.body.appendChild(button);
+// Add event listener for Enter key on message input
+document.getElementById('message-input')?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.keyCode === 13) {
+        event.preventDefault();
+        document.getElementById('send-message')?.click();
     }
-  }, 100);
 });
 
-// Add event listener for Enter key on message input
-document.getElementById('message-input').addEventListener('keydown', (event) => {
-    // Check if the key pressed was Enter (key code 13)
-    if (event.key === 'Enter' || event.keyCode === 13) {
-        // Prevent the default action (like adding a newline)
-        event.preventDefault();
-        // Trigger the click event on the send button
-        document.getElementById('send-message').click();
+// Text selection handler
+document.addEventListener('mouseup', () => {
+    const selection = window.getSelection();
+    const text = selection?.toString().trim();
+
+    if (text && text.length >= 2) {
+        const range = selection?.getRangeAt(0);
+        const rect = range?.getBoundingClientRect();
+
+        if (rect) {
+            const button = document.createElement('button');
+            button.className = 'audio-button';
+            button.innerHTML = '🔊 Play Audio';
+            button.style.position = 'fixed';
+            button.style.left = `${rect.left}px`;
+            button.style.top = `${rect.bottom + 5}px`;
+            button.style.zIndex = '10000';
+
+            button.onclick = async () => {
+                button.innerHTML = '🔄 Loading...';
+                button.disabled = true;
+
+                try {
+                    await handleTextToSpeech(text);
+                    button.innerHTML = '✅ Played';
+                } catch (error) {
+                    console.error('Audio playback failed:', error);
+                    button.innerHTML = '❌ Error';
+                }
+
+                setTimeout(() => button.remove(), 2000);
+            };
+
+            document.body.appendChild(button);
+        }
     }
 });
 
@@ -1448,12 +1442,12 @@ document.addEventListener('selectionchange', () => {
 
   const selection = window.getSelection();
   const text = selection.toString().trim();
-  
+
   // Only show button if we have valid selection
   if (text && text.length >= 2) {
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
-    
+
     // Create and position button
     audioButton = document.createElement('button');
     audioButton.className = 'audio-button';
@@ -1462,12 +1456,12 @@ document.addEventListener('selectionchange', () => {
     audioButton.style.left = `${rect.left}px`;  
     audioButton.style.top = `${rect.bottom + 5}px`;
     audioButton.style.zIndex = '10000';
-    
+
     // Add click handler
     audioButton.onclick = async () => {
       audioButton.innerHTML = '🔄 Loading...';
       audioButton.disabled = true;
-      
+
       try {
         await handleTextToSpeech(text);
         audioButton.innerHTML = '✅ Played';
@@ -1475,7 +1469,7 @@ document.addEventListener('selectionchange', () => {
         console.error('Audio playback failed:', error);
         audioButton.innerHTML = '❌ Error';
       }
-      
+
       setTimeout(() => {
         if (audioButton) {
           audioButton.remove();
@@ -1483,7 +1477,7 @@ document.addEventListener('selectionchange', () => {
         }
       }, 2000);
     };
-    
+
     document.body.appendChild(audioButton);
   }
 });
