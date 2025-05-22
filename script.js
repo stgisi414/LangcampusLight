@@ -1743,14 +1743,21 @@ function createAudioButton(text, rect) {
     let isPlaying = false;
     // Add click event listener with preventDefault
     button.addEventListener('click', async (e) => {
-        console.log('========= AUDIO BUTTON CLICK START =========');
-        console.log('Button clicked with text:', text);
-        console.log('Button state:', {
-            disabled: button.disabled,
-            isPlaying,
-            classList: Array.from(button.classList),
-            display: button.style.display,
-            visibility: button.style.visibility
+        console.log('🎵 AUDIO BUTTON CLICK', {
+            text,
+            buttonState: {
+                disabled: button.disabled,
+                isPlaying,
+                classes: Array.from(button.classList),
+                styles: {
+                    display: button.style.display,
+                    visibility: button.style.visibility,
+                    position: button.style.position,
+                    left: button.style.left,
+                    top: button.style.top
+                }
+            },
+            audioContext: audioContext ? 'initialized' : 'null'
         });
 
         e.preventDefault();
@@ -1862,7 +1869,6 @@ function removeAudioButton() {
 
 // Text selection handler for both desktop and mobile
 document.addEventListener('selectionchange', function() {
-    console.log('Selection changed');
     
     // Don't show audio button if selection is in input/textarea
     const activeElement = document.activeElement;
