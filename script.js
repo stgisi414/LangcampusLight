@@ -986,6 +986,38 @@ document.getElementById('send-message').addEventListener('click', async () => { 
     }
 });
 
+// Handle text selection
+document.addEventListener('mouseup', (event) => {
+  removeExistingAudioButton();
+  
+  const selection = window.getSelection();
+  const text = selection.toString().trim();
+  
+  if (isValidSelection(text)) {
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    
+    const button = createAudioButton(rect);
+    button.onclick = async () => {
+      button.innerHTML = '🔄 Loading...';
+      button.classList.add('playing');
+      
+      try {
+        await handleTextToSpeech(text);
+      } catch (error) {
+        console.error('Audio playback failed:', error);
+        button.innerHTML = '❌ Error';
+      }
+      
+      setTimeout(() => {
+        button.remove();
+      }, 2000);
+    };
+    
+    document.body.appendChild(button);
+  }
+});
+
 // Add event listener for Enter key on message input
 document.getElementById('message-input').addEventListener('keydown', (event) => {
     // Check if the key pressed was Enter (key code 13)
@@ -1392,6 +1424,34 @@ function validateWebhookOrigin(url) {
     console.error('Invalid URL:', error);
     return false;
   }
+}
+
+// Remove existing audio button if present
+function removeExistingAudioButton() {
+  const existingButton = document.querySelector('.audio-button');
+  if (existingButton) {
+    existingButton.remove();
+  }
+}
+
+// Create and position audio button
+function createAudioButton(rect) {
+  removeExistingAudioButton();
+  
+  const button = document.createElement('button');
+  button.className = 'audio-button';
+  button.innerHTML = '🔊 Play Audio';
+  
+  // Position button below selected text
+  button.style.left = `${window.scrollX + rect.left}px`;
+  button.style.top = `${window.scrollY + rect.bottom + 5}px`;
+  
+  return button;
+}
+
+// Check if text contains at least two non-space/punctuation characters
+function isValidSelection(text) {
+  return text.replace(/[\s\p{P}]/gu, '').length >= 2;
 }
 
 // Function to handle text-to-speech conversion

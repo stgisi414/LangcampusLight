@@ -29,6 +29,30 @@
     opacity: 0.9;
 }
 
+
+.audio-button {
+  position: absolute;
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.audio-button:hover {
+  background: #2980b9;
+}
+
+.audio-button.playing {
+  background: #27ae60;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     line-height: 1.6;
