@@ -1743,25 +1743,18 @@ function createAudioButton(text, rect) {
     let isPlaying = false;
     // Add click event listener with preventDefault
     button.addEventListener('click', async (e) => {
-        console.log('🎵 AUDIO BUTTON CLICK', {
-            text,
-            buttonState: {
-                disabled: button.disabled,
-                isPlaying,
-                classes: Array.from(button.classList),
-                styles: {
-                    display: button.style.display,
-                    visibility: button.style.visibility,
-                    position: button.style.position,
-                    left: button.style.left,
-                    top: button.style.top
-                }
-            },
-            audioContext: audioContext ? 'initialized' : 'null'
-        });
-
         e.preventDefault();
         e.stopPropagation();
+        
+        // Prevent button from being removed immediately
+        e.target.style.pointerEvents = 'none';
+        
+        console.log('🎵 AUDIO BUTTON CLICK START');
+        
+        // Keep button visible during audio processing
+        button.style.display = 'flex';
+        button.style.visibility = 'visible';
+        button.style.opacity = '1';
         
         if (isPlaying) {
             console.error('Already playing state detected - preventing duplicate playback');
