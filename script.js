@@ -1290,8 +1290,14 @@ document.getElementById('targetLanguage').addEventListener('change', (event) => 
 document.getElementById('save-partner-btn').addEventListener('click', () => {
     if (!currentPartner) return;
 
-    // Check if running on mobile
+    // Check if running on mobile and HTTPS
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isHttps = window.location.protocol === 'https:';
+
+    if (!isHttps) {
+        alert('Save functionality requires HTTPS. Please ensure you are using a secure connection.');
+        return;
+    }
 
     try {
         const savedPartner = localStorage.getItem('savedPartner');
@@ -1460,6 +1466,10 @@ function initAudioContext() {
 // Function to play audio with better error handling
 async function playAudioFromText(text, button) {
     try {
+        if (window.location.protocol !== 'https:') {
+            throw new Error('Audio functionality requires HTTPS');
+        }
+        
         initAudioContext();
         button.disabled = true;
         button.innerHTML = '🔄 Loading...';
