@@ -986,18 +986,18 @@ document.getElementById('send-message').addEventListener('click', async () => { 
     }
 });
 
-// Handle text selection inside chat modal
+// Handle text selection
 document.addEventListener('mouseup', (event) => {
-  const selection = window.getSelection();
-  const text = selection.toString().trim();
-  
-  // Debug alert
-  alert('Selected text: ' + text);
-  
-  if (text.length >= 2) {
-    const range = selection.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
-    const modalRect = document.getElementById('chat-modal').getBoundingClientRect();
+  setTimeout(() => {
+    const selection = window.getSelection();
+    const text = selection.toString().trim();
+    
+    // Debug alert - only show if text is selected
+    if (text.length >= 2) {
+      alert('Selected text: ' + text);
+      
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
     
     const button = document.createElement('button');
     button.className = 'audio-button';
