@@ -1248,7 +1248,7 @@ function checkSavedPartner() {
     if (savedPartnerData) {
         const data = JSON.parse(savedPartnerData);
         banner.style.display = 'block';
-        info.textContent = `Saved chat with ${data.partner.name}`;
+        info.textContent = `Chat with ${data.partner.name}`;
 
         // Resume chat button
         document.getElementById('resume-chat-btn').onclick = () => {
