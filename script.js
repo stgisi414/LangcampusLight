@@ -1800,110 +1800,120 @@ function detectLanguage(text) {
 }
 
 // Function to play audio with better error handling
-async function playAudioFromText(text, button) {
+async function playAudioFromText(text, button, maxRetries = 3) {
     console.log('Starting playAudioFromText with text:', text);
-    try {
-        if (window.location.protocol !== 'https:') {
-            throw new Error('Audio functionality requires HTTPS');
-        }
+    let retryCount = 0;
+    let success = false;
 
-        initAudioContext();
-        button.disabled = true;
-        button.style.visibility = 'visible';
-        button.style.display = 'flex';
-        button.innerHTML = '🔄 Loading...';
+    while (retryCount < maxRetries && !success) {
+        try {
+            if (window.location.protocol !== 'https:') {
+                throw new Error('Audio functionality requires HTTPS');
+            }
 
-        const detectedLang = detectLanguage(text);
-        const voiceId = VOICE_MAPPING[detectedLang] || VOICE_MAPPING.en;
-
-        console.log('Sending TTS request:', {
-            url: TTS_API_URL,
-            text: text,
-            voiceId: voiceId
-        });
-
-        console.log('Sending TTS request to:', TTS_API_URL);
-        const requestBody = {
-            text: text,
-            voice_id: voiceId,
-            model_id: "eleven_multilingual_v2"
-        };
-        console.log('Request body:', requestBody);
-
-        const response = await fetch(TTS_API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer wsec_81c54a71adb28dff26425889f84fbdfee3b446707529b33bd0e2a54eb3a43944'
-            },
-            body: JSON.stringify(requestBody)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('TTS API Error:', {
-                status: response.status,
-                statusText: response.statusText,
-                errorBody: errorText
-            });
-            throw new Error(`TTS API error: ${response.status} ${response.statusText}`);
-        }
-
-        console.log('API response received, getting blob...');
-        const audioBlob = await response.blob();
-        console.log('Received audio blob:', {
-            size: audioBlob.size,
-            type: audioBlob.type
-        });
-
-        if (audioBlob.size === 0) {
-            console.error('Empty audio blob received');
-            throw new Error('Received empty audio response');
-        }
-
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-
-        audio.onerror = (e) => {
-            console.error('Audio playback error:', e);
-            button.innerHTML = '❌ Error';
+            initAudioContext();
+            button.disabled = true;
+            button.style.visibility = 'visible';
             button.style.display = 'flex';
-            setTimeout(() => button.remove(), 3000);
-        };
+            button.innerHTML = retryCount > 0 ? 
+                `🔄 Loading... (Retry ${retryCount}/${maxRetries})` : 
+                '🔄 Loading...';
 
-        audio.onended = () => {
+            const detectedLang = detectLanguage(text);
+            const voiceId = VOICE_MAPPING[detectedLang] || VOICE_MAPPING.en;
+
+            // Create timeout promise
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Request timeout')), 10000)
+            );
+
+            // Fetch with timeout
+            const fetchPromise = fetch(TTS_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer wsec_81c54a71adb28dff26425889f84fbdfee3b446707529b33bd0e2a54eb3a43944'
+                },
+                body: JSON.stringify({
+                    text: text,
+                    voice_id: voiceId,
+                    model_id: "eleven_multilingual_v2"
+                })
+            });
+
+            const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`TTS API error: ${response.status} - ${errorText}`);
+            }
+
+            const audioBlob = await response.blob();
+            if (!audioBlob || audioBlob.size === 0) {
+                throw new Error('Empty audio response received');
+            }
+
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio();
+
+            // Pre-load audio
+            await new Promise((resolve, reject) => {
+                audio.oncanplaythrough = resolve;
+                audio.onerror = reject;
+                audio.src = audioUrl;
+                audio.load();
+                setTimeout(() => reject(new Error('Audio loading timeout')), 5000);
+            });
+
+            // Setup event handlers
+            audio.onerror = (e) => {
+                console.error('Audio playback error:', e);
+                throw new Error('Audio playback failed');
+            };
+
+            // Play audio and wait for completion
+            await audio.play();
+            await new Promise((resolve) => {
+                audio.onended = resolve;
+            });
+
+            // Success! Update button and clean up
             button.innerHTML = '✅ Played';
             button.style.display = 'flex';
             setTimeout(() => {
                 URL.revokeObjectURL(audioUrl);
                 button.remove();
             }, 2000);
-        };
 
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-            await playPromise;
-            button.innerHTML = '🔊 Playing...';
-            button.style.display = 'flex';
-        }
+            success = true;
 
-    } catch (error) {
-        console.error('Audio playback failed:', error);
-        if (button && button.parentNode) {
-            button.disabled = false;
-            button.style.visibility = 'visible';
-            button.style.display = 'flex';
-            button.innerHTML = `❌ Error: ${error.message}`;
+        } catch (error) {
+            console.error(`TTS attempt ${retryCount + 1} failed:`, error);
+            retryCount++;
 
-            // Add retry functionality instead of removing button
-            setTimeout(() => {
+            if (retryCount < maxRetries) {
+                // Wait before retrying (increasing delay)
+                await new Promise(r => setTimeout(r, retryCount * 1000));
+            } else {
+                // All retries failed
                 if (button && button.parentNode) {
-                    button.innerHTML = '🔊 Try Again';
                     button.disabled = false;
+                    button.style.visibility = 'visible';
+                    button.style.display = 'flex';
+                    button.innerHTML = `❌ Error: ${error.message}`;
+
+                    setTimeout(() => {
+                        if (button && button.parentNode) {
+                            button.innerHTML = '🔊 Try Again';
+                            button.disabled = false;
+                        }
+                    }, 3000);
                 }
-            }, 3000);
+            }
         }
     }
+
+    return success;
 }
 
 // Audio button controller 
