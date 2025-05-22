@@ -1494,8 +1494,11 @@ async function sendWebhookRequest(data) {
     }
 }
 
-const TTS_API_URL = 'https://langcamp.us/elevenlbs-exchange-audio/exchange-audio';
+const TTS_API_URL = 'https://practicefor.fun/elevenlbs-exchange-audio/exchange-audio';
 var audioContext = null;
+
+// Debug logging
+console.log('TTS functionality initialized');
 
 // Voice mapping for different languages
 const VOICE_MAPPING = {
@@ -1555,17 +1558,21 @@ async function playAudioFromText(text, button) {
             voiceId: voiceId
         });
 
+        console.log('Sending TTS request to:', TTS_API_URL);
+        const requestBody = {
+            text: text,
+            voice_id: voiceId,
+            model_id: "eleven_multilingual_v2"
+        };
+        console.log('Request body:', requestBody);
+
         const response = await fetch(TTS_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer wsec_81c54a71adb28dff26425889f84fbdfee3b446707529b33bd0e2a54eb3a43944'
             },
-            body: JSON.stringify({
-                text: text,
-                voice_id: voiceId,
-                model_id: "eleven_multilingual_v2"
-            })
+            body: JSON.stringify(requestBody)
         });
 
         if (!response.ok) {
@@ -1693,9 +1700,14 @@ function createAudioButton(text, rect) {
 
     let isPlaying = false;
     button.onclick = async () => {
-        if (isPlaying) return;
+        console.log('Audio button clicked');
+        if (isPlaying) {
+            console.log('Already playing, ignoring click');
+            return;
+        }
         
         try {
+            console.log('Starting audio playback');
             isPlaying = true;
             button.classList.add('playing');
             button.innerHTML = `
