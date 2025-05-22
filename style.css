@@ -256,6 +256,8 @@ footer {
 footer a {
     color: #3498db !important;
     text-decoration: none;
+    font-weight: normal;
+    opacity: 1;
 }
 
 footer a:hover {
