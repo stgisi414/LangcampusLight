@@ -1378,4 +1378,54 @@ chatMessages.addEventListener('click', async (event) => {
         }
     }
 });
-// ... existing code ...
+
+// Webhook configuration with domain restriction
+const ALLOWED_DOMAIN = 'practicefor.fun';
+const WEBHOOK_URL = 'https://api.elevenlabs.io/v1/text-to-speech/add/webhook';
+
+// Function to validate webhook request origin
+function validateWebhookOrigin(url) {
+  try {
+    const webhookDomain = new URL(url).hostname;
+    return webhookDomain === ALLOWED_DOMAIN;
+  } catch (error) {
+    console.error('Invalid URL:', error);
+    return false;
+  }
+}
+
+// Function to handle text-to-speech conversion
+async function handleTextToSpeech(text) {
+  try {
+    const selectedText = window.getSelection().toString();
+    if (selectedText.length < 2) {
+      alert('Please select at least 2 characters of text');
+      return;
+    }
+
+    // Validate request origin
+    if (!validateWebhookOrigin(window.location.href)) {
+      alert('Unauthorized domain');
+      return;
+    }
+
+    // Create audio element
+    const audio = new Audio();
+    audio.src = `${WEBHOOK_URL}?text=${encodeURIComponent(selectedText)}`;
+
+    // Play audio when ready
+    audio.addEventListener('canplaythrough', () => {
+      audio.play();
+    });
+
+    // Error handling
+    audio.addEventListener('error', () => {
+      console.error('Error playing audio');
+      alert('Error playing audio. Please try again.');
+    });
+
+  } catch (error) {
+    console.error('Text-to-speech error:', error);
+    alert('Error processing text-to-speech request');
+  }
+}
