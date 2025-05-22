@@ -207,6 +207,15 @@ footer {
     color: white;
 }
 
+footer a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
 @media (max-width: 600px) {
     .search-filters {
         flex-direction: column;
