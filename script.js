@@ -816,6 +816,9 @@ const grammarData = {
 console.log("Grammar data embedded."); // Log to confirm it's loaded
 
 function openChat(partner) { // Now accepts the full partner object
+    // Clean up any existing audio buttons
+    removeAudioButton();
+    
     const modal = document.getElementById('chat-modal');
     const chatHeader = modal.querySelector('.chat-header'); // Get the header element
     const chatMessages = document.getElementById('chat-messages');
@@ -1782,6 +1785,12 @@ document.addEventListener('selectionchange', function() {
 
 // Add touch event handling for mobile
 document.addEventListener('touchend', function(e) {
+    // Don't show audio button if selection is in input/textarea
+    const activeElement = document.activeElement;
+    if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') {
+        return;
+    }
+
     // Small delay to allow selection to complete
     setTimeout(() => {
         const selection = window.getSelection();
@@ -1796,9 +1805,16 @@ document.addEventListener('touchend', function(e) {
             
             // Adjust position for mobile
             const scrollY = window.pageYOffset || document.documentElement.scrollTop;
-            rect.top += scrollY;
+            const adjustedRect = new DOMRect(
+                rect.x,
+                rect.y + scrollY,
+                rect.width,
+                rect.height
+            );
             
-            createAudioButton(selectedText, rect);
+            // Remove any existing audio buttons before creating new one
+            removeAudioButton();
+            createAudioButton(selectedText, adjustedRect);
         }
     }, 100);
 });
