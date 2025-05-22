@@ -254,7 +254,7 @@ footer {
 }
 
 footer a {
-    color: #3498db;
+    color: #3498db !important;
     text-decoration: none;
 }
 
