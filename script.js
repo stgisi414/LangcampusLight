@@ -1290,11 +1290,22 @@ document.getElementById('targetLanguage').addEventListener('change', (event) => 
 document.getElementById('save-partner-btn').addEventListener('click', () => {
     if (!currentPartner) return;
 
+    // Check if running on mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
     try {
         const savedPartner = localStorage.getItem('savedPartner');
         if (savedPartner) {
-            if (!confirm('Do you want to overwrite the previously saved partner?')) {
-                return;
+            // Use custom modal for mobile devices instead of confirm
+            if (isMobile) {
+                const confirmed = window.confirm('Do you want to overwrite the previously saved partner?');
+                if (!confirmed) {
+                    return;
+                }
+            } else {
+                if (!confirm('Do you want to overwrite the previously saved partner?')) {
+                    return;
+                }
             }
         }
 
@@ -1305,10 +1316,55 @@ document.getElementById('save-partner-btn').addEventListener('click', () => {
         };
 
         localStorage.setItem('savedPartner', JSON.stringify(dataToSave));
-        alert('Partner and recent messages saved successfully!');
+        
+        // Show success message
+        if (isMobile) {
+            // Create a temporary success message element
+            const successMsg = document.createElement('div');
+            successMsg.style.position = 'fixed';
+            successMsg.style.bottom = '20px';
+            successMsg.style.left = '50%';
+            successMsg.style.transform = 'translateX(-50%)';
+            successMsg.style.background = '#4CAF50';
+            successMsg.style.color = 'white';
+            successMsg.style.padding = '10px 20px';
+            successMsg.style.borderRadius = '5px';
+            successMsg.style.zIndex = '10000';
+            successMsg.textContent = 'Partner saved successfully!';
+            
+            document.body.appendChild(successMsg);
+            
+            // Remove after 2 seconds
+            setTimeout(() => {
+                successMsg.remove();
+            }, 2000);
+        } else {
+            alert('Partner and recent messages saved successfully!');
+        }
     } catch (error) {
         console.error('Error saving partner:', error);
-        alert('Could not save partner. Please ensure you are using HTTPS in production.');
+        if (isMobile) {
+            // Show error message for mobile
+            const errorMsg = document.createElement('div');
+            errorMsg.style.position = 'fixed';
+            errorMsg.style.bottom = '20px';
+            errorMsg.style.left = '50%';
+            errorMsg.style.transform = 'translateX(-50%)';
+            errorMsg.style.background = '#f44336';
+            errorMsg.style.color = 'white';
+            errorMsg.style.padding = '10px 20px';
+            errorMsg.style.borderRadius = '5px';
+            errorMsg.style.zIndex = '10000';
+            errorMsg.textContent = 'Could not save partner. Please ensure HTTPS is enabled.';
+            
+            document.body.appendChild(errorMsg);
+            
+            setTimeout(() => {
+                errorMsg.remove();
+            }, 3000);
+        } else {
+            alert('Could not save partner. Please ensure you are using HTTPS in production.');
+        }
     }
 });
 
@@ -1559,7 +1615,7 @@ function removeAudioButton() {
     if (chatMessages) chatMessages.style.overflow = '';
 }
 
-// Text selection handler
+// Text selection handler for both desktop and mobile
 document.addEventListener('selectionchange', function() {
     // Don't show audio button if selection is in input/textarea
     const activeElement = document.activeElement;
@@ -1577,10 +1633,40 @@ document.addEventListener('selectionchange', function() {
         const rect = range.getBoundingClientRect();
         if (!rect) return;
 
+        // For mobile, adjust the rect position to account for scroll
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        if (isMobile) {
+            const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+            rect.top += scrollY;
+        }
+
         createAudioButton(selectedText, rect);
     } else {
         removeAudioButton();
     }
+});
+
+// Add touch event handling for mobile
+document.addEventListener('touchend', function(e) {
+    // Small delay to allow selection to complete
+    setTimeout(() => {
+        const selection = window.getSelection();
+        const selectedText = selection?.toString().trim();
+        
+        if (selectedText && selectedText.length >= 2) {
+            const range = selection?.getRangeAt(0);
+            if (!range) return;
+            
+            const rect = range.getBoundingClientRect();
+            if (!rect) return;
+            
+            // Adjust position for mobile
+            const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+            rect.top += scrollY;
+            
+            createAudioButton(selectedText, rect);
+        }
+    }, 100);
 });
 
 // Remove audio button when clicking outside
