@@ -1,0 +1,131 @@
+Here's an improved implementation for your audio playback that should be more reliable:
+
+// Improved function to play TTS with retry logic and better error handling
+async function playTextToSpeech(text, maxRetries = 3) {
+  let retryCount = 0;
+  let success = false;
+  
+  // Show loading indicator
+  const loadingElement = document.getElementById('audio-loading') || document.createElement('div');
+  loadingElement.textContent = 'Loading audio...';
+  loadingElement.style.display = 'block';
+  
+  while (retryCount < maxRetries && !success) {
+    try {
+      // Update loading message if retrying
+      if (retryCount > 0) {
+        loadingElement.textContent = `Loading audio... (Retry ${retryCount}/${maxRetries})`;
+      }
+      
+      // Determine language and select appropriate voice
+      const voiceId = 'pNInz6obpgDQGcFmaJgB'; // Default voice, you can add language detection here
+      
+      // Create a timeout promise to abort if taking too long
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timeout')), 10000)
+      );
+      
+      // Fetch with timeout
+      const fetchPromise = fetch('https://langcamp.us/elevenlbs-exchange-audio/exchange-audio', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer wsec_81c54a71adb28dff26425889f84fbdfee3b446707529b33bd0e2a54eb3a43944'
+        },
+        body: JSON.stringify({
+          text: text,
+          voice_id: voiceId,
+          model_id: 'eleven_multilingual_v2'
+        })
+      });
+      
+      // Race between fetch and timeout
+      const response = await Promise.race([fetchPromise, timeoutPromise]);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API error: ${response.status} - ${errorText}`);
+      }
+      
+      const audioBlob = await response.blob();
+      if (!audioBlob || audioBlob.size === 0) {
+        throw new Error('Empty audio response received');
+      }
+      
+      // Pre-load the audio before playing
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio();
+      
+      await new Promise((resolve, reject) => {
+        // Set up event handlers before setting src
+        audio.oncanplaythrough = resolve;
+        audio.onerror = reject;
+        
+        // Now set the source
+        audio.src = audioUrl;
+        
+        // Start loading
+        audio.load();
+        
+        // Set a timeout for this step too
+        setTimeout(() => reject(new Error('Audio loading timeout')), 5000);
+      });
+      
+      // Play the audio
+      await audio.play();
+      
+      // Wait for audio completion
+      await new Promise((resolve) => {
+        audio.onended = resolve;
+      });
+      
+      // Clean up
+      URL.revokeObjectURL(audioUrl);
+      success = true;
+      
+    } catch (error) {
+      console.error(`TTS attempt ${retryCount + 1} failed:`, error);
+      retryCount++;
+      
+      // Wait before retrying (increasing delay)
+      if (retryCount < maxRetries) {
+        await new Promise(r => setTimeout(r, retryCount * 1000));
+      }
+    }
+  }
+  
+  // Hide loading indicator
+  loadingElement.style.display = 'none';
+  
+  // Return whether we succeeded
+  return success;
+}
+Here's how to use this in your practicefor.fun site:
+
+Add a loading indicator to your UI so users know something is happening
+
+Call the function when you want to play speech:
+
+const successfulPlay = await playTextToSpeech("Your text here");
+if (!successfulPlay) {
+  // Show a fallback message or UI element
+  showErrorMessage("Sorry, couldn't play audio at this time.");
+}
+For better user experience, consider adding a fallback option when audio fails:
+
+// In your UI component where you have a play button
+async function handlePlayClick() {
+  playButton.disabled = true;
+  
+  try {
+    const success = await playTextToSpeech(messageText);
+    if (!success) {
+      showMessage("Audio could not be played. Try again later.");
+    }
+  } catch (err) {
+    console.error("Audio playback error:", err);
+    showMessage("Error playing audio.");
+  } finally {
+    playButton.disabled = false;
+  }
+}

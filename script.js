@@ -220,7 +220,7 @@ function displayResults(partners) {
 
     // Add partner cards or 'no results' message
     if (!partners || partners.length === 0) {
-        resultsContainer.innerHTML = '<p style="text-align:center;">No partners found matching your criteria.</p>';
+        resultsContainer.innerHTML = '<p style="grid-column: 1 / -1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 3rem; text-align: center; color: #555;">No partners found matching your criteria.</p>';
     } else {
         partners.forEach(partner => {
             const card = document.createElement('div');
