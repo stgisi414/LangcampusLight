@@ -1729,13 +1729,21 @@ function createAudioButton(text, rect) {
         
         try {
             console.log('Starting audio playback');
+            if (isPlaying) {
+                console.log('Already playing, preventing duplicate playback');
+                return;
+            }
             isPlaying = true;
+            
+            // Keep button visible and interactive
             button.style.opacity = '1';
             button.style.visibility = 'visible';
             button.style.display = 'flex';
-            button.disabled = true; // Disable button while processing
+            button.style.pointerEvents = 'auto';
+            
+            // Update button state
+            button.disabled = true;
             button.classList.add('playing');
-            button.style.pointerEvents = 'none'; // Prevent additional clicks
             button.innerHTML = `
                 <span class="button-icon">🔄</span>
                 <span class="button-text">Loading...</span>
@@ -1759,22 +1767,31 @@ function createAudioButton(text, rect) {
             setTimeout(() => button.remove(), 2000);
         } catch (error) {
             console.error('Audio playback failed:', error);
-            button.disabled = false;
-            button.classList.remove('playing');
-            button.style.opacity = '1';
-            button.style.visibility = 'visible';
-            button.style.display = 'flex';
-            button.style.pointerEvents = 'auto';
-            button.innerHTML = `
-                <span class="button-icon">❌</span>
-                <span class="button-text">Error: ${error.message}</span>
-            `;
-            // Keep the error visible longer
-            setTimeout(() => {
-                if (button && button.parentNode) {
-                    button.remove();
-                }
-            }, 5000);
+            if (button && button.parentNode) {
+                button.disabled = false;
+                button.classList.remove('playing');
+                button.style.opacity = '1';
+                button.style.visibility = 'visible';
+                button.style.display = 'flex';
+                button.style.pointerEvents = 'auto';
+                button.innerHTML = `
+                    <span class="button-icon">❌</span>
+                    <span class="button-text">Error: ${error.message}</span>
+                `;
+                
+                // Keep error visible and allow retry
+                const retryTimeout = setTimeout(() => {
+                    if (button && button.parentNode) {
+                        button.innerHTML = `
+                            <span class="button-icon">🔊</span>
+                            <span class="button-text">Try Again</span>
+                        `;
+                    }
+                }, 3000);
+                
+                // Store timeout ID on button element
+                button.dataset.retryTimeout = retryTimeout;
+            }
         } finally {
             isPlaying = false;
         }
