@@ -1661,14 +1661,12 @@ async function playAudioFromText(text, button) {
 
 // Audio button controller 
 function createAudioButton(text, rect) {
-    try {
-        console.log('Creating audio button for text:', text);
-        console.log('Button position:', rect);
-        
-        // Remove any existing audio buttons first
-        const existingButtons = document.querySelectorAll('.audio-button');
-        console.log('Removing existing buttons:', existingButtons.length);
-        existingButtons.forEach(btn => btn.remove());
+    // Remove existing buttons
+    removeAudioButton();
+    
+    // Create new button
+    const button = document.createElement('button');
+    button.className = 'audio-button';
 
     const button = document.createElement('button');
     button.className = 'audio-button icon-button';
@@ -1745,16 +1743,15 @@ function createAudioButton(text, rect) {
     button.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
+        button.disabled = true;
         
-        // Prevent button from being removed immediately
-        e.target.style.pointerEvents = 'none';
-        
-        console.log('🎵 AUDIO BUTTON CLICK START');
-        
-        // Keep button visible during audio processing
-        button.style.display = 'flex';
-        button.style.visibility = 'visible';
-        button.style.opacity = '1';
+        try {
+            await playAudioFromText(text, button);
+        } catch (error) {
+            console.error('Audio playback failed:', error);
+            button.textContent = 'Error - Click to retry';
+            button.disabled = false;
+        }
         
         if (isPlaying) {
             console.error('Already playing state detected - preventing duplicate playback');
