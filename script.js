@@ -1434,39 +1434,38 @@ async function playAudioFromText(text, button) {
     }
 }
 
-// Audio button controller
-const audioButton = {
-    element: null,
-    create(text, rect) {
-        this.remove();
-        const button = document.createElement('button');
-        button.className = 'audio-button';
-        button.innerHTML = '🔊 Play Audio';
-        button.style.position = 'fixed';
-        button.style.left = `${rect.left + window.scrollX}px`;
-        button.style.top = `${rect.bottom + window.scrollY + 5}px`;
-        button.style.zIndex = '10000';
-        
-        button.onclick = async () => {
-            try {
-                await playAudioFromText(text, button);
-            } catch (error) {
-                console.error('Audio playback failed:', error);
-                button.innerHTML = '❌ Error';
-                setTimeout(() => this.remove(), 2000);
-            }
-        };
+// Audio button controller 
+function createAudioButton(text, rect) {
+    // Remove any existing audio buttons first
+    const existingButtons = document.querySelectorAll('.audio-button');
+    existingButtons.forEach(btn => btn.remove());
 
-        document.body.appendChild(button);
-        this.element = button;
-    },
-    remove() {
-        if (this.element) {
-            this.element.remove();
-            this.element = null;
+    const button = document.createElement('button');
+    button.className = 'audio-button';
+    button.innerHTML = '🔊 Play Audio';
+    button.style.position = 'fixed';
+    button.style.left = `${rect.left + window.scrollX}px`;
+    button.style.top = `${rect.bottom + window.scrollY + 5}px`;
+    button.style.zIndex = '10000';
+
+    button.onclick = async () => {
+        try {
+            await playAudioFromText(text, button);
+        } catch (error) {
+            console.error('Audio playback failed:', error);
+            button.innerHTML = '❌ Error';
+            setTimeout(() => button.remove(), 2000);
         }
-    }
-};
+    };
+
+    document.body.appendChild(button);
+    return button;
+}
+
+function removeAudioButton() {
+    const buttons = document.querySelectorAll('.audio-button');
+    buttons.forEach(btn => btn.remove());
+}
 
 // Text selection handler
 document.addEventListener('mouseup', function(event) {
@@ -1484,15 +1483,15 @@ document.addEventListener('mouseup', function(event) {
         const rect = range.getBoundingClientRect();
         if (!rect) return;
 
-        audioButton.create(selectedText, rect);
+        createAudioButton(selectedText, rect);
     } else {
-        audioButton.remove();
+        removeAudioButton();
     }
 });
 
 // Remove audio button when clicking outside
 document.addEventListener('mousedown', (event) => {
-    if (audioButton.element && event.target !== audioButton.element) {
-        audioButton.remove();
+    if (!event.target.classList.contains('audio-button')) {
+        removeAudioButton();
     }
 });
