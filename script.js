@@ -987,11 +987,12 @@ document.getElementById('send-message').addEventListener('click', async () => { 
 });
 
 // Handle text selection inside chat modal
-document.getElementById('chat-modal').addEventListener('mouseup', (event) => {
-  removeExistingAudioButton();
-  
+document.addEventListener('mouseup', (event) => {
   const selection = window.getSelection();
   const text = selection.toString().trim();
+  
+  // Debug alert
+  alert('Selected text: ' + text);
   
   if (text.length >= 2) {
     const range = selection.getRangeAt(0);
