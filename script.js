@@ -1740,13 +1740,23 @@ function createAudioButton(text, rect) {
     button.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
+        
+        console.log('Audio button clicked');
+        
+        if (button.disabled) {
+            console.log('Button is disabled, ignoring click');
+            return;
+        }
+        
         button.disabled = true;
+        button.innerHTML = '🔄 Loading...';
         
         try {
+            console.log('Starting audio playback');
             await playAudioFromText(text, button);
         } catch (error) {
             console.error('Audio playback failed:', error);
-            button.textContent = 'Error - Click to retry';
+            button.innerHTML = '❌ Error - Click to retry';
             button.disabled = false;
         }
         
