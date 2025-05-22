@@ -1494,8 +1494,10 @@ function removeAudioButton() {
 }
 
 // Text selection handler
-document.addEventListener('mouseup', function(event) {
-    if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+document.addEventListener('selectionchange', function() {
+    // Don't show audio button if selection is in input/textarea
+    const activeElement = document.activeElement;
+    if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') {
         return;
     }
 
