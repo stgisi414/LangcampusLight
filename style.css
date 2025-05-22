@@ -289,6 +289,23 @@ footer {
     justify-content: flex-start; /* Align controls to the left */
 }
 
+.save-partner-btn {
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    color: #3498db;
+}
+
+.save-partner-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+.save-partner-btn:hover {
+    color: #2980b9;
+}
+
 /* Toggle Switch Styles */
 .toggle-switch {
     position: relative;

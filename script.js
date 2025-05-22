@@ -1256,6 +1256,27 @@ document.getElementById('targetLanguage').addEventListener('change', (event) => 
     localStorage.setItem("selectedTargetLanguage", valueToSave);
 });
 
+// Save partner functionality
+document.getElementById('save-partner-btn').addEventListener('click', () => {
+    if (!currentPartner) return;
+
+    const savedPartner = localStorage.getItem('savedPartner');
+    if (savedPartner) {
+        if (!confirm('Do you want to overwrite the previously saved partner?')) {
+            return;
+        }
+    }
+
+    // Save partner and last 10 messages
+    const dataToSave = {
+        partner: currentPartner,
+        messages: chatHistory.slice(-10)
+    };
+    
+    localStorage.setItem('savedPartner', JSON.stringify(dataToSave));
+    alert('Partner and recent messages saved successfully!');
+});
+
 // Add interest search filter
 document.getElementById('interestSearch').addEventListener('input', () => {
     const searchButton = document.getElementById('searchButton');
