@@ -15,6 +15,80 @@
             box-sizing: border-box;
         }
 
+        .tutorial-banner {
+            background-color: #e3f2fd;
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #bbdefb;
+        }
+
+        .tutorial-button {
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tutorial-button:hover {
+            background-color: #1976d2;
+            transform: translateY(-1px);
+        }
+
+        .tutorial-content {
+            max-width: 800px;
+            padding: 30px;
+        }
+
+        .tutorial-content h2 {
+            color: #1976d2;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .tutorial-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .tutorial-section h3 {
+            color: #2196f3;
+            margin-bottom: 15px;
+        }
+
+        .tutorial-section ul {
+            list-style-type: none;
+        }
+
+        .tutorial-section li {
+            margin: 10px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .tutorial-section li:before {
+            content: "•";
+            color: #2196f3;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        @media (max-width: 600px) {
+            .tutorial-content {
+                padding: 15px;
+                margin: 10px;
+            }
+        }
+
         .saved-partner-banner {
             background-color: #f0f8ff;
             padding: 10px;
@@ -561,6 +635,49 @@
         <span id="saved-partner-info"></span>
         <button id="resume-chat-btn" class="banner-button">Resume</button>
         <button id="delete-partner-btn" class="banner-button delete">Delete</button>
+    </div>
+    <div class="tutorial-banner">
+        <button id="tutorial-btn" class="tutorial-button">
+            <span>📚 How to Use This App</span>
+        </button>
+    </div>
+
+    <!-- Tutorial Modal -->
+    <div id="tutorial-modal" class="modal">
+        <div class="modal-content tutorial-content">
+            <span class="close tutorial-close">&times;</span>
+            <h2>🌟 How to Use Langcampus Exchange</h2>
+            
+            <div class="tutorial-section">
+                <h3>🔍 Finding Language Partners</h3>
+                <ul>
+                    <li>Select your native language from the "I speak..." dropdown</li>
+                    <li>Choose the language you want to learn from "I want to learn..."</li>
+                    <li>Use the interest search to find partners with similar hobbies</li>
+                    <li>Click "Find Partners" to see your matches</li>
+                </ul>
+            </div>
+
+            <div class="tutorial-section">
+                <h3>💬 Chat Features</h3>
+                <ul>
+                    <li>🎯 <strong>Grammar Learning:</strong> Use the "Teach Me" button to access grammar topics</li>
+                    <li>✍️ <strong>Corrections:</strong> Toggle the corrections switch to get language feedback</li>
+                    <li>🔊 <strong>Text-to-Speech:</strong> Select any text to hear it pronounced</li>
+                    <li>💾 <strong>Save Chats:</strong> Click the save icon to continue conversations later</li>
+                </ul>
+            </div>
+
+            <div class="tutorial-section">
+                <h3>📝 Practice Tips</h3>
+                <ul>
+                    <li>Start with basic greetings and introductions</li>
+                    <li>Use the grammar topics as conversation starters</li>
+                    <li>Don't be afraid to make mistakes - that's how we learn!</li>
+                    <li>Practice regularly with different partners</li>
+                </ul>
+            </div>
+        </div>
     </div>
     <header>
         <img src="./img/logo.png" alt="Logo" class="header-logo">

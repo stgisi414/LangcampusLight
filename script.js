@@ -1240,7 +1240,28 @@ Do NOT include any text before or after the Markdown content.`;
 document.addEventListener('DOMContentLoaded', () => {
     loadPreferences();
     checkSavedPartner();
+    initializeTutorial();
 });
+
+function initializeTutorial() {
+    const tutorialModal = document.getElementById('tutorial-modal');
+    const tutorialBtn = document.getElementById('tutorial-btn');
+    const tutorialClose = tutorialModal.querySelector('.tutorial-close');
+
+    tutorialBtn.onclick = () => {
+        tutorialModal.style.display = 'flex';
+    };
+
+    tutorialClose.onclick = () => {
+        tutorialModal.style.display = 'none';
+    };
+
+    window.onclick = (event) => {
+        if (event.target === tutorialModal) {
+            tutorialModal.style.display = 'none';
+        }
+    };
+}
 
 function checkSavedPartner() {
     const savedPartnerData = localStorage.getItem('savedPartner');
