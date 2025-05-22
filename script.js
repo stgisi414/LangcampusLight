@@ -1435,11 +1435,20 @@ async function playAudioFromText(text, button) {
     }
 }
 
+// Global variable for audio button
+let activeAudioButton = null;
+
 // Text selection handler
-document.addEventListener('mouseup', () => {
+document.addEventListener('mouseup', (event) => {
+    // Don't show audio button when selecting inside input fields
+    if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+        return;
+    }
+
     const selection = window.getSelection();
     const selectedText = selection?.toString().trim();
 
+    // Remove existing audio button
     if (activeAudioButton) {
         activeAudioButton.remove();
         activeAudioButton = null;
@@ -1447,22 +1456,39 @@ document.addEventListener('mouseup', () => {
 
     if (selectedText && selectedText.length >= 2) {
         const range = selection?.getRangeAt(0);
-        const rect = range?.getBoundingClientRect();
+        if (!range) return;
+        
+        const rect = range.getBoundingClientRect();
+        if (!rect) return;
 
-        if (rect) {
-            const button = document.createElement('button');
-            button.className = 'audio-button';
-            button.innerHTML = '🔊 Play Audio';
-            button.style.position = 'fixed';
-            button.style.left = `${rect.left}px`;
-            button.style.top = `${rect.bottom + 5}px`;
-            button.style.zIndex = '10000';
+        // Create new audio button
+        const button = document.createElement('button');
+        button.className = 'audio-button';
+        button.innerHTML = '🔊 Play Audio';
+        button.style.position = 'fixed';
+        button.style.left = `${rect.left + window.scrollX}px`;
+        button.style.top = `${rect.bottom + window.scrollY + 5}px`;
+        button.style.zIndex = '10000';
 
-            button.onclick = () => playAudioFromText(selectedText, button);
+        // Handle button click
+        button.onclick = async () => {
+            button.disabled = true;
+            button.innerHTML = '🔄 Loading...';
+            
+            try {
+                const audio = new Audio(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(selectedText)}`);
+                await audio.play();
+                button.innerHTML = '✅ Played';
+            } catch (error) {
+                console.error('Audio playback failed:', error);
+                button.innerHTML = '❌ Error';
+            }
+            
+            setTimeout(() => button.remove(), 2000);
+        };
 
-            document.body.appendChild(button);
-            activeAudioButton = button;
-        }
+        document.body.appendChild(button);
+        activeAudioButton = button;
     }
 });
 
