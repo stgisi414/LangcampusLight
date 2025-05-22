@@ -1494,8 +1494,18 @@ async function sendWebhookRequest(data) {
     }
 }
 
-const TTS_API_URL = 'https://api.elevenlabs.io/v1/text-to-speech';
+const TTS_API_URL = 'https://langcamp.us/elevenlbs-exchange-audio/exchange-audio';
 var audioContext = null;
+
+// Voice mapping for different languages
+const VOICE_MAPPING = {
+    'en': 'pNInz6obpgDQGcFmaJgB', // English
+    'es': '3zcEGzEYQQUXzdCubewx', // Spanish
+    'fr': 'jsCqWAovK2LkecY7zXl4', // French
+    'de': 'b3VNW9IEW1aDDStvLk0D', // German
+    'ja': 'zcAOhNBS3c14rBihAFp1', // Japanese
+    'zh': 'TxGEqnHWrfWFTfGW9XjX'  // Chinese
+};
 
 // Initialize audio context on user interaction
 function initAudioContext() {
@@ -1504,11 +1514,25 @@ function initAudioContext() {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
         } catch (error) {
             console.error('Could not initialize audio context:', error);
-            // Return null to indicate initialization failed
             return null;
         }
     }
     return audioContext;
+}
+
+// Detect language using basic character set analysis
+function detectLanguage(text) {
+    // Check for Chinese characters
+    if (/[\u4E00-\u9FFF]/.test(text)) return 'zh';
+    // Check for Japanese characters (Hiragana, Katakana, Kanji)
+    if (/[\u3040-\u30FF\u3400-\u4DBF]/.test(text)) return 'ja';
+    // Check for Spanish/French specific characters
+    if (/[áéíóúñ]/i.test(text)) return 'es';
+    if (/[àâçéèêëîïôûùüÿ]/i.test(text)) return 'fr';
+    // Check for German specific characters
+    if (/[äöüß]/i.test(text)) return 'de';
+    // Default to English
+    return 'en';
 }
 
 // Function to play audio with better error handling
@@ -1522,11 +1546,20 @@ async function playAudioFromText(text, button) {
         button.disabled = true;
         button.innerHTML = '🔄 Loading...';
 
-        const response = await fetch(`${TTS_API_URL}?text=${encodeURIComponent(text)}`, {
-            method: 'GET',
+        const detectedLang = detectLanguage(text);
+        const voiceId = VOICE_MAPPING[detectedLang] || VOICE_MAPPING.en;
+
+        const response = await fetch(TTS_API_URL, {
+            method: 'POST',
             headers: {
-                'Accept': 'audio/*'
-            }
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer wsec_81c54a71adb28dff26425889f84fbdfee3b446707529b33bd0e2a54eb3a43944'
+            },
+            body: JSON.stringify({
+                text: text,
+                voice_id: voiceId,
+                model_id: "eleven_multilingual_v2"
+            })
         });
 
         if (!response.ok) {
