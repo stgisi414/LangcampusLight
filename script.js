@@ -943,10 +943,17 @@ document.getElementById('send-message').addEventListener('click', async () => { 
             connectingMessage.remove();
         }
 
-        // Add user's message to UI and history
-        const userMessage = { sender: 'You', text: messageText };
+        // Add user's message with timestamp to UI and history
+        const timestamp = new Date().toISOString();
+        const userMessage = { sender: 'You', text: messageText, timestamp };
         chatHistory.push(userMessage);
-        chatMessages.innerHTML += `<p><strong>You:</strong> ${messageText}</p>`;
+        chatMessages.innerHTML += `
+          <p>
+            <strong>You:</strong> ${messageText}
+            <span class="message-time" style="font-size: 0.8em; color: #666; margin-left: 8px;">
+              ${new Date(timestamp).toLocaleTimeString()}
+            </span>
+          </p>`;
         messageInput.value = ''; // Clear input field
         chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll down
 
@@ -969,9 +976,16 @@ document.getElementById('send-message').addEventListener('click', async () => { 
 
             // Add partner's response to UI and history
             if (partnerResponseText) {
-                const partnerResponse = { sender: currentPartnerName, text: partnerResponseText };
+                const timestamp = new Date().toISOString();
+                const partnerResponse = { sender: currentPartnerName, text: partnerResponseText, timestamp };
                 chatHistory.push(partnerResponse);
-                chatMessages.innerHTML += `<p><strong>${currentPartnerName}:</strong> ${partnerResponseText}</p>`;
+                chatMessages.innerHTML += `
+                  <p>
+                    <strong>${currentPartnerName}:</strong> ${partnerResponseText}
+                    <span class="message-time" style="font-size: 0.8em; color: #666; margin-left: 8px;">
+                      ${new Date(timestamp).toLocaleTimeString()}
+                    </span>
+                  </p>`;
             } else {
                 chatMessages.innerHTML += `<p><em>Sorry, ${currentPartnerName} couldn't respond right now.</em></p>`;
             }
@@ -1100,8 +1114,10 @@ async function getGeminiChatResponse(partner, history) {
     const prompt = `You are ${partner.name}, a language exchange partner on the website http://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
 You are chatting with someone whose native language is ${partner.targetLanguage} and who is learning your language (${partner.nativeLanguage}).
 
-Here is the recent chat history (last 10 messages):
-${history.map(msg => `${msg.sender}: ${msg.text}`).join('\n')}
+Here is the recent chat history (last 10 messages) with timestamps:
+${history.map(msg => `[${new Date(msg.timestamp).toLocaleTimeString()}] ${msg.sender}: ${msg.text}`).join('\n')}
+
+Consider the timestamps when crafting your response. If there has been a long gap between messages, you may acknowledge it naturally in your response.
 
 Respond naturally to the last message in the chat.
 Respond in a friendly, encouraging, and informal chat style. Keep your response relatively short, like a typical chat message (1-3 sentences), unless directly asked to explain something in detail or to provide a long story or explanation. The max amount of sentences should be 4-7 for special messages.
