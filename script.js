@@ -1447,18 +1447,38 @@ function createAudioButton(text, rect) {
         <span class="button-text">Play Audio</span>
     `;
     button.style.position = 'fixed';
-    // Calculate viewport dimensions and scroll position
+    
+    // Get chat modal for scroll handling
+    const chatModal = document.getElementById('chat-modal');
+    const chatMessages = document.getElementById('chat-messages');
+    const modalRect = chatModal?.getBoundingClientRect() || { top: 0, left: 0 };
+    
+    // Calculate viewport dimensions
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
     
-    // Calculate initial position
-    let left = Math.min(rect.left + window.scrollX, viewportWidth - 120); // Ensure button doesn't go off right edge
-    let top = rect.bottom + window.scrollY + 2; // Reduced spacing from 5px to 2px
+    // Calculate initial position relative to viewport
+    let left = Math.min(rect.left, viewportWidth - 120); // Use viewport-relative position
+    let top = rect.bottom + 2; // Use viewport-relative position
+    
+    // Adjust if selection is inside chat modal
+    if (chatModal && chatModal.contains(window.getSelection().anchorNode)) {
+        // Keep chat modal scrollable but lock main page
+        document.body.style.overflow = 'hidden';
+        chatMessages.style.overflow = 'auto';
+        
+        // Adjust position relative to chat modal
+        top += modalRect.top;
+        left += modalRect.left;
+    } else {
+        // Lock page scroll for selections outside chat
+        document.body.style.overflow = 'hidden';
+    }
     
     // Adjust for bottom of viewport
-    const buttonHeight = 36; // Reduced button height
-    if (top + buttonHeight > window.scrollY + viewportHeight) {
-        top = rect.top + window.scrollY - buttonHeight - 2; // Reduced spacing when above text
+    const buttonHeight = 36;
+    if (top + buttonHeight > viewportHeight) {
+        top = rect.top - buttonHeight - 2;
     }
     
     // Ensure left position isn't negative
@@ -1508,6 +1528,10 @@ function createAudioButton(text, rect) {
 function removeAudioButton() {
     const buttons = document.querySelectorAll('.audio-button');
     buttons.forEach(btn => btn.remove());
+    // Restore scroll behavior
+    document.body.style.overflow = '';
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) chatMessages.style.overflow = '';
 }
 
 // Text selection handler
