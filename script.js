@@ -1497,11 +1497,21 @@ async function sendWebhookRequest(data) {
     }
 }
 
-const TTS_API_URL = 'https://practicefor.fun/elevenlbs-exchange-audio/exchange-audio';
+const TTS_API_URL = 'https://practicefor.fun/webhook';
 var audioContext = null;
 
 // Debug logging
-console.log('TTS functionality initialized');
+console.log('TTS functionality initialized with URL:', TTS_API_URL);
+
+// Add error event listener to window
+window.addEventListener('error', (event) => {
+    console.error('Global error:', event.error);
+});
+
+// Add unhandled rejection handler
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled promise rejection:', event.reason);
+});
 
 // Voice mapping for different languages
 const VOICE_MAPPING = {
@@ -1702,7 +1712,7 @@ function createAudioButton(text, rect) {
     button.style.zIndex = '10000';
 
     let isPlaying = false;
-    button.onclick = async () => {
+    button.addEventListener('click', async () => {
         console.log('Audio button clicked');
         if (isPlaying) {
             console.log('Already playing, ignoring click');
@@ -1713,6 +1723,13 @@ function createAudioButton(text, rect) {
             console.log('Starting audio playback');
             isPlaying = true;
             button.classList.add('playing');
+            
+            // Initialize audio context on click
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                console.log('Audio context initialized:', audioContext.state);
+            }
+            
             button.innerHTML = `
                 <span class="button-icon">🔄</span>
                 <span class="button-text">Loading...</span>
