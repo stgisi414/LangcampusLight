@@ -253,11 +253,13 @@ footer {
     color: white;
 }
 
-footer p a {
-    color: #3498db;
-    text-decoration: none;
-    font-weight: normal;
-    opacity: 1;
+footer p a, 
+footer p a:link,
+footer p a:visited {
+    color: #3498db !important;
+    text-decoration: none !important;
+    font-weight: normal !important;
+    opacity: 1 !important;
 }
 
 footer a:hover {
