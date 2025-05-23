@@ -1330,7 +1330,7 @@ ${history.map(msg => `[${new Date(msg.timestamp).toLocaleTimeString()}] ${msg.se
 Consider the timestamps when crafting your response. If there has been a long gap between messages, you may acknowledge it naturally in your response.
 
 Respond naturally to the last message in the chat.
-Respond in a friendly, encouraging, and informal chat style. Keep your response relatively short, like a typical chat message (1-3 sentences), unless directly asked to explain something in detail or to provide a long story or explanation. The max amount of sentences should be 4-7 for special messages.
+Respond in a friendly, encouraging, and informal chat style. Keep your response relatively short, like a typical chat message (1-3 sentences), unless directly asked to explain something in detail or to provide a long story or explanation. The max amount of sentences should be 4-7 for special messages. In all, the most important thing is that you engage directly and positively with the user and do not by any means parrot what they're saying unless appropriate for the context.
 
 ${enableCorrections ? `
 IMPORTANT: The user wants corrections. If their last message (sender: 'You') contains grammar or spelling errors in ${partner.nativeLanguage}, provide a brief, friendly correction AFTER your main conversational reply.
