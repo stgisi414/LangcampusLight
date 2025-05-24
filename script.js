@@ -1578,21 +1578,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('addHobby').addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        const hobbiesList = document.getElementById('hobbiesList');
-        const div = document.createElement('div');
-        div.className = 'hobby-input';
-        div.innerHTML = `
-            <input type="text" placeholder="Enter a hobby" value="">
-            <button class="remove-hobby">×</button>
-        `;
-        
-        div.querySelector('.remove-hobby').addEventListener('click', function() {
-            div.remove();
-            saveMyInfo();
-        });
-        
-        div.querySelector('input').addEventListener('input', saveMyInfo);
-        hobbiesList.appendChild(div);
+        addHobbyInput('');
         saveMyInfo();
     });
     
