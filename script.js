@@ -1420,6 +1420,7 @@ let currentQuiz = null;
 
 async function startQuiz(topicTitle, language, level = 'unknown') {
     const explanationContainer = document.getElementById('grammar-topic-list');
+    console.log(explanationContainer.innerHTML);
     if (!explanationContainer) {
         console.error('Quiz container not found');
         return;
@@ -1487,7 +1488,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
             try {
                 questions = JSON.parse(quizText);
                 if (!Array.isArray(questions)) throw new Error('Quiz must be an array');
-                
+
                 currentQuiz.questions = questions;
                 currentQuiz.total = questions.length;
                 showNextQuestion(explanationContainer);
