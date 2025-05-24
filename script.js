@@ -1669,7 +1669,8 @@ function handleAnswer(selected, correct) {
     // Disable all buttons
     buttons.forEach(button => button.disabled = true);
 
-    // Update score if correct
+    // Store user's answer and update score if correct
+    currentQuiz.questions[currentQuiz.currentQuestion].userAnswer = selected;
     if (selected === correct) currentQuiz.score++;
 
     // Show result
@@ -1711,16 +1712,44 @@ function endQuiz(message, container) {
     else if (percentage >= 70) grade = 'Good work! 👍';
     else if (percentage >= 60) grade = 'Keep practicing! 💪';
     else grade = 'More practice needed! 📚';
-
+    
+    // Get incorrect questions for sharing
+    const incorrectQuestions = currentQuiz.questions
+        .filter((q, idx) => q.userAnswer !== undefined && q.userAnswer !== q.correctIndex)
+        .map(q => q.question)
+        .slice(0, 3); // Only share up to 3 missed questions
+    
     container.innerHTML = `
         <div class="quiz-end">
             <strong>Quiz Complete!</strong>
             <pre style="margin: 10px 0; white-space: pre-wrap;">Your score: ${score}/${total} (${percentage}%)\n${grade}</pre>
+            <button onclick="shareQuizResults('${grade}', ${percentage}, ${score}, ${total}, ${JSON.stringify(incorrectQuestions).replace(/'/g, "\\'")})" class="chat-button" style="margin-right: 10px;">Share Results</button>
             <button onclick="location.reload()" class="chat-button">Start Over</button>
         </div>
     `;
 
     currentQuiz = {};
+}
+
+function shareQuizResults(grade, percentage, score, total, missedQuestions) {
+    const topicTitle = document.querySelector('.teach-me-content h2')?.textContent.replace('Grammar Topics', '') || 'grammar quiz';
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-message');
+    
+    // Format missed questions if any
+    const missedSection = missedQuestions.length > 0 
+        ? `\nAreas to review:\n${missedQuestions.join('\n')}`
+        : '';
+    
+    // Construct the message
+    messageInput.value = `I just completed the "${topicTitle}" quiz!\nScore: ${score}/${total} (${percentage}%)\n${grade}${missedSection}`;
+    
+    // Close the teach me modal
+    const teachMeModal = document.getElementById('teach-me-modal');
+    teachMeModal.style.display = 'none';
+    
+    // Send the message
+    sendButton.click();
 }
 
 async function getGrammarExplanation(topicTitle, language, level = null) {
