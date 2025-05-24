@@ -1446,7 +1446,23 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         level = grammarData[language]?.find(topic => topic.title === topicTitle)?.level || 1;
     }
 
-    const quizPrompt = `Create a multiple-choice quiz (5 questions) about "${topicTitle}" in ${language} at level ${level}. Your response must be a valid JSON array of objects. Each object must have exactly these fields: "question" (string), "options" (array of exactly 4 strings), and "correctIndex" (number 0-3). Do not include any markdown formatting or backticks.`;
+    const quizPrompt = `Create a multiple-choice quiz (5 questions) about "${topicTitle}" in ${language} at level ${level}. Your response must be valid JSON structured like this example:
+
+    [
+      {
+        "question": "What is the capital of France?",
+        "options": ["Rome", "London", "Paris", "Berlin"],
+        "correctIndex": 2
+      },
+      {
+        "question": "Which planet is known as the Red Planet?",
+        "options": ["Earth", "Mars", "Jupiter", "Venus"],
+        "correctIndex": 1
+      },
+      // Additional questions...
+    ]
+
+    Each quiz question in your JSON should follow this structure. Do not include any markdown formatting or backticks.`;
 
     fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
         method: 'POST',
