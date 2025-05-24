@@ -1,3 +1,22 @@
+
+// Store last message for retry functionality
+let lastUserMessage = '';
+
+// Function to retry last failed message
+async function retryLastMessage() {
+    if (!lastUserMessage) return;
+    
+    // Remove the error message
+    const errorMessages = document.querySelectorAll('.error-message');
+    errorMessages.forEach(msg => msg.remove());
+    
+    // Resend the last message
+    const messageInput = document.getElementById('message-input');
+    messageInput.value = lastUserMessage;
+    await document.getElementById('send-message').click();
+    messageInput.value = '';
+}
+
 const API_KEY = 'AIzaSyDIFeql6HUpkZ8JJlr_kuN0WDFHUyOhijA';
 
 async function searchPartners() {
@@ -1141,6 +1160,7 @@ document.getElementById('send-message').addEventListener('click', async () => { 
     const chatMessages = document.getElementById('chat-messages');
 
     if (messageText && currentPartner) { // Ensure partner context is available
+        lastUserMessage = messageText; // Store message for retry functionality
         // Clear the Gemini intro timer if the user sends a message first
         if (geminiIntroTimer) {
             clearTimeout(geminiIntroTimer);
@@ -1206,7 +1226,13 @@ document.getElementById('send-message').addEventListener('click', async () => { 
             if (thinkingIndicatorToRemove) {
                 thinkingIndicatorToRemove.remove();
             }
-            chatMessages.innerHTML += `<p><em>Error getting response. Please try again.</em></p>`;
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `
+                <p><em>Error getting response.</em></p>
+                <button onclick="retryLastMessage()" class="chat-button small-button" style="margin-top: 8px;">Retry</button>
+            `;
+            chatMessages.appendChild(errorDiv);
         } finally {
             chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll down after response/error
         }
