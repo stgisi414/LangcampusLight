@@ -2001,6 +2001,7 @@ async function startQuiz(topicTitle, language, level) {
             <p>Starting quiz on "${topicTitle}"! Get ready...</p>
         </div>
     `;
+    chatMessages.scrollTop = chatMessages.scrollHeight;
     
     const quizPrompt = `Create a multiple-choice quiz (5 questions) about "${topicTitle}" in ${language} at level ${level}. Format it as a JSON array where each question object has: "question", "options" (array of 4 choices), and "correctIndex" (0-3). Make it challenging but appropriate for the level.`;
 
@@ -2016,15 +2017,121 @@ async function startQuiz(topicTitle, language, level) {
         if (!response.ok) throw new Error('Failed to generate quiz');
         const data = await response.json();
         const quizText = data.candidates[0].content.parts[0].text;
-        currentQuiz = JSON.parse(quizText);
-        currentQuiz.score = 0;
-        currentQuiz.total = currentQuiz.length;
-        currentQuiz.currentQuestion = 0;
-        showNextQuestion(chatMessages);
+        try {
+            currentQuiz = {
+                questions: JSON.parse(quizText),
+                score: 0,
+                total: 5,
+                currentQuestion: 0
+            };
+            showNextQuestion(chatMessages);
+        } catch (parseError) {
+            console.error('Quiz parsing failed:', parseError);
+            endQuiz('Failed to parse quiz data. Please try again.');
+        }
     } catch (error) {
         console.error('Quiz generation failed:', error);
         endQuiz('Quiz generation failed. Please try again.');
     }
+}
+
+function showNextQuestion(chatMessages) {
+    if (!currentQuiz || currentQuiz.currentQuestion >= currentQuiz.questions.length) {
+        const percentage = Math.round((currentQuiz.score / currentQuiz.total) * 100);
+        let grade = '';
+        if (percentage >= 90) grade = 'Excellent! 🌟';
+        else if (percentage >= 80) grade = 'Great job! 👏';
+        else if (percentage >= 70) grade = 'Good work! 👍';
+        else if (percentage >= 60) grade = 'Keep practicing! 💪';
+        else grade = 'More practice needed! 📚';
+        
+        endQuiz(`Quiz complete!\nYour score: ${currentQuiz.score}/${currentQuiz.total} (${percentage}%)\n${grade}`);
+        return;
+    }
+
+    const question = currentQuiz.questions[currentQuiz.currentQuestion];
+    const letters = ['A', 'B', 'C', 'D'];
+    
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'chat-message quiz-question';
+    questionDiv.innerHTML = `
+        <strong>Question ${currentQuiz.currentQuestion + 1}/${currentQuiz.total}:</strong>
+        <p>${question.question}</p>
+        <div class="quiz-options">
+            ${question.options.map((option, i) => `
+                <button class="quiz-choice" onclick="handleAnswer(${i}, ${question.correctIndex})">
+                    ${letters[i]}) ${option}
+                </button>
+            `).join('')}
+        </div>
+    `;
+    
+    chatMessages.appendChild(questionDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function handleAnswer(selected, correct) {
+    const chatMessages = document.getElementById('chat-messages');
+    const buttons = document.querySelectorAll('.quiz-question:last-child .quiz-choice');
+    
+    // Disable all buttons
+    buttons.forEach(button => button.disabled = true);
+    
+    // Update score if correct
+    if (selected === correct) currentQuiz.score++;
+    
+    // Show result
+    buttons.forEach((button, index) => {
+        if (index === correct) {
+            button.style.backgroundColor = '#4CAF50';
+            button.style.color = 'white';
+        } else if (index === selected && selected !== correct) {
+            button.style.backgroundColor = '#f44336';
+            button.style.color = 'white';
+        }
+        button.style.opacity = '0.7';
+    });
+
+    // Add feedback message
+    const resultDiv = document.createElement('div');
+    resultDiv.className = 'chat-message quiz-result';
+    resultDiv.innerHTML = `
+        <p style="color: ${selected === correct ? '#4CAF50' : '#f44336'}">
+            <strong>${selected === correct ? '✓ Correct!' : '✗ Incorrect'}</strong><br>
+            ${selected !== correct ? `The correct answer was: ${buttons[correct].textContent}` : ''}
+        </p>
+    `;
+    chatMessages.appendChild(resultDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // Move to next question after delay
+    currentQuiz.currentQuestion++;
+    setTimeout(() => showNextQuestion(chatMessages), 2000);
+}
+
+function endQuiz(message) {
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-message');
+    const teachMeButton = document.getElementById('teach-me-button');
+    const chatMessages = document.getElementById('chat-messages');
+    
+    // Re-enable chat controls
+    messageInput.disabled = false;
+    sendButton.disabled = false;
+    teachMeButton.disabled = false;
+    quizActive = false;
+    
+    const endMessage = document.createElement('div');
+    endMessage.className = 'chat-message quiz-end';
+    endMessage.innerHTML = `
+        <strong>Quiz Complete!</strong>
+        <pre style="margin: 10px 0; white-space: pre-wrap;">${message}</pre>
+        <p><em>Chat has been re-enabled. Feel free to continue practicing!</em></p>
+    `;
+    chatMessages.appendChild(endMessage);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    currentQuiz = null;
 }
 
 function showNextQuestion(chatMessages) {
