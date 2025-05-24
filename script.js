@@ -1562,7 +1562,9 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
 }
 
 function showNextQuestion(container) {
+    console.log(container);
     if (!currentQuiz || !currentQuiz.questions || !Array.isArray(currentQuiz.questions) || currentQuiz.currentQuestion >= currentQuiz.questions.length) {
+        console.log("Current quiz and questions exist and quiz is active");
         const total = currentQuiz?.questions?.length || currentQuiz?.total || 0;
         const percentage = total ? Math.round((currentQuiz.score / total) * 100) : 0;
         let grade = '';
@@ -2234,62 +2236,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 explanationDiv.appendChild(quizButton);
                 chatMessages.appendChild(explanationDiv);
-
-                async function startQuiz(topicTitle, language, level) {
-                    // Close the grammar topics modal
-                    document.getElementById('teach-me-modal').style.display = 'none';
-
-                    const chatMessages = document.getElementById('chat-messages');
-                    const messageInput = document.getElementById('message-input');
-                    const sendButton = document.getElementById('send-message');
-                    const teachMeButton = document.getElementById('teach-me-button');
-
-                    // Disable all chat controls during quiz
-                    messageInput.disabled = true;
-                    sendButton.disabled = true;
-                    teachMeButton.disabled = true;
-                    quizActive = true;
-
-                    // Add starting message
-                    chatMessages.innerHTML += `
-        <div class="chat-message">
-            <strong>Quiz Bot:</strong> 
-            <p>Starting quiz on "${topicTitle}"! Get ready...</p>
-        </div>
-    `;
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-                    const quizPrompt = `Create a multiple-choice quiz (5 questions) about "${topicTitle}" in ${language} at level ${level}. Format it as a JSON array where each question object has: "question", "options" (array of 4 choices), and "correctIndex" (0-3). Make it challenging but appropriate for the level.`;
-
-                    try {
-                        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                contents: [{ parts: [{ text: quizPrompt }] }]
-                            })
-                        });
-
-                        if (!response.ok) throw new Error('Failed to generate quiz');
-                        const data = await response.json();
-                        const quizText = data.candidates[0].content.parts[0].text;
-                        try {
-                            currentQuiz = {
-                                questions: JSON.parse(quizText),
-                                score: 0,
-                                total: 5,
-                                currentQuestion: 0
-                            };
-                            showNextQuestion();
-                        } catch (parseError) {
-                            console.error('Quiz parsing failed:', parseError);
-                            endQuiz('Failed to parse quiz data. Please try again.');
-                        }
-                    } catch (error) {
-                        console.error('Quiz generation failed:', error);
-                        endQuiz('Quiz generation failed. Please try again.');
-                    }
-                }
 
             } catch (error) {
                 // Remove the requesting message even if there's an error
