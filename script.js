@@ -1793,19 +1793,22 @@ function endQuiz(message, container) {
 }
 
 function shareQuizResults() {
-    if (!window.lastQuizResults) return;
+    const lastResults = window.lastQuizResults;
+    if (!lastResults) {
+        console.error('No quiz results available to share');
+        return;
+    }
     
-    const {grade, percentage, score, total, incorrectQuestions, topicTitle} = window.lastQuizResults;
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-message');
     
     // Format missed questions if any
-    const missedSection = incorrectQuestions.length > 0 
-        ? `\nAreas to review:\n${incorrectQuestions.join('\n')}`
+    const missedSection = lastResults.incorrectQuestions?.length > 0 
+        ? `\nAreas to review:\n${lastResults.incorrectQuestions.join('\n')}`
         : '';
     
     // Construct the message
-    messageInput.value = `I just completed the "${topicTitle}" grammar quiz!\n\n Score: ${score}/${total} (${percentage}%)\n ${grade}${missedSection}`;
+    messageInput.value = `I just completed the "${lastResults.topicTitle}" grammar quiz!\n\nScore: ${lastResults.score}/${lastResults.total} (${lastResults.percentage}%)\n${lastResults.grade}${missedSection}`;
     
     // Close the teach me modal
     const teachMeModal = document.getElementById('teach-me-modal');
