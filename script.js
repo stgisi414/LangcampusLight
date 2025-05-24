@@ -1532,21 +1532,45 @@ You are chatting with someone whose native language is ${partner.targetLanguage}
     // Rest of the existing function remains the same...
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Content Loaded');
     loadPreferences();
     loadMyInfo();
     
     // My Info event listeners
-    document.getElementById('toggleMyInfo').addEventListener('click', () => {
-        const content = document.getElementById('myInfoContent');
-        const toggle = document.getElementById('toggleMyInfo');
-        const chevron = toggle.querySelector('.chevron');
-        content.classList.toggle('hidden');
-        toggle.classList.toggle('collapsed');
-        // Rotate chevron when toggled
-        if (content.classList.contains('hidden')) {
-            chevron.style.transform = 'rotate(-90deg)';
-        } else {
-            chevron.style.transform = 'rotate(0deg)';
+    const toggleButton = document.getElementById('toggleMyInfo');
+    const content = document.getElementById('myInfoContent');
+    
+    if (toggleButton && content) {
+        toggleButton.addEventListener('click', () => {
+            console.log('Toggle clicked');
+            content.classList.toggle('hidden');
+            toggleButton.classList.toggle('collapsed');
+            const chevron = toggleButton.querySelector('.chevron');
+            if (chevron) {
+                chevron.style.transform = content.classList.contains('hidden') ? 'rotate(-90deg)' : 'rotate(0deg)';
+            }
+        });
+    }
+
+    // Add hobby button handler
+    const addHobbyButton = document.getElementById('addHobby');
+    if (addHobbyButton) {
+        addHobbyButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Add hobby clicked');
+            addHobbyInput();
+            saveMyInfo();
+        });
+    }
+    
+    // Real-time saving for inputs
+    ['userName', 'userBio'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('input', () => {
+                console.log(`Saving ${id}`);
+                saveMyInfo();
+            });
         }
     });
     
@@ -1572,24 +1596,39 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function addHobbyInput(value = '') {
+    console.log('Adding hobby input with value:', value);
     const hobbiesList = document.getElementById('hobbiesList');
-    if (!hobbiesList) return;
+    if (!hobbiesList) {
+        console.error('Hobbies list not found');
+        return;
+    }
     
     const div = document.createElement('div');
     div.className = 'hobby-input';
     div.innerHTML = `
         <input type="text" placeholder="Enter a hobby" value="${value}">
-        <button class="remove-hobby">×</button>
+        <button type="button" class="remove-hobby">×</button>
     `;
     
+    // Add input event listener for real-time saving
+    const input = div.querySelector('input');
+    input.addEventListener('input', () => {
+        console.log('Hobby input changed');
+        saveMyInfo();
+    });
+    
+    // Add remove button handler
     const removeButton = div.querySelector('.remove-hobby');
     removeButton.addEventListener('click', (e) => {
         e.preventDefault();
+        e.stopPropagation();
+        console.log('Removing hobby input');
         div.remove();
         saveMyInfo();
     });
     
     hobbiesList.appendChild(div);
+    console.log('Hobby input added');
 }
 
 function saveMyInfo() {
