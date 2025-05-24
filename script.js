@@ -1468,7 +1468,11 @@ Do NOT include any text before or after the Markdown content.`;
         const explanationHtml = marked.parse(explanationMarkdown);
 
         // Display the HTML content in the modal
-        explanationContainer.innerHTML = `<h2>Explanation: ${topicTitle}</h2> ${explanationHtml}`; // Display parsed HTML
+        explanationContainer.innerHTML = `
+            <h2>Explanation: ${topicTitle}</h2>
+            ${explanationHtml}
+            <button class="chat-button" style="margin-top: 20px;" onclick="startQuiz('${topicTitle}', '${language}', ${level})">Quiz Me</button>
+        `; // Display parsed HTML
 
     } catch (error) {
         console.error('Error getting grammar explanation:', error);
