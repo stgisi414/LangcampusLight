@@ -1082,8 +1082,50 @@ function openChat(partner) { // Now accepts the full partner object
         // Check if the user hasn't sent a message yet (chatMessages only has the intro)
         // Check history length instead of DOM elements
         if (chatHistory.length === 0) {
-            // Generate an intro message roleplaying as the partner
-            const introMessageText = `Hi! I'm ${partner.name}. Nice to meet you! I see you're learning ${partner.nativeLanguage}. Maybe we can practice?`;
+            // Generate a personalized intro message based on context
+            const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+            const hour = new Date().getHours();
+            const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+            
+            let introMessageText = `Good ${timeOfDay}! I'm ${partner.name}`;
+            
+            // Add greeting based on partner's native language
+            const greetings = {
+                'Japanese': 'はじめまして',
+                'Chinese': '你好',
+                'Korean': '안녕하세요',
+                'Spanish': '¡Hola',
+                'French': 'Bonjour',
+                'Portuguese': 'Olá',
+                'Vietnamese': 'Xin chào',
+                'Mongolian': 'Сайн байна уу',
+                'English': 'Hi'
+            };
+            
+            if (greetings[partner.nativeLanguage]) {
+                introMessageText += ` (${greetings[partner.nativeLanguage]}!)`;
+            }
+
+            // Add personalization based on shared interests
+            if (myInfo.hobbies && partner.interests) {
+                const sharedInterests = myInfo.hobbies.filter(hobby => 
+                    partner.interests.some(interest => 
+                        interest.toLowerCase().includes(hobby.toLowerCase()) ||
+                        hobby.toLowerCase().includes(interest.toLowerCase())
+                    )
+                );
+                
+                if (sharedInterests.length > 0) {
+                    introMessageText += ` I see we both enjoy ${sharedInterests[0]}!`;
+                }
+            }
+
+            introMessageText += ` I'd love to help you practice ${partner.nativeLanguage} while I improve my ${partner.targetLanguage}.`;
+
+            // Add personalized touch if user name is available
+            if (myInfo.name) {
+                introMessageText += ` Nice to meet you, ${myInfo.name}!`;
+            }
 
             // Remove the "Connecting..." message
             const connectingMessage = document.getElementById('connecting-message');
