@@ -1561,11 +1561,15 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         });
 }
 
-function showNextQuestion(container) {
-    console.log(container);
+function showNextQuestion() {
+    const container = document.getElementById('grammar-topic-list');
+    if (!container) {
+        console.error('Quiz container not found');
+        return;
+    }
+
     if (!currentQuiz || !currentQuiz.questions || !Array.isArray(currentQuiz.questions) || currentQuiz.currentQuestion >= currentQuiz.questions.length) {
-        console.log("Current quiz and questions exist and quiz is active");
-        const total = currentQuiz?.questions?.length || currentQuiz?.total || 0;
+        const total = currentQuiz?.questions?.length || 0;
         const percentage = total ? Math.round((currentQuiz.score / total) * 100) : 0;
         let grade = '';
         if (percentage >= 90) grade = 'Excellent! 🌟';
@@ -1579,7 +1583,7 @@ function showNextQuestion(container) {
     }
 
     const question = currentQuiz.questions[currentQuiz.currentQuestion];
-    if (!question || typeof question !== 'object' || !Array.isArray(question.options) || !question.options.length === 4 || typeof question.correctIndex !== 'number') {
+    if (!question || typeof question !== 'object' || !Array.isArray(question.options) || question.options.length !== 4 || typeof question.correctIndex !== 'number') {
         console.error('Invalid question format:', question);
         endQuiz('Quiz error: Invalid question format', container);
         return;
