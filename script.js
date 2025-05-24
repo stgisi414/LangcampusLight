@@ -1535,6 +1535,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
 
                 currentQuiz.questions = questions;
                 currentQuiz.total = questions.length;
+                currentQuiz.currentQuestion = 0;
                 showNextQuestion(explanationContainer);
             } catch (parseError) {
                 console.error('Quiz parsing failed:', parseError);
