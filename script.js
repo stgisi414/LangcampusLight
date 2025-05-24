@@ -1416,7 +1416,7 @@ Your response should be ONLY the chat message text. Do not include your name or 
 
 // New function to get grammar explanation
 let quizActive = false;
-let currentQuiz = null;
+let currentQuiz = {};
 
 async function startQuiz(topicTitle, language, level = 'unknown') {
     // Validate inputs
@@ -1499,7 +1499,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
             return response.json();
         })
         .then(data => {
-            console.log(data.candidates[0].content.parts[0].text);
+            //console.log(data.candidates[0].content.parts[0].text);
             let quizText = data.candidates[0].content.parts[0].text;
             quizText = quizText.replace(/```json\s*|\s*```/g, '').trim();
 
@@ -1511,23 +1511,23 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
             try {
                 // Clean and validate the response text
                 let cleanText = quizText.replace(/```json\s*|\s*```/g, '').trim();
-                
+
                 // Ensure it starts with [ and ends with ]
                 if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
                     throw new Error('Invalid quiz format: must be a JSON array');
                 }
-                
+
                 // Parse the JSON
                 const questions = JSON.parse(cleanText);
-                
+                console.log(questions);
                 // Validate the structure
                 if (!Array.isArray(questions)) {
                     throw new Error('Quiz must be an array');
                 }
-                
+
                 // Validate each question
                 questions.forEach((q, index) => {
-                    if (!q.question || !Array.isArray(q.options) || q.options.length !== 4 || 
+                    if (!q.question || !Array.isArray(q.options) || q.options.length !== 4 ||
                         typeof q.correctIndex !== 'number' || q.correctIndex < 0 || q.correctIndex > 3) {
                         throw new Error(`Invalid question format at index ${index}`);
                     }
@@ -1655,14 +1655,14 @@ function endQuiz(message, container) {
         </div>
     `;
 
-    currentQuiz = null;
+    currentQuiz = {};
 }
 
 async function getGrammarExplanation(topicTitle, language, level = null) {
     const explanationContainer = document.getElementById('grammar-topic-list');
     explanationContainer.innerHTML = '<p>Loading explanation...</p>';
     quizActive = false;
-    currentQuiz = null;
+    currentQuiz = {};
 
     // Handle invalid or undefined topic
     if (!topicTitle || topicTitle === 'undefined') {
