@@ -1720,15 +1720,25 @@ function endQuiz(message, container) {
     
     // Get incorrect questions for sharing
     const incorrectQuestions = currentQuiz.questions
-        .filter((q, idx) => q.userAnswer !== undefined && q.userAnswer !== q.correctIndex)
-        .map(q => q.question)
-        .slice(0, 3); // Only share up to 3 missed questions
+        ?.filter((q, idx) => q.userAnswer !== undefined && q.userAnswer !== q.correctIndex)
+        ?.map(q => q.question)
+        ?.slice(0, 3) || []; // Only share up to 3 missed questions
+    
+    // Store the data as a global variable to avoid string encoding issues
+    window.lastQuizResults = {
+        grade,
+        percentage,
+        score,
+        total,
+        incorrectQuestions,
+        topicTitle: currentTopicTitle
+    };
     
     container.innerHTML = `
         <div class="quiz-end">
             <strong>Quiz Complete!</strong>
             <pre style="margin: 10px 0; white-space: pre-wrap;">Your score: ${score}/${total} (${percentage}%)\n${grade}</pre>
-            <button onclick="shareQuizResults('${grade}', ${percentage}, ${score}, ${total}, ${JSON.stringify(incorrectQuestions).replace(/'/g, "\\'")})" class="chat-button" style="margin-right: 10px;">Share Results</button>
+            <button onclick="shareQuizResults()" class="chat-button" style="margin-right: 10px;">Share Results</button>
             <button onclick="startQuiz('${currentTopicTitle}', '${currentPartner.nativeLanguage}')" class="chat-button">Start Over</button>
         </div>
     `;
@@ -1736,18 +1746,20 @@ function endQuiz(message, container) {
     currentQuiz = {};
 }
 
-function shareQuizResults(grade, percentage, score, total, missedQuestions) {
-    const topicTitle = currentTopicTitle || 'grammar quiz';
+function shareQuizResults() {
+    if (!window.lastQuizResults) return;
+    
+    const {grade, percentage, score, total, incorrectQuestions, topicTitle} = window.lastQuizResults;
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-message');
     
     // Format missed questions if any
-    const missedSection = missedQuestions.length > 0 
-        ? `\nAreas to review:\n${missedQuestions.join('\n')}`
+    const missedSection = incorrectQuestions.length > 0 
+        ? `\nAreas to review:\n${incorrectQuestions.join('\n')}`
         : '';
     
     // Construct the message
-    messageInput.value = `I just completed the "${topicTitle}" quiz!\n\nScore: ${score}/${total} (${percentage}%)\n${grade}\n${missedSection}`;
+    messageInput.value = `I just completed the "${topicTitle || 'grammar quiz'}"!\n\nScore: ${score}/${total} (${percentage}%)\n${grade}${missedSection}`;
     
     // Close the teach me modal
     const teachMeModal = document.getElementById('teach-me-modal');
@@ -1755,6 +1767,9 @@ function shareQuizResults(grade, percentage, score, total, missedQuestions) {
     
     // Send the message
     sendButton.click();
+    
+    // Clear the stored results
+    window.lastQuizResults = null;
 }
 
 async function getGrammarExplanation(topicTitle, language, level = null) {
