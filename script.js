@@ -1445,7 +1445,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         questions: [],
         currentQuestion: 0,
         score: 0,
-        total: 5
+        total: 15
     };
 
     // Ensure level is valid
@@ -1582,6 +1582,8 @@ function showNextQuestion() {
         return;
     }
 
+    console.log("Is currentquiz.questions array? " + !Array.isArray(currentQuiz.questions))
+    console.log("Are there currently quiz questions? " + currentQuiz.questions.length === 0);
     if (!Array.isArray(currentQuiz.questions) || currentQuiz.questions.length === 0) {
         console.error('Invalid quiz questions');
         endQuiz('Quiz questions not properly loaded', container);
