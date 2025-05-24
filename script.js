@@ -5,11 +5,11 @@ let lastUserMessage = '';
 // Function to retry last failed message
 async function retryLastMessage() {
     if (!lastUserMessage) return;
-    
+
     // Remove the error message
     const errorMessages = document.querySelectorAll('.error-message');
     errorMessages.forEach(msg => msg.remove());
-    
+
     // Resend the last message
     const messageInput = document.getElementById('message-input');
     messageInput.value = lastUserMessage;
@@ -1422,7 +1422,7 @@ let currentQuiz = null;
 async function startQuiz(topicTitle, language, level = 1) {
     const explanationContainer = document.getElementById('grammar-topic-list');
     const chatMessages = document.getElementById('chat-messages');
-    
+
     quizActive = true;
     currentQuiz = {
         questions: [],
@@ -1447,30 +1447,30 @@ async function startQuiz(topicTitle, language, level = 1) {
             contents: [{ parts: [{ text: quizPrompt }] }]
         })
     })
-    .then(response => {
-        if (!response.ok) throw new Error('Failed to generate quiz');
-        return response.json();
-    })
-    .then(data => {
-        let quizText = data.candidates[0].content.parts[0].text;
-        quizText = quizText.replace(/```json\s*|\s*```/g, '').trim();
-        
-        if (!quizText.startsWith('[')) {
-            throw new Error('Invalid quiz format received');
-        }
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to generate quiz');
+            return response.json();
+        })
+        .then(data => {
+            let quizText = data.candidates[0].content.parts[0].text;
+            quizText = quizText.replace(/```json\s*|\s*```/g, '').trim();
 
-        const questions = JSON.parse(quizText);
-        if (!Array.isArray(questions)) throw new Error('Quiz must be an array');
-        
-        currentQuiz.questions = questions;
-        currentQuiz.total = questions.length;
-        showNextQuestion(explanationContainer);
-    })
-    .catch(error => {
-        console.error('Quiz generation failed:', error);
-        explanationContainer.innerHTML = '<p>Failed to generate quiz. Please try again.</p>';
-        quizActive = false;
-    });
+            if (!quizText.startsWith('[')) {
+                throw new Error('Invalid quiz format received');
+            }
+
+            const questions = JSON.parse(quizText);
+            if (!Array.isArray(questions)) throw new Error('Quiz must be an array');
+
+            currentQuiz.questions = questions;
+            currentQuiz.total = questions.length;
+            showNextQuestion(explanationContainer);
+        })
+        .catch(error => {
+            console.error('Quiz generation failed:', error);
+            explanationContainer.innerHTML = '<p>Failed to generate quiz. Please try again.</p>';
+            quizActive = false;
+        });
 }
 
 function showNextQuestion(container) {
@@ -1482,14 +1482,14 @@ function showNextQuestion(container) {
         else if (percentage >= 70) grade = 'Good work! 👍';
         else if (percentage >= 60) grade = 'Keep practicing! 💪';
         else grade = 'More practice needed! 📚';
-        
+
         endQuiz(`Quiz complete!\nYour score: ${currentQuiz.score}/${currentQuiz.total} (${percentage}%)\n${grade}`, container);
         return;
     }
 
     const question = currentQuiz.questions[currentQuiz.currentQuestion];
     const letters = ['A', 'B', 'C', 'D'];
-    
+
     container.innerHTML = `
         <div class="quiz-question">
             <strong>Question ${currentQuiz.currentQuestion + 1}/${currentQuiz.total}:</strong>
@@ -1507,16 +1507,16 @@ function showNextQuestion(container) {
 
 function handleAnswer(selected, correct) {
     if (!currentQuiz) return;
-    
+
     const container = document.getElementById('grammar-topic-list');
     const buttons = container.querySelectorAll('.quiz-choice');
-    
+
     // Disable all buttons
     buttons.forEach(button => button.disabled = true);
-    
+
     // Update score if correct
     if (selected === correct) currentQuiz.score++;
-    
+
     // Show result
     buttons.forEach((button, index) => {
         if (index === correct) {
@@ -1539,7 +1539,7 @@ function handleAnswer(selected, correct) {
         </p>
     `;
     container.appendChild(resultDiv);
-    
+
     // Move to next question after delay
     currentQuiz.currentQuestion++;
     setTimeout(() => showNextQuestion(container), 2000);
@@ -1547,7 +1547,7 @@ function handleAnswer(selected, correct) {
 
 function endQuiz(message, container) {
     quizActive = false;
-    
+
     container.innerHTML = `
         <div class="quiz-end">
             <strong>Quiz Complete!</strong>
@@ -1555,7 +1555,7 @@ function endQuiz(message, container) {
             <button onclick="location.reload()" class="chat-button">Start Over</button>
         </div>
     `;
-    
+
     currentQuiz = null;
 }
 
@@ -1641,7 +1641,7 @@ Do NOT include any text before or after the Markdown content.`;
 // My Info management
 function loadMyInfo() {
     const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
-    
+
     if (myInfo.name) {
         document.getElementById('userName').value = myInfo.name;
     }
@@ -1655,7 +1655,7 @@ function loadMyInfo() {
             addHobbyInput(hobby);
         });
     }
-    
+
     // Check if we should collapse the section
     const content = document.getElementById('myInfoContent');
     const toggle = document.getElementById('toggleMyInfo');
@@ -1670,7 +1670,7 @@ function saveMyInfo() {
     const bio = document.getElementById('userBio').value;
     const hobbyInputs = document.querySelectorAll('.hobby-input input');
     const hobbies = Array.from(hobbyInputs).map(input => input.value).filter(Boolean);
-    
+
     const myInfo = { name, bio, hobbies };
     localStorage.setItem('myInfo', JSON.stringify(myInfo));
 }
@@ -1683,12 +1683,12 @@ function addHobbyInput(value = '') {
         <input type="text" placeholder="Enter a hobby" value="${value}">
         <button class="remove-hobby">×</button>
     `;
-    
+
     div.querySelector('.remove-hobby').addEventListener('click', () => {
         div.remove();
         saveMyInfo();
     });
-    
+
     div.querySelector('input').addEventListener('change', saveMyInfo);
     hobbiesList.appendChild(div);
 }
@@ -1696,8 +1696,8 @@ function addHobbyInput(value = '') {
 // Modified getGeminiChatResponse to include user info
 async function getGeminiChatResponse(partner, history) {
     const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
-    const userContext = myInfo.name ? 
-        `The user's name is ${myInfo.name}. ${myInfo.bio ? `Their bio: ${myInfo.bio}.` : ''} ${myInfo.hobbies?.length ? `Their hobbies: ${myInfo.hobbies.join(', ')}.` : ''}` : 
+    const userContext = myInfo.name ?
+        `The user's name is ${myInfo.name}. ${myInfo.bio ? `Their bio: ${myInfo.bio}.` : ''} ${myInfo.hobbies?.length ? `Their hobbies: ${myInfo.hobbies.join(', ')}.` : ''}` :
         '';
 
     const prompt = `You are ${partner.name}, a language exchange partner on the website http://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
@@ -1743,7 +1743,7 @@ Your response should be ONLY the chat message text. Do not include your name or 
         }
 
         const data = await response.json();
-        
+
         if (data?.candidates?.[0]?.content?.parts?.[0]) {
             let text = data.candidates[0].content.parts[0].text.trim();
             if (text.startsWith('"') && text.endsWith('"')) {
@@ -1751,7 +1751,7 @@ Your response should be ONLY the chat message text. Do not include your name or 
             }
             return text;
         }
-        
+
         throw new Error('Invalid API response structure');
     } catch (error) {
         console.error('Error getting chat response:', error);
@@ -1762,7 +1762,7 @@ Your response should be ONLY the chat message text. Do not include your name or 
 document.addEventListener('DOMContentLoaded', () => {
     loadPreferences();
     loadMyInfo();
-    
+
     // My Info event listeners
     document.getElementById('toggleMyInfo').addEventListener('click', () => {
         const content = document.getElementById('myInfoContent');
@@ -1777,24 +1777,24 @@ document.addEventListener('DOMContentLoaded', () => {
             chevron.style.transform = 'rotate(0deg)';
         }
     });
-    
+
     document.getElementById('addHobby')?.addEventListener('click', (e) => {
         e.preventDefault();
         addHobbyInput();
         saveMyInfo(); // Save after adding new hobby input
     });
-    
+
     // Add input event listeners for real-time saving
     document.getElementById('userName')?.addEventListener('input', saveMyInfo);
     document.getElementById('userBio')?.addEventListener('input', saveMyInfo);
-    
+
     // Add event delegation for hobby inputs
     document.getElementById('hobbiesList')?.addEventListener('input', (e) => {
         if (e.target.matches('input')) {
             saveMyInfo();
         }
     });
-    
+
     checkSavedPartner();
     initializeTutorial();
 });
@@ -1802,21 +1802,21 @@ document.addEventListener('DOMContentLoaded', () => {
 function addHobbyInput(value = '') {
     const hobbiesList = document.getElementById('hobbiesList');
     if (!hobbiesList) return;
-    
+
     const div = document.createElement('div');
     div.className = 'hobby-input';
     div.innerHTML = `
         <input type="text" placeholder="Enter a hobby" value="${value}">
         <button class="remove-hobby">×</button>
     `;
-    
+
     const removeButton = div.querySelector('.remove-hobby');
     removeButton.addEventListener('click', (e) => {
         e.preventDefault();
         div.remove();
         saveMyInfo();
     });
-    
+
     hobbiesList.appendChild(div);
 }
 
@@ -1825,7 +1825,7 @@ function saveMyInfo() {
     const bio = document.getElementById('userBio')?.value || '';
     const hobbyInputs = document.querySelectorAll('.hobby-input input');
     const hobbies = Array.from(hobbyInputs).map(input => input.value).filter(Boolean);
-    
+
     const myInfo = { name, bio, hobbies };
     localStorage.setItem('myInfo', JSON.stringify(myInfo));
 }
@@ -1833,17 +1833,17 @@ function saveMyInfo() {
 function loadMyInfo() {
     try {
         const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
-        
+
         if (myInfo.name) {
             const userNameInput = document.getElementById('userName');
             if (userNameInput) userNameInput.value = myInfo.name;
         }
-        
+
         if (myInfo.bio) {
             const userBioInput = document.getElementById('userBio');
             if (userBioInput) userBioInput.value = myInfo.bio;
         }
-        
+
         const hobbiesList = document.getElementById('hobbiesList');
         if (hobbiesList) {
             hobbiesList.innerHTML = ''; // Clear existing hobbies
@@ -1853,7 +1853,7 @@ function loadMyInfo() {
                 addHobbyInput(); // Add one empty hobby input if none exist
             }
         }
-        
+
         // Set initial visibility state
         const content = document.getElementById('myInfoContent');
         const toggle = document.getElementById('toggleMyInfo');
@@ -2037,7 +2037,7 @@ document.getElementById('interestSearch').addEventListener('input', () => {
 // Event listener for grammar topic links
 document.addEventListener('DOMContentLoaded', () => {
     const chatMessages = document.getElementById('chat-messages');
-    
+
     chatMessages?.addEventListener('click', async (event) => {
         if (event.target.classList.contains('grammar-topic-link')) {
             event.preventDefault();
@@ -2119,306 +2119,62 @@ document.addEventListener('DOMContentLoaded', () => {
                 explanationDiv.appendChild(quizButton);
                 chatMessages.appendChild(explanationDiv);
 
-async function startQuiz(topicTitle, language, level) {
-    // Close the grammar topics modal
-    document.getElementById('teach-me-modal').style.display = 'none';
-    
-    const chatMessages = document.getElementById('chat-messages');
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-message');
-    const teachMeButton = document.getElementById('teach-me-button');
-    
-    // Disable all chat controls during quiz
-    messageInput.disabled = true;
-    sendButton.disabled = true;
-    teachMeButton.disabled = true;
-    quizActive = true;
-    
-    // Add starting message
-    chatMessages.innerHTML += `
+                async function startQuiz(topicTitle, language, level) {
+                    // Close the grammar topics modal
+                    document.getElementById('teach-me-modal').style.display = 'none';
+
+                    const chatMessages = document.getElementById('chat-messages');
+                    const messageInput = document.getElementById('message-input');
+                    const sendButton = document.getElementById('send-message');
+                    const teachMeButton = document.getElementById('teach-me-button');
+
+                    // Disable all chat controls during quiz
+                    messageInput.disabled = true;
+                    sendButton.disabled = true;
+                    teachMeButton.disabled = true;
+                    quizActive = true;
+
+                    // Add starting message
+                    chatMessages.innerHTML += `
         <div class="chat-message">
             <strong>Quiz Bot:</strong> 
             <p>Starting quiz on "${topicTitle}"! Get ready...</p>
         </div>
     `;
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-    
-    const quizPrompt = `Create a multiple-choice quiz (5 questions) about "${topicTitle}" in ${language} at level ${level}. Format it as a JSON array where each question object has: "question", "options" (array of 4 choices), and "correctIndex" (0-3). Make it challenging but appropriate for the level.`;
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: quizPrompt }] }]
-            })
-        });
+                    const quizPrompt = `Create a multiple-choice quiz (5 questions) about "${topicTitle}" in ${language} at level ${level}. Format it as a JSON array where each question object has: "question", "options" (array of 4 choices), and "correctIndex" (0-3). Make it challenging but appropriate for the level.`;
 
-        if (!response.ok) throw new Error('Failed to generate quiz');
-        const data = await response.json();
-        const quizText = data.candidates[0].content.parts[0].text;
-        try {
-            currentQuiz = {
-                questions: JSON.parse(quizText),
-                score: 0,
-                total: 5,
-                currentQuestion: 0
-            };
-            showNextQuestion();
-        } catch (parseError) {
-            console.error('Quiz parsing failed:', parseError);
-            endQuiz('Failed to parse quiz data. Please try again.');
-        }
-    } catch (error) {
-        console.error('Quiz generation failed:', error);
-        endQuiz('Quiz generation failed. Please try again.');
-    }
-}
+                    try {
+                        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: quizPrompt }] }]
+                            })
+                        });
 
-function showNextQuestion() {
-    const chatMessages = document.getElementById('chat-messages');
-    if (!currentQuiz || currentQuiz.currentQuestion >= currentQuiz.questions.length) {
-        const percentage = Math.round((currentQuiz.score / currentQuiz.total) * 100);
-        let grade = '';
-        if (percentage >= 90) grade = 'Excellent! 🌟';
-        else if (percentage >= 80) grade = 'Great job! 👏';
-        else if (percentage >= 70) grade = 'Good work! 👍';
-        else if (percentage >= 60) grade = 'Keep practicing! 💪';
-        else grade = 'More practice needed! 📚';
-        
-        endQuiz(`Quiz complete!\nYour score: ${currentQuiz.score}/${currentQuiz.total} (${percentage}%)\n${grade}`);
-        return;
-    }
+                        if (!response.ok) throw new Error('Failed to generate quiz');
+                        const data = await response.json();
+                        const quizText = data.candidates[0].content.parts[0].text;
+                        try {
+                            currentQuiz = {
+                                questions: JSON.parse(quizText),
+                                score: 0,
+                                total: 5,
+                                currentQuestion: 0
+                            };
+                            showNextQuestion();
+                        } catch (parseError) {
+                            console.error('Quiz parsing failed:', parseError);
+                            endQuiz('Failed to parse quiz data. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Quiz generation failed:', error);
+                        endQuiz('Quiz generation failed. Please try again.');
+                    }
+                }
 
-    const question = currentQuiz.questions[currentQuiz.currentQuestion];
-    const letters = ['A', 'B', 'C', 'D'];
-    
-    const questionDiv = document.createElement('div');
-    questionDiv.className = 'chat-message quiz-question';
-    questionDiv.innerHTML = `
-        <strong>Question ${currentQuiz.currentQuestion + 1}/${currentQuiz.total}:</strong>
-        <p>${question.question}</p>
-        <div class="quiz-options">
-            ${question.options.map((option, i) => `
-                <button class="quiz-choice" onclick="handleAnswer(${i}, ${question.correctIndex})">
-                    ${letters[i]}) ${option}
-                </button>
-            `).join('')}
-        </div>
-    `;
-    
-    chatMessages.appendChild(questionDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function showNextQuestion(chatMessages) {
-    if (!currentQuiz || currentQuiz.currentQuestion >= currentQuiz.questions.length) {
-        const percentage = Math.round((currentQuiz.score / currentQuiz.total) * 100);
-        let grade = '';
-        if (percentage >= 90) grade = 'Excellent! 🌟';
-        else if (percentage >= 80) grade = 'Great job! 👏';
-        else if (percentage >= 70) grade = 'Good work! 👍';
-        else if (percentage >= 60) grade = 'Keep practicing! 💪';
-        else grade = 'More practice needed! 📚';
-        
-        endQuiz(`Quiz complete!\nYour score: ${currentQuiz.score}/${currentQuiz.total} (${percentage}%)\n${grade}`);
-        return;
-    }
-
-    const question = currentQuiz.questions[currentQuiz.currentQuestion];
-    const letters = ['A', 'B', 'C', 'D'];
-    
-    const questionDiv = document.createElement('div');
-    questionDiv.className = 'chat-message quiz-question';
-    questionDiv.innerHTML = `
-        <strong>Question ${currentQuiz.currentQuestion + 1}/${currentQuiz.total}:</strong>
-        <p>${question.question}</p>
-        <div class="quiz-options">
-            ${question.options.map((option, i) => `
-                <button class="quiz-choice" onclick="handleAnswer(${i}, ${question.correctIndex})">
-                    ${letters[i]}) ${option}
-                </button>
-            `).join('')}
-        </div>
-    `;
-    
-    chatMessages.appendChild(questionDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function handleAnswer(selected, correct) {
-    const chatMessages = document.getElementById('chat-messages');
-    const buttons = document.querySelectorAll('.quiz-question:last-child .quiz-choice');
-    
-    // Disable all buttons
-    buttons.forEach(button => button.disabled = true);
-    
-    // Update score if correct
-    if (selected === correct) currentQuiz.score++;
-    
-    // Show result
-    buttons.forEach((button, index) => {
-        if (index === correct) {
-            button.style.backgroundColor = '#4CAF50';
-            button.style.color = 'white';
-        } else if (index === selected && selected !== correct) {
-            button.style.backgroundColor = '#f44336';
-            button.style.color = 'white';
-        }
-        button.style.opacity = '0.7';
-    });
-
-    // Add feedback message
-    const resultDiv = document.createElement('div');
-    resultDiv.className = 'chat-message quiz-result';
-    resultDiv.innerHTML = `
-        <p style="color: ${selected === correct ? '#4CAF50' : '#f44336'}">
-            <strong>${selected === correct ? '✓ Correct!' : '✗ Incorrect'}</strong><br>
-            ${selected !== correct ? `The correct answer was: ${buttons[correct].textContent}` : ''}
-        </p>
-    `;
-    chatMessages.appendChild(resultDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-    
-    // Move to next question after delay
-    currentQuiz.currentQuestion++;
-    setTimeout(() => showNextQuestion(chatMessages), 2000);
-}
-
-function endQuiz(message) {
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-message');
-    const teachMeButton = document.getElementById('teach-me-button');
-    const chatMessages = document.getElementById('chat-messages');
-    
-    // Re-enable chat controls
-    messageInput.disabled = false;
-    sendButton.disabled = false;
-    teachMeButton.disabled = false;
-    quizActive = false;
-    
-    const endMessage = document.createElement('div');
-    endMessage.className = 'chat-message quiz-end';
-    endMessage.innerHTML = `
-        <strong>Quiz Complete!</strong>
-        <pre style="margin: 10px 0; white-space: pre-wrap;">${message}</pre>
-        <p><em>Chat has been re-enabled. Feel free to continue practicing!</em></p>
-    `;
-    chatMessages.appendChild(endMessage);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-    
-    currentQuiz = null;
-}
-
-function showNextQuestion(chatMessages) {
-    if (!currentQuiz || currentQuiz.currentQuestion >= currentQuiz.length) {
-        const percentage = Math.round((currentQuiz.score / currentQuiz.total) * 100);
-        let grade = '';
-        if (percentage >= 90) grade = 'Excellent! 🌟';
-        else if (percentage >= 80) grade = 'Great job! 👏';
-        else if (percentage >= 70) grade = 'Good work! 👍';
-        else if (percentage >= 60) grade = 'Keep practicing! 💪';
-        else grade = 'More practice needed! 📚';
-        
-        endQuiz(`Quiz completed!\nYour score: ${currentQuiz.score}/${currentQuiz.total} (${percentage}%)\n${grade}`);
-        return;
-    }
-
-    const question = currentQuiz[currentQuiz.currentQuestion];
-    const letters = ['A', 'B', 'C', 'D'];
-    
-    const questionDiv = document.createElement('div');
-    questionDiv.className = 'chat-message quiz-question';
-    questionDiv.innerHTML = `
-        <strong>Question ${currentQuiz.currentQuestion + 1}/${currentQuiz.length}:</strong>
-        <p>${question.question}</p>
-        <div class="quiz-options">
-            ${question.options.map((option, i) => `
-                <button class="chat-button quiz-choice" onclick="handleAnswer(${i}, ${question.correctIndex}, ${currentQuiz.currentQuestion})">
-                    ${letters[i]}) ${option}
-                </button>
-            `).join('')}
-        </div>
-    `;
-    
-    chatMessages.appendChild(questionDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function handleAnswer(selected, correct, questionIndex) {
-    const chatMessages = document.getElementById('chat-messages');
-    const buttons = document.querySelectorAll('.quiz-question:last-child .quiz-choice');
-    
-    // Disable all buttons
-    buttons.forEach(button => button.disabled = true);
-    
-    // Update score if correct
-    if (selected === correct) currentQuiz.score++;
-    
-    // Show result message
-    const resultDiv = document.createElement('div');
-    resultDiv.className = 'chat-message quiz-result';
-    
-    if (selected === correct) {
-        resultDiv.innerHTML = `
-            <p style="color: #4CAF50;">
-                <strong>✓ Correct!</strong><br>
-                Great job! Let's continue...
-            </p>
-        `;
-    } else {
-        resultDiv.innerHTML = `
-            <p style="color: #f44336;">
-                <strong>✗ Incorrect</strong><br>
-                The correct answer was: ${currentQuiz[questionIndex].options[correct]}
-            </p>
-        `;
-    }
-    
-    // Highlight buttons
-    buttons.forEach((button, index) => {
-        if (index === correct) {
-            button.style.backgroundColor = '#4CAF50';
-            button.style.color = 'white';
-        } else if (index === selected && selected !== correct) {
-            button.style.backgroundColor = '#f44336';
-            button.style.color = 'white';
-        }
-        button.style.opacity = '0.7';
-    });
-    
-    chatMessages.appendChild(resultDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-    
-    // Move to next question after delay
-    currentQuiz.currentQuestion++;
-    setTimeout(() => showNextQuestion(chatMessages), 2000);
-}
-
-function endQuiz(message) {
-    quizActive = false;
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-message');
-    const teachMeButton = document.getElementById('teach-me-button');
-    const chatMessages = document.getElementById('chat-messages');
-    
-    // Re-enable all chat controls
-    messageInput.disabled = false;
-    sendButton.disabled = false;
-    teachMeButton.disabled = false;
-    
-    const endMessage = document.createElement('div');
-    endMessage.className = 'chat-message quiz-end';
-    endMessage.innerHTML = `
-        <strong>Quiz Complete!</strong>
-        <pre style="margin: 10px 0; white-space: pre-wrap;">${message}</pre>
-        <p><em>Chat has been re-enabled. Feel free to continue practicing!</em></p>
-    `;
-    chatMessages.appendChild(endMessage);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-    
-    currentQuiz = null;
-}
             } catch (error) {
                 // Remove the requesting message even if there's an error
                 if (chatMessages.contains(requestingMsg)) {
@@ -2438,65 +2194,6 @@ function endQuiz(message) {
 });
 
 // Text-to-speech configuration with retry mechanism
-const WEBHOOK_SECRET = 'wsec_01bd5c39d5578c3b569001b062a2532ab49c657fc7af3ca10c4926968cfe46ef';
-const WEBHOOK_URL = 'https://practicefor.fun/webhook';
-
-async function sendWebhookRequest(data) {
-    console.log('Starting webhook request with data:', data);
-    const timestamp = Date.now().toString();
-    console.log('Generated timestamp:', timestamp);
-    const message = timestamp + JSON.stringify(data);
-    console.log('Created message for signature:', message);
-
-    try {
-        // Create HMAC signature
-        console.log('Creating HMAC signature...');
-        const encoder = new TextEncoder();
-        const key = await crypto.subtle.importKey(
-            'raw',
-            encoder.encode(WEBHOOK_SECRET),
-            { name: 'HMAC', hash: 'SHA-256' },
-            false,
-            ['sign']
-        );
-        console.log('Key imported successfully');
-        const signature = await crypto.subtle.sign(
-            'HMAC',
-            key,
-            encoder.encode(message)
-        );
-        console.log('Signature generated successfully');
-
-        const signatureHex = Array.from(new Uint8Array(signature))
-            .map(b => b.toString(16).padStart(2, '0'))
-            .join('');
-    } catch (error) {
-        console.error('Error creating HMAC signature:', error);
-        throw error;
-    }
-
-    try {
-        const response = await fetch(WEBHOOK_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Signature': signatureHex,
-                'X-Timestamp': timestamp
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-            throw new Error(`Webhook request failed: ${response.status}`);
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error('Webhook error:', error);
-        throw error;
-    }
-}
-
 const TTS_API_URL = 'https://langcamp.us/elevenlbs-exchange-audio/exchange-audio';
 var audioContext = null;
 
@@ -2557,15 +2254,15 @@ async function playAudioFromText(text, button, maxRetries = 3) {
             button.disabled = true;
             button.style.visibility = 'visible';
             button.style.display = 'flex';
-            button.innerHTML = retryCount > 0 ? 
-                `🔄 Loading... (Retry ${retryCount}/${maxRetries})` : 
+            button.innerHTML = retryCount > 0 ?
+                `🔄 Loading... (Retry ${retryCount}/${maxRetries})` :
                 '🔄 Loading...';
 
             const detectedLang = detectLanguage(text);
             const voiceId = VOICE_MAPPING[detectedLang] || VOICE_MAPPING.en;
 
             // Create timeout promise
-            const timeoutPromise = new Promise((_, reject) => 
+            const timeoutPromise = new Promise((_, reject) =>
                 setTimeout(() => reject(new Error('Request timeout')), 10000)
             );
 
