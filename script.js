@@ -1416,9 +1416,14 @@ Your response should be ONLY the chat message text. Do not include your name or 
 }
 
 // New function to get grammar explanation
+let quizActive = false;
+let currentQuiz = null;
+
 async function getGrammarExplanation(topicTitle, language, level = 'unknown') { // Added level parameter
     const explanationContainer = document.getElementById('grammar-topic-list'); // Assuming this is where we show loading/result
     explanationContainer.innerHTML = '<p>Loading explanation...</p>'; // Show loading state
+    quizActive = false;
+    currentQuiz = null;
 
     console.log(`Requesting grammar explanation for: ${topicTitle} in ${language}, Level: ${level}`);
 
@@ -1928,7 +1933,92 @@ document.addEventListener('DOMContentLoaded', () => {
                 contentDiv.innerHTML = explanationHtml;
                 explanationDiv.appendChild(contentDiv);
 
+                // Add Quiz button
+                const quizButton = document.createElement('button');
+                quizButton.className = 'chat-button';
+                quizButton.style.marginTop = '10px';
+                quizButton.textContent = 'Quiz Me';
+                quizButton.onclick = async () => {
+                    if (quizActive) return;
+                    quizActive = true;
+                    const messageInput = document.getElementById('message-input');
+                    const sendButton = document.getElementById('send-message');
+                    messageInput.disabled = true;
+                    sendButton.disabled = true;
+
+                    const quizPrompt = `Create a multiple-choice quiz (5-8 questions) about "${topicTitle}" in ${language} at level ${level}. Format it as a JSON array where each question object has: "question", "options" (array of 4 choices), and "correctIndex" (0-3). Make it challenging but appropriate for the level.`;
+
+                    try {
+                        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: quizPrompt }] }]
+                            })
+                        });
+
+                        if (!response.ok) throw new Error('Failed to generate quiz');
+                        const data = await response.json();
+                        const quizText = data.candidates[0].content.parts[0].text;
+                        currentQuiz = JSON.parse(quizText);
+                        showNextQuestion(0, chatMessages);
+                    } catch (error) {
+                        console.error('Quiz generation failed:', error);
+                        quizActive = false;
+                        messageInput.disabled = false;
+                        sendButton.disabled = false;
+                        const errorMsg = document.createElement('p');
+                        errorMsg.innerHTML = '<em>Failed to generate quiz. Please try again.</em>';
+                        chatMessages.appendChild(errorMsg);
+                    }
+                };
+                explanationDiv.appendChild(quizButton);
                 chatMessages.appendChild(explanationDiv);
+
+function showNextQuestion(index, chatMessages) {
+    if (!currentQuiz || index >= currentQuiz.length) {
+        endQuiz();
+        return;
+    }
+
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'quiz-question';
+    questionDiv.innerHTML = `<p><strong>Question ${index + 1}:</strong> ${currentQuiz[index].question}</p>`;
+    
+    currentQuiz[index].options.forEach((option, optIndex) => {
+        const button = document.createElement('button');
+        button.className = 'chat-button quiz-choice';
+        button.textContent = option;
+        button.onclick = () => handleAnswer(optIndex, currentQuiz[index].correctIndex, index, chatMessages);
+        questionDiv.appendChild(button);
+    });
+
+    chatMessages.appendChild(questionDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function handleAnswer(selected, correct, questionIndex, chatMessages) {
+    const resultDiv = document.createElement('div');
+    resultDiv.innerHTML = selected === correct ? 
+        '<p style="color: green;">✓ Correct!</p>' : 
+        `<p style="color: red;">✗ Incorrect. The correct answer was: ${currentQuiz[questionIndex].options[correct]}</p>`;
+    chatMessages.appendChild(resultDiv);
+    
+    setTimeout(() => showNextQuestion(questionIndex + 1, chatMessages), 1500);
+}
+
+function endQuiz() {
+    quizActive = false;
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-message');
+    messageInput.disabled = false;
+    sendButton.disabled = false;
+    
+    const endMessage = document.createElement('div');
+    endMessage.innerHTML = '<p><em>Quiz completed! Feel free to ask any questions about the topic.</em></p>';
+    chatMessages.appendChild(endMessage);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
             } catch (error) {
                 // Remove the requesting message even if there's an error
                 if (chatMessages.contains(requestingMsg)) {
