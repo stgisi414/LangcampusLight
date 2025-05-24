@@ -1419,7 +1419,7 @@ Your response should be ONLY the chat message text. Do not include your name or 
 let quizActive = false;
 let currentQuiz = null;
 
-async function startQuiz(topicTitle, language, level) {
+async function startQuiz(topicTitle, language, level = 1) {
     const explanationContainer = document.getElementById('grammar-topic-list');
     const chatMessages = document.getElementById('chat-messages');
     
@@ -1428,7 +1428,12 @@ async function startQuiz(topicTitle, language, level) {
 
     explanationContainer.innerHTML = '<p>Loading quiz...</p>';
 
-    const quizPrompt = `Create a multiple-choice quiz (5 questions) about "${topicTitle}" in ${language} at level ${level}. Format it as a JSON array where each question object has: "question", "options" (array of 4 choices), and "correctIndex" (0-3). Make it challenging but appropriate for the level.`;
+    // Find topic level from grammar data if not provided
+    if (!level || level === 'unknown') {
+        level = grammarData[language]?.find(topic => topic.title === topicTitle)?.level || 1;
+    }
+
+    const quizPrompt = `Create a multiple-choice quiz (5 questions) about "${topicTitle}" in ${language} at level ${level}. Your response must be a valid JSON array of objects. Each object must have exactly these fields: "question" (string), "options" (array of exactly 4 strings), and "correctIndex" (number 0-3). Do not include any markdown formatting or backticks.`;
 
     try {
         const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
@@ -1441,9 +1446,17 @@ async function startQuiz(topicTitle, language, level) {
 
         if (!response.ok) throw new Error('Failed to generate quiz');
         const data = await response.json();
-        const quizText = data.candidates[0].content.parts[0].text;
+        let quizText = data.candidates[0].content.parts[0].text;
+        
+        // Clean up the response to ensure valid JSON
+        quizText = quizText.replace(/```json\s*|\s*```/g, '').trim();
+        if (!quizText.startsWith('[')) {
+            throw new Error('Invalid quiz format received');
+        }
+
         try {
             currentQuiz = JSON.parse(quizText);
+            if (!Array.isArray(currentQuiz)) throw new Error('Quiz must be an array');
             showNextQuestion(explanationContainer);
         } catch (parseError) {
             console.error('Quiz parsing failed:', parseError);
