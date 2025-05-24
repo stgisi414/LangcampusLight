@@ -394,7 +394,7 @@ async function openChat(partner) { // Now accepts the full partner object
             chatHistory.push(partnerIntro);
             chatHistory.push(partnerIntro);
             chatMessages.innerHTML += `
-              <p>
+              <p class="partner-message"> {/* <--- ADDED CLASS HERE */}
                 <strong>${partner.name}:</strong> ${introMessageText}
                 <span class="message-time" style="font-size: 0.8em; color: #666; margin-left: 8px;">
                   ${new Date(timestamp).toLocaleTimeString()}
@@ -485,7 +485,7 @@ document.getElementById('send-message').addEventListener('click', async () => { 
         const userMessage = { sender: 'You', text: messageText, timestamp };
         chatHistory.push(userMessage);
         chatMessages.innerHTML += `
-          <p>
+          <p class="user-message"> {/* <--- ADDED CLASS HERE */}
             <strong>You:</strong> ${messageText}
             <span class="message-time" style="font-size: 0.8em; color: #666; margin-left: 8px;">
               ${new Date(timestamp).toLocaleTimeString()}
@@ -517,10 +517,10 @@ document.getElementById('send-message').addEventListener('click', async () => { 
                 const partnerResponse = { sender: currentPartnerName, text: partnerResponseText, timestamp };
                 chatHistory.push(partnerResponse);
                 chatMessages.innerHTML += `
-                  <p>
+                  <p class="partner-message"> {/* <--- ADDED CLASS HERE */}
                     <strong>${currentPartnerName}:</strong> ${partnerResponseText}
                     <span class="message-time" style="font-size: 0.8em; color: #666; margin-left: 8px;">
-                      ${new Date(timestamp).toLocaleTimeString()}
+                      ${new Date(partnerMessageTimestamp).toLocaleTimeString()}
                     </span>
                   </p>`;
             } else {
