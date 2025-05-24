@@ -1571,9 +1571,13 @@ function showNextQuestion() {
         return;
     }
 
-    if (!currentQuiz || !currentQuiz.questions || !Array.isArray(currentQuiz.questions) || currentQuiz.currentQuestion >= currentQuiz.questions.length) {
-        const total = currentQuiz?.questions?.length || 0;
-        const percentage = total ? Math.round((currentQuiz.score / total) * 100) : 0;
+    if (!currentQuiz || !currentQuiz.questions || !Array.isArray(currentQuiz.questions)) {
+        console.error('Invalid quiz state');
+        return;
+    }
+
+    if (currentQuiz.currentQuestion >= currentQuiz.total) {
+        const percentage = Math.round((currentQuiz.score / currentQuiz.total) * 100);
         let grade = '';
         if (percentage >= 90) grade = 'Excellent! 🌟';
         else if (percentage >= 80) grade = 'Great job! 👏';
@@ -1581,7 +1585,7 @@ function showNextQuestion() {
         else if (percentage >= 60) grade = 'Keep practicing! 💪';
         else grade = 'More practice needed! 📚';
 
-        endQuiz(`Quiz complete!\nYour score: ${currentQuiz.score}/${total} (${percentage}%)\n${grade}`, container);
+        endQuiz(`Quiz complete!\nYour score: ${currentQuiz.score}/${currentQuiz.total} (${percentage}%)\n${grade}`, container);
         return;
     }
 
