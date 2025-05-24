@@ -602,8 +602,8 @@ teachMeButton.addEventListener('click', () => {
 });
 
 async function loadVocabularyContent(topic, targetLang) {
-    const vocabTopicList = document.getElementById('vocabulary-topic-list');
-    vocabTopicList.innerHTML = `
+    const vocabSection = document.getElementById('vocabulary-section');
+    vocabSection.innerHTML = `
         <h2>${topic.title}</h2>
         <div id="vocabulary-content">
             <p>Loading vocabulary content...</p>
@@ -661,7 +661,7 @@ Format the response in Markdown with clear sections and examples.`;
 
 async function startVocabularyQuiz(topicTitle, language) {
     currentTopicTitle = topicTitle;
-    const container = document.getElementById('vocabulary-topic-list');
+    const container = document.getElementById('vocabulary-section');
     container.innerHTML = '<p>Loading quiz...</p>';
 
     quizActive = true;
