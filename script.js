@@ -602,12 +602,14 @@ teachMeButton.addEventListener('click', () => {
 });
 
 async function loadVocabularyContent(topic, targetLang) {
-    const container = document.getElementById('vocabulary-topic-list');
-    container.innerHTML = `<button style="display: block; width: 100%; padding: 0.8rem; margin-bottom: 0.5rem; text-align: left; background-color: #f9f9f9; border: 1px solid #eee; cursor: pointer; border-radius: 4px; transition: background-color 0.2s; color: #333;">
-        ${topic.title}
-        <span style="font-size: 0.8em; color: #777; margin-left: 10px; background-color: #eee; padding: 2px 6px; border-radius: 3px;">Level ${topic.level}</span>
-    </button>
-    <p>Loading vocabulary content...</p>`;
+    const vocabSection = document.getElementById('vocabulary-section');
+    vocabSection.innerHTML = `
+        <h2>${topic.title}</h2>
+        <div id="vocabulary-content">
+            <p>Loading vocabulary content...</p>
+        </div>
+    `;
+    const container = document.getElementById('vocabulary-content');
 
     try {
         const prompt = `Create a vocabulary study guide for "${topic.title}" in ${targetLang}. 
@@ -640,7 +642,6 @@ Format the response in Markdown with clear sections and examples.`;
         
         // Convert markdown to HTML and display
         container.innerHTML = `
-            <h2>${topic.title}</h2>
             ${marked.parse(content)}
             <button class="chat-button" style="margin-top: 20px;" onclick="startVocabularyQuiz('${topic.title}', '${targetLang}')">
                 Quiz Me
@@ -660,7 +661,7 @@ Format the response in Markdown with clear sections and examples.`;
 
 async function startVocabularyQuiz(topicTitle, language) {
     currentTopicTitle = topicTitle;
-    const container = document.getElementById('vocabulary-topic-list');
+    const container = document.getElementById('vocabulary-content');
     container.innerHTML = '<p>Loading quiz...</p>';
 
     quizActive = true;
