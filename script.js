@@ -1986,16 +1986,23 @@ async function startQuiz(topicTitle, language, level) {
     const chatMessages = document.getElementById('chat-messages');
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-message');
+    const teachMeButton = document.getElementById('teach-me-button');
     
-    // Disable input during quiz
+    // Disable all chat controls during quiz
     messageInput.disabled = true;
     sendButton.disabled = true;
+    teachMeButton.disabled = true;
     quizActive = true;
     
     // Add starting message
-    chatMessages.innerHTML += `<p><em>Starting quiz on ${topicTitle}...</em></p>`;
+    chatMessages.innerHTML += `
+        <div class="chat-message">
+            <strong>Quiz Bot:</strong> 
+            <p>Starting quiz on "${topicTitle}"! Get ready...</p>
+        </div>
+    `;
     
-    const quizPrompt = `Create a multiple-choice quiz (5-8 questions) about "${topicTitle}" in ${language} at level ${level}. Format it as a JSON array where each question object has: "question", "options" (array of 4 choices), and "correctIndex" (0-3). Make it challenging but appropriate for the level.`;
+    const quizPrompt = `Create a multiple-choice quiz (5 questions) about "${topicTitle}" in ${language} at level ${level}. Format it as a JSON array where each question object has: "question", "options" (array of 4 choices), and "correctIndex" (0-3). Make it challenging but appropriate for the level.`;
 
     try {
         const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
@@ -2012,66 +2019,80 @@ async function startQuiz(topicTitle, language, level) {
         currentQuiz = JSON.parse(quizText);
         currentQuiz.score = 0;
         currentQuiz.total = currentQuiz.length;
-        showNextQuestion(0, chatMessages);
+        currentQuiz.currentQuestion = 0;
+        showNextQuestion(chatMessages);
     } catch (error) {
         console.error('Quiz generation failed:', error);
         endQuiz('Quiz generation failed. Please try again.');
     }
 }
 
-function showNextQuestion(index, chatMessages) {
-    if (!currentQuiz || index >= currentQuiz.length) {
+function showNextQuestion(chatMessages) {
+    if (!currentQuiz || currentQuiz.currentQuestion >= currentQuiz.length) {
         const percentage = Math.round((currentQuiz.score / currentQuiz.total) * 100);
-        endQuiz(`Quiz completed! Your score: ${currentQuiz.score}/${currentQuiz.total} (${percentage}%)`);
+        let grade = '';
+        if (percentage >= 90) grade = 'Excellent! 🌟';
+        else if (percentage >= 80) grade = 'Great job! 👏';
+        else if (percentage >= 70) grade = 'Good work! 👍';
+        else if (percentage >= 60) grade = 'Keep practicing! 💪';
+        else grade = 'More practice needed! 📚';
+        
+        endQuiz(`Quiz completed!\nYour score: ${currentQuiz.score}/${currentQuiz.total} (${percentage}%)\n${grade}`);
         return;
     }
 
+    const question = currentQuiz[currentQuiz.currentQuestion];
+    const letters = ['A', 'B', 'C', 'D'];
+    
     const questionDiv = document.createElement('div');
-    questionDiv.className = 'quiz-question';
+    questionDiv.className = 'chat-message quiz-question';
     questionDiv.innerHTML = `
-        <p style="margin-top: 15px;">
-            <strong>Question ${index + 1}/${currentQuiz.length}:</strong><br>
-            ${currentQuiz[index].question}
-        </p>
+        <strong>Question ${currentQuiz.currentQuestion + 1}/${currentQuiz.length}:</strong>
+        <p>${question.question}</p>
+        <div class="quiz-options">
+            ${question.options.map((option, i) => `
+                <button class="chat-button quiz-choice" onclick="handleAnswer(${i}, ${question.correctIndex}, ${currentQuiz.currentQuestion})">
+                    ${letters[i]}) ${option}
+                </button>
+            `).join('')}
+        </div>
     `;
     
-    const optionsDiv = document.createElement('div');
-    optionsDiv.style.display = 'flex';
-    optionsDiv.style.flexDirection = 'column';
-    optionsDiv.style.gap = '8px';
-    optionsDiv.style.marginTop = '10px';
-    
-    const letters = ['A', 'B', 'C', 'D'];
-    currentQuiz[index].options.forEach((option, optIndex) => {
-        const button = document.createElement('button');
-        button.className = 'chat-button quiz-choice';
-        button.style.textAlign = 'left';
-        button.innerHTML = `${letters[optIndex]}) ${option}`;
-        button.onclick = () => handleAnswer(optIndex, currentQuiz[index].correctIndex, index, chatMessages);
-        optionsDiv.appendChild(button);
-    });
-    
-    questionDiv.appendChild(optionsDiv);
     chatMessages.appendChild(questionDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-function handleAnswer(selected, correct, questionIndex, chatMessages) {
-    // Disable all buttons for this question
-    const buttons = chatMessages.querySelectorAll('.quiz-question:last-child .quiz-choice');
+function handleAnswer(selected, correct, questionIndex) {
+    const chatMessages = document.getElementById('chat-messages');
+    const buttons = document.querySelectorAll('.quiz-question:last-child .quiz-choice');
+    
+    // Disable all buttons
     buttons.forEach(button => button.disabled = true);
     
-    // Update score
+    // Update score if correct
     if (selected === correct) currentQuiz.score++;
     
+    // Show result message
     const resultDiv = document.createElement('div');
-    resultDiv.className = 'quiz-result';
-    resultDiv.innerHTML = selected === correct ? 
-        '<p style="color: green; margin-top: 10px;">✓ Correct!</p>' : 
-        `<p style="color: red; margin-top: 10px;">✗ Incorrect. The correct answer was: ${currentQuiz[questionIndex].options[correct]}</p>`;
-    chatMessages.appendChild(resultDiv);
+    resultDiv.className = 'chat-message quiz-result';
     
-    // Highlight correct/incorrect answers
+    if (selected === correct) {
+        resultDiv.innerHTML = `
+            <p style="color: #4CAF50;">
+                <strong>✓ Correct!</strong><br>
+                Great job! Let's continue...
+            </p>
+        `;
+    } else {
+        resultDiv.innerHTML = `
+            <p style="color: #f44336;">
+                <strong>✗ Incorrect</strong><br>
+                The correct answer was: ${currentQuiz[questionIndex].options[correct]}
+            </p>
+        `;
+    }
+    
+    // Highlight buttons
     buttons.forEach((button, index) => {
         if (index === correct) {
             button.style.backgroundColor = '#4CAF50';
@@ -2080,22 +2101,36 @@ function handleAnswer(selected, correct, questionIndex, chatMessages) {
             button.style.backgroundColor = '#f44336';
             button.style.color = 'white';
         }
+        button.style.opacity = '0.7';
     });
     
-    setTimeout(() => showNextQuestion(questionIndex + 1, chatMessages), 2000);
+    chatMessages.appendChild(resultDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // Move to next question after delay
+    currentQuiz.currentQuestion++;
+    setTimeout(() => showNextQuestion(chatMessages), 2000);
 }
 
 function endQuiz(message) {
     quizActive = false;
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-message');
+    const teachMeButton = document.getElementById('teach-me-button');
     const chatMessages = document.getElementById('chat-messages');
     
+    // Re-enable all chat controls
     messageInput.disabled = false;
     sendButton.disabled = false;
+    teachMeButton.disabled = false;
     
     const endMessage = document.createElement('div');
-    endMessage.innerHTML = `<p style="margin-top: 15px;"><em>${message}</em></p>`;
+    endMessage.className = 'chat-message quiz-end';
+    endMessage.innerHTML = `
+        <strong>Quiz Complete!</strong>
+        <pre style="margin: 10px 0; white-space: pre-wrap;">${message}</pre>
+        <p><em>Chat has been re-enabled. Feel free to continue practicing!</em></p>
+    `;
     chatMessages.appendChild(endMessage);
     chatMessages.scrollTop = chatMessages.scrollHeight;
     
