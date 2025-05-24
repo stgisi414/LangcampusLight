@@ -1509,8 +1509,29 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
 
             let questions;
             try {
-                questions = JSON.parse(quizText);
-                if (!Array.isArray(questions)) throw new Error('Quiz must be an array');
+                // Clean and validate the response text
+                let cleanText = quizText.replace(/```json\s*|\s*```/g, '').trim();
+                
+                // Ensure it starts with [ and ends with ]
+                if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
+                    throw new Error('Invalid quiz format: must be a JSON array');
+                }
+                
+                // Parse the JSON
+                const questions = JSON.parse(cleanText);
+                
+                // Validate the structure
+                if (!Array.isArray(questions)) {
+                    throw new Error('Quiz must be an array');
+                }
+                
+                // Validate each question
+                questions.forEach((q, index) => {
+                    if (!q.question || !Array.isArray(q.options) || q.options.length !== 4 || 
+                        typeof q.correctIndex !== 'number' || q.correctIndex < 0 || q.correctIndex > 3) {
+                        throw new Error(`Invalid question format at index ${index}`);
+                    }
+                });
 
                 currentQuiz.questions = questions;
                 currentQuiz.total = questions.length;
