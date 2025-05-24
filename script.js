@@ -1463,8 +1463,92 @@ Do NOT include any text before or after the Markdown content.`;
 
 // Load preferences only when the page loads
 // Grammar data is now embedded, no need to fetch it here.
+// My Info management
+function loadMyInfo() {
+    const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+    
+    if (myInfo.name) {
+        document.getElementById('userName').value = myInfo.name;
+    }
+    if (myInfo.bio) {
+        document.getElementById('userBio').value = myInfo.bio;
+    }
+    if (myInfo.hobbies && myInfo.hobbies.length > 0) {
+        const hobbiesList = document.getElementById('hobbiesList');
+        hobbiesList.innerHTML = '';
+        myInfo.hobbies.forEach(hobby => {
+            addHobbyInput(hobby);
+        });
+    }
+    
+    // Check if we should collapse the section
+    const content = document.getElementById('myInfoContent');
+    const toggle = document.getElementById('toggleMyInfo');
+    if (!myInfo.name && !myInfo.bio && (!myInfo.hobbies || myInfo.hobbies.length === 0)) {
+        content.classList.add('hidden');
+        toggle.classList.add('collapsed');
+    }
+}
+
+function saveMyInfo() {
+    const name = document.getElementById('userName').value;
+    const bio = document.getElementById('userBio').value;
+    const hobbyInputs = document.querySelectorAll('.hobby-input input');
+    const hobbies = Array.from(hobbyInputs).map(input => input.value).filter(Boolean);
+    
+    const myInfo = { name, bio, hobbies };
+    localStorage.setItem('myInfo', JSON.stringify(myInfo));
+}
+
+function addHobbyInput(value = '') {
+    const hobbiesList = document.getElementById('hobbiesList');
+    const div = document.createElement('div');
+    div.className = 'hobby-input';
+    div.innerHTML = `
+        <input type="text" placeholder="Enter a hobby" value="${value}">
+        <button class="remove-hobby">×</button>
+    `;
+    
+    div.querySelector('.remove-hobby').addEventListener('click', () => {
+        div.remove();
+        saveMyInfo();
+    });
+    
+    div.querySelector('input').addEventListener('change', saveMyInfo);
+    hobbiesList.appendChild(div);
+}
+
+// Modified getGeminiChatResponse to include user info
+async function getGeminiChatResponse(partner, history) {
+    const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+    const userContext = myInfo.name ? 
+        `The user's name is ${myInfo.name}. ${myInfo.bio ? `Their bio: ${myInfo.bio}.` : ''} ${myInfo.hobbies?.length ? `Their hobbies: ${myInfo.hobbies.join(', ')}.` : ''}` : 
+        '';
+
+    const prompt = `You are ${partner.name}, a language exchange partner on the website http://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
+${userContext}
+You are chatting with someone whose native language is ${partner.targetLanguage} and who is learning your language (${partner.nativeLanguage}).`;
+
+    // Rest of the existing function remains the same...
+
 document.addEventListener('DOMContentLoaded', () => {
     loadPreferences();
+    loadMyInfo();
+    
+    // My Info event listeners
+    document.getElementById('toggleMyInfo').addEventListener('click', () => {
+        const content = document.getElementById('myInfoContent');
+        const toggle = document.getElementById('toggleMyInfo');
+        content.classList.toggle('hidden');
+        toggle.classList.toggle('collapsed');
+    });
+    
+    document.getElementById('addHobby').addEventListener('click', () => {
+        addHobbyInput();
+    });
+    
+    document.getElementById('userName').addEventListener('change', saveMyInfo);
+    document.getElementById('userBio').addEventListener('change', saveMyInfo);
     checkSavedPartner();
     initializeTutorial();
 });
