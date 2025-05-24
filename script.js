@@ -1043,7 +1043,7 @@ const grammarData = {
 };
 console.log("Grammar data embedded."); // Log to confirm it's loaded
 
-function openChat(partner) { // Now accepts the full partner object
+async function openChat(partner) { // Now accepts the full partner object
     // Clean up any existing audio buttons
     removeAudioButton();
 
@@ -1078,7 +1078,7 @@ function openChat(partner) { // Now accepts the full partner object
     }
 
     // Set a timer to send a message from the partner if the user doesn't type
-    geminiIntroTimer = setTimeout(() => {
+    geminiIntroTimer = setTimeout(async () => {
         // Check if the user hasn't sent a message yet (chatMessages only has the intro)
         // Check history length instead of DOM elements
         if (chatHistory.length === 0) {
