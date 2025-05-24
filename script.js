@@ -1671,9 +1671,7 @@ async function getGrammarExplanation(topicTitle, language, level = null) {
     quizActive = false;
     currentQuiz = {};
 
-    // Only show validation error if we're not in quiz mode
-    if ((!topicTitle || topicTitle === 'undefined') && !quizActive) {
-        explanationContainer.innerHTML = '<p style="color: red;">Error: Invalid grammar topic selected.</p>';
+    if (!topicTitle || topicTitle === 'undefined') {
         return;
     }
 
