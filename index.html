@@ -177,58 +177,164 @@
         /* --- Banners (Tutorial, Saved Partner) --- */
         .tutorial-banner,
         .saved-partner-banner {
-            padding: 0.75rem 1rem;
+            padding: 1rem 1.5rem;
             text-align: center;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.95rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: var(--border-radius);
+            margin: 1.5rem auto;
+            max-width: 900px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1), 0 2px 5px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInBanner 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeInBanner {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tutorial-banner::before,
+        .saved-partner-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 75%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.4) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: skewX(-25deg);
+            animation: shimmer 4s infinite linear;
+            opacity: 0;
+        }
+
+        .saved-partner-banner::before {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -150%;
+                opacity: 0;
+            }
+            20% {
+                left: -150%;
+                opacity: 0.6;
+            }
+            80% {
+                left: 150%;
+                opacity: 0.6;
+            }
+            100% {
+                left: 150%;
+                opacity: 0;
+            }
         }
 
         .tutorial-banner {
-            background-color: #e7f3ff;
-            /* Light blue */
-            color: #004085;
+            background: linear-gradient(135deg, #007BFF, #00C6FF);
+            color: white;
+        }
+
+        .tutorial-banner .banner-icon {
+            font-size: 1.8rem;
+            margin-right: 1rem;
+            animation: iconPulse 2s infinite ease-in-out;
         }
 
         .saved-partner-banner {
-            background-color: #fff3cd;
-            /* Light yellow */
-            color: #856404;
+            background: linear-gradient(135deg, var(--secondary-color), #FFA726);
+            color: white;
+        }
+
+        .saved-partner-banner .banner-icon {
+            font-size: 1.8rem;
+            margin-right: 1rem;
+            animation: iconPulse 2s infinite ease-in-out 0.3s;
+        }
+
+        @keyframes iconPulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.15);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .banner-text-content {
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        .banner-text-content strong {
+            font-weight: 700;
         }
 
         .banner-button,
         .tutorial-button {
-            margin: 0 0.3rem;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: calc(var(--border-radius) / 2);
+            padding: 0.6rem 1.2rem;
+            border: 2px solid white;
+            border-radius: 25px;
             cursor: pointer;
             font-size: 0.9rem;
-            transition: all 0.2s ease;
-            font-weight: 500;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background-color: transparent;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .tutorial-button {
-            background-color: var(--primary-color);
-            color: white;
+        .banner-button:hover,
+        .tutorial-button:hover {
+            background-color: white;
+            color: var(--primary-color);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
 
         .tutorial-button:hover {
-            background-color: var(--primary-hover-color);
-            transform: translateY(-1px);
-        }
-
-        .banner-button {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-
-        .banner-button.delete {
-            background-color: var(--error-color);
+            color: #007BFF;
         }
 
         .banner-button:hover {
-            opacity: 0.85;
-            transform: translateY(-1px);
+            color: var(--secondary-color);
+        }
+
+        .banner-button.delete {
+            border-color: rgba(255, 255, 255, 0.7);
+        }
+
+        .banner-button.delete:hover {
+            background-color: white;
+            color: var(--error-color);
+            border-color: white;
+        }
+
+        #tutorial-banner,
+        #saved-partner-banner {
+            display: none;
         }
 
         /* --- Forms: Select, Button, Input --- */
@@ -1207,15 +1313,23 @@
 </head>
 
 <body>
-    <div id="saved-partner-banner" style="display: none;" class="saved-partner-banner">
-        <span id="saved-partner-info"></span>
-        <button id="resume-chat-btn" class="banner-button">Resume</button>
-        <button id="delete-partner-btn" class="banner-button delete">Delete</button>
+    <div id="tutorial-banner" class="tutorial-banner">
+        <span class="banner-icon">🎓</span>
+        <div class="banner-text-content">
+            New here? Check out our quick guide to get started!
+        </div>
+        <button id="tutorial-btn" class="tutorial-button">Show Tutorial</button>
     </div>
-    <div class="tutorial-banner">
-        <button id="tutorial-btn" class="tutorial-button">
-            <span>📚 How to Use Langcampus Exchange</span>
-        </button>
+
+    <div id="saved-partner-banner" class="saved-partner-banner" style="display: none;">
+        <span class="banner-icon">💬</span>
+        <div class="banner-text-content" id="saved-partner-info">
+            Continue chat with [Partner Name]
+        </div>
+        <div>
+            <button id="resume-chat-btn" class="banner-button">Resume Chat</button>
+            <button id="delete-partner-btn" class="banner-button delete">Forget Partner</button>
+        </div>
     </div>
 
     <!-- Tutorial Modal -->
