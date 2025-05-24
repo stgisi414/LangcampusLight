@@ -277,16 +277,29 @@ async function openChat(partner) { // Now accepts the full partner object
     removeAudioButton();
 
     const modal = document.getElementById('chat-modal');
-    const chatHeader = modal.querySelector('.chat-header'); // Get the header element
+    // It's good practice to check if modal exists, though your existing code doesn't always do this.
+    if (!modal) {
+        console.error("Chat modal element not found!");
+        return; 
+    }
+    const chatHeader = modal.querySelector('.chat-header'); 
     const chatMessages = document.getElementById('chat-messages');
     const messageInput = document.getElementById('message-input');
 
-    // Clear previous messages, history, and reset input
+    // Ensure all critical elements are found before proceeding
+    if (!chatHeader || !chatMessages || !messageInput) {
+        console.error("One or more critical chat modal sub-elements not found.");
+        // Optionally, inform the user via an alert or a message in a safe part of the UI
+        return;
+    }
+
+    // Clear previous messages, history, and reset input for a fresh chat session display
+    // (Resume Chat logic in checkSavedPartner will repopulate history and messages after this)
     chatMessages.innerHTML = '';
     messageInput.value = '';
-    chatHistory = []; // Clear history for new chat
-    currentPartner = partner; // Store the whole partner object
-    currentPartnerName = partner.name; // Store partner name
+    chatHistory = []; // Cleared here, then repopulated by resume logic if applicable
+    currentPartner = partner; 
+    currentPartnerName = partner.name; 
 
     // Populate the chat header
     chatHeader.innerHTML = `
@@ -295,104 +308,106 @@ async function openChat(partner) { // Now accepts the full partner object
         <p>(${partner.nativeLanguage} speaker, learning ${partner.targetLanguage})</p>
     `;
 
-    modal.style.setProperty('display', 'flex', 'important'); // Use flex to enable centering and force it
-    document.body.style.overflow = 'hidden'; // <<< LOCK body scroll
-
+    modal.style.setProperty('display', 'flex', 'important'); // Make the modal visible
+    document.body.style.overflow = 'hidden'; // <<< --- ADD THIS LINE HERE ---
 
     // Add initial placeholder/intro message - DO NOT add to history yet
+    // This will be removed if the partner sends an intro or the user types first.
+    // Or, if resuming, this gets overwritten by loaded messages.
+    if (document.getElementById('connecting-message')) { // Remove if it exists from a previous quick open/close
+        document.getElementById('connecting-message').remove();
+    }
     chatMessages.innerHTML += `<p id="connecting-message"><em>Connecting you with ${partner.name}...</em></p>`;
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     // Clear any existing timer before setting a new one
     if (geminiIntroTimer) {
         clearTimeout(geminiIntroTimer);
+        geminiIntroTimer = null; // Important to nullify after clearing
     }
 
     // Set a timer to send a message from the partner if the user doesn't type
+    // (This is mainly for new chats, resume chat will fill history)
     geminiIntroTimer = setTimeout(async () => {
-        // Check if the user hasn't sent a message yet (chatMessages only has the intro)
-        // Check history length instead of DOM elements
-        if (chatHistory.length === 0) {
-            // Generate custom intro with Gemini
-            const userLocalDateTime = new Date();
-            const userTimeOfDay = userLocalDateTime.getHours() < 6 ? "very early morning" :
-                userLocalDateTime.getHours() < 12 ? "morning" :
-                    (userLocalDateTime.getHours() < 18 ? "afternoon" : "evening");
+        const connectingMsg = document.getElementById('connecting-message');
+        // Only send auto-intro if no messages have been loaded/sent yet
+        if (chatHistory.length === 0 && connectingMsg) { 
+            // ... (existing intro message generation logic) ...
 
-            const partnerNativeLanguage = partner.nativeLanguage;
-            let timezoneHint = `It's currently ${userTimeOfDay} for the user you are about to greet.`;
+            // Example of how intro message is added (ensure you have your full logic here)
+            // const introMessageText = `Hi from ${partner.name}!`; // Placeholder for actual generated text
+            // if (connectingMsg) connectingMsg.remove(); // Remove "Connecting..."
+            // const timestamp = new Date().toISOString();
+            // const partnerIntro = { sender: partner.name, text: introMessageText, timestamp };
+            // chatHistory.push(partnerIntro);
+            // chatMessages.innerHTML += `
+            //   <p class="partner-message">
+            //     <strong>${partner.name}:</strong> ${introMessageText}
+            //     <span class="message-time" style="font-size: 0.8em; color: #666; margin-left: 8px;">
+            //       ${new Date(timestamp).toLocaleTimeString()}
+            //     </span>
+            //   </p>`;
+            // chatMessages.scrollTop = chatMessages.scrollHeight;
+            // >>>>>>> Make sure your full partner intro logic from lines 330-377 is here
+            // For brevity, I'm not pasting all of it, but it should be within this timeout.
+            // The critical part for the intro message generation:
+            const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+            const userLocalDateTime = new Date(); // Renamed from timeOfDay to avoid conflict
+            const currentUserTimeOfDay = userLocalDateTime.getHours() < 12 ? 'morning' : (userLocalDateTime.getHours() < 18 ? 'afternoon' : 'evening');
 
-            const asianLanguages = ['Chinese', 'Japanese', 'Korean', 'Vietnamese', 'Mongolian'];
-            if (asianLanguages.includes(partnerNativeLanguage)) {
-                timezoneHint += ` You, ${partner.name}, are from a country in Asia where ${partnerNativeLanguage} is spoken. This means it's likely a very different time for you (e.g., if it's the user's morning, it might be your evening or night).`;
-            } else { // For European, English-speaking regions, etc.
-                timezoneHint += ` You, ${partner.name}, are from a country where ${partnerNativeLanguage} is spoken. Your time of day will also be different from the user's, though the specific difference can vary.`;
+            const partnerNativeLangForIntro = partner.nativeLanguage; // Use a distinct variable
+            let timezoneHintForIntro = `It is currently ${currentUserTimeOfDay} for the user you are about to greet.`;
+            const asianLanguagesForIntro = ['Chinese', 'Japanese', 'Korean', 'Vietnamese', 'Mongolian'];
+
+            if (asianLanguagesForIntro.includes(partnerNativeLangForIntro)) {
+                timezoneHintForIntro += ` You, ${partner.name}, are from a country in Asia where ${partnerNativeLangForIntro} is spoken. This means it's likely a very different time for you (e.g., if it's the user's morning, it might be your evening or night).`;
+            } else {
+                timezoneHintForIntro += ` You, ${partner.name}, are from a country where ${partnerNativeLangForIntro} is spoken. Your time of day will also be different from the user's, though the specific difference can vary.`;
             }
-
-            const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}'); // Ensure myInfo is loaded here
 
             const introPrompt = `You are ${partner.name}. Your native language is ${partner.nativeLanguage}, and you are roleplaying as if you live in a country where it's spoken. You're enthusiastic about learning ${partner.targetLanguage}. Your interests are: ${partner.interests.join(', ')}.
 
-            You are about to send your *very first message* to a new language partner on the Langcampus Exchange website.
-            ${myInfo.name ? `Their name is ${myInfo.name}.` : 'They haven\'t shared their name yet.'} ${myInfo.bio ? `Their bio says: "${myInfo.bio}".` : ''} ${myInfo.hobbies?.length ? `Their hobbies include: ${myInfo.hobbies.join(', ')}.` : 'They haven\'t listed hobbies yet.'}
-            This user speaks ${partner.targetLanguage} (which you are learning) and wants to learn your native language (${partner.nativeLanguage}).
+You are about to send your *very first message* to a new language partner on the Langcampus Exchange website.
+${myInfo.name ? `Their name is ${myInfo.name}.` : 'They haven\'t shared their name yet.'} ${myInfo.bio ? `Their bio says: "${myInfo.bio}".` : ''} ${myInfo.hobbies?.length ? `Their hobbies include: ${myInfo.hobbies.join(', ')}.` : 'They haven\'t listed hobbies yet.'}
+This user speaks ${partner.targetLanguage} (which you are learning) and want to learn your native language (${partner.nativeLanguage}).
 
-            IMPORTANT TIMEZONE CONTEXT: ${timezoneHint}
+IMPORTANT TIMEZONE CONTEXT: ${timezoneHintForIntro}
 
-            Your task is to create a friendly, natural, and culturally appropriate first greeting message (keep it to 2-4 sentences).
-            Your message should:
-            1.  Start with a greeting. You should acknowledge the user's time of day (e.g., "Good ${userTimeOfDay} to you!").
-            2.  Briefly introduce yourself (as ${partner.name}).
-            3.  Express genuine enthusiasm for the language exchange opportunity.
-            4.  It's good if you can naturally allude to *your own* current time of day or a general activity appropriate for it, from your perspective as someone in your country (e.g., "It's just about dinner time here in [Your Country/Region]..." or "Hope you're having a great day, I'm just starting mine here."). This makes the interaction feel more real.
-            5.  If you share any interests (${partner.interests.join(', ')}) with the user's listed hobbies (${myInfo.hobbies?.join(', ')}), briefly and naturally mention one if it fits.
-            6.  End with an engaging open-ended question to encourage them to reply and start the conversation.
+Your task is to create a friendly, natural, and culturally appropriate first greeting message (keep it to 2-4 sentences).
+Your message should:
+1.  Start with a greeting. You should acknowledge the user's time of day (e.g., "Good ${currentUserTimeOfDay}!").
+2.  Briefly introduce yourself (as ${partner.name}).
+3.  Express genuine enthusiasm for the language exchange opportunity.
+4.  It's good if you can naturally allude to *your own* current time of day or a general activity appropriate for it, from your perspective as someone in your country (e.g., "It's just about dinner time here in [Your Country/Region]..." or "Hope you're having a great day, I'm just starting mine here."). This makes the interaction feel more real.
+5.  If you share any interests (${partner.interests.join(', ')}) with the user's listed hobbies (${myInfo.hobbies?.join(', ')}), briefly and naturally mention one if it fits.
+6.  End with an engaging open-ended question to encourage them to reply and start the conversation.
 
-            Style: Conversational, warm, welcoming, and natural. Avoid using emojis or excessive punctuation.
-            Your response must be ONLY the chat message text itself, without any prefix like your name.`;
+Style: Conversational, warm, welcoming, and natural. Avoid using emojis or excessive punctuation.
+Your response must be ONLY the chat message text itself, without any prefix like your name.`;
 
             let introMessageText;
             try {
-                const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+                const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, { // Ensure API_KEY is defined
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{
-                                text: introPrompt
-                            }]
-                        }]
-                    })
+                    headers: { 'Content-Type': 'application/json', },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: introPrompt }] }] })
                 });
-
-                if (!response.ok) throw new Error('Failed to generate intro');
-
+                if (!response.ok) throw new Error('Failed to generate intro from API');
                 const data = await response.json();
                 introMessageText = data.candidates[0].content.parts[0].text.trim();
-
-                // Remove quotes if present
                 if (introMessageText.startsWith('"') && introMessageText.endsWith('"')) {
                     introMessageText = introMessageText.slice(1, -1);
                 }
             } catch (error) {
                 console.error('Error generating custom intro:', error);
-                // Fallback to default intro if generation fails
-                introMessageText = `Hi! I'm ${partner.name}. Nice to meet you! I see you're learning ${partner.nativeLanguage}. Maybe we can practice?`;
+                introMessageText = `Hi! I'm ${partner.name}. It's nice to meet you! I see you're learning ${partner.nativeLanguage}. How's it going so far?`; // Fallback
             }
 
-            // Remove the "Connecting..." message
-            const connectingMessage = document.getElementById('connecting-message');
-            if (connectingMessage) {
-                connectingMessage.remove();
-            }
+            if (connectingMsg) connectingMsg.remove(); // Remove "Connecting..."
 
-            // Add partner's intro to UI and history
-            const timestamp = new Date().toISOString(); // Get current timestamp
-            const partnerIntro = { sender: partner.name, text: introMessageText, timestamp: timestamp }; // Store message with timestamp
-            chatHistory.push(partnerIntro);
-            chatHistory.push(partnerIntro);
+            const timestamp = new Date().toISOString();
+            const partnerIntro = { sender: partner.name, text: introMessageText, timestamp };
+            chatHistory.push(partnerIntro); // Add to history
             chatMessages.innerHTML += `
               <p class="partner-message">
                 <strong>${partner.name}:</strong> ${introMessageText}
@@ -401,31 +416,23 @@ async function openChat(partner) { // Now accepts the full partner object
                 </span>
               </p>`;
             chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-        geminiIntroTimer = null; // Clear timer ID after it runs or is cleared
-    }, 5000); // 5 seconds
+
+        } // End of if (chatHistory.length === 0 && connectingMsg)
+        geminiIntroTimer = null; 
+    }, 5000);
 
     const closeBtn = modal.querySelector('.close');
-    closeBtn.onclick = () => {
-        modal.style.display = 'none';
-        document.body.style.overflow = ''; // <<< UNLOCK body scroll
-        if (geminiIntroTimer) {
-            clearTimeout(geminiIntroTimer);
-            geminiIntroTimer = null;
-        }
-    };
-
-    // REMOVE the following block from openChat if it exists (it was around line 386):
-    // window.onclick = (event) => {
-    //     if (event.target === modal) {
-    //         modal.style.display = 'none';
-    //         document.body.style.overflow = ''; // This part would have been here
-    //         if (geminiIntroTimer) {
-    //             clearTimeout(geminiIntroTimer);
-    //             geminiIntroTimer = null;
-    //         }
-    //     }
-    // };
+    if(closeBtn) { // Ensure closeBtn exists
+        closeBtn.onclick = () => {
+            modal.style.display = 'none';
+            document.body.style.overflow = ''; // UNLOCK body scroll
+            if (geminiIntroTimer) {
+                clearTimeout(geminiIntroTimer);
+                geminiIntroTimer = null;
+            }
+        };
+    }
+    // The consolidated window.addEventListener('click', ...) handles outside clicks
 }
 
 // Function to load preferences from localStorage
@@ -1808,29 +1815,75 @@ function checkSavedPartner() {
     const banner = document.getElementById('saved-partner-banner');
     const info = document.getElementById('saved-partner-info');
 
+    if (!banner || !info) {
+        // console.error("Saved partner banner elements not found."); // Optionally uncomment for debugging
+        return;
+    }
+
     if (savedPartnerData) {
-        const data = JSON.parse(savedPartnerData);
-        banner.style.display = 'block';
-        info.textContent = `Chat with ${data.partner.name}`;
-
-        // Resume chat button
-        document.getElementById('resume-chat-btn').onclick = () => {
-            openChat(data.partner);
-            // Load saved messages
-            const chatMessages = document.getElementById('chat-messages');
-            chatHistory = data.messages;
-            chatMessages.innerHTML = chatHistory.map(msg =>
-                `<p><strong>${msg.sender}:</strong> ${msg.text}</p>`
-            ).join('');
-        };
-
-        // Delete saved partner button
-        document.getElementById('delete-partner-btn').onclick = () => {
-            if (confirm('Are you sure you want to delete the saved chat?')) {
-                localStorage.removeItem('savedPartner');
+        try {
+            const data = JSON.parse(savedPartnerData);
+            if (!data || !data.partner || !Array.isArray(data.messages)) {
+                console.error("Saved partner data is corrupted or incomplete.");
+                localStorage.removeItem('savedPartner'); // Clear corrupted data
                 banner.style.display = 'none';
+                return;
             }
-        };
+
+            banner.style.display = 'block';
+            info.textContent = `Continue chat with ${data.partner.name}`; // Updated text slightly
+
+            const resumeBtn = document.getElementById('resume-chat-btn');
+            if (resumeBtn) {
+                resumeBtn.onclick = () => {
+                    openChat(data.partner); // This call initializes the chat UI, including clearing messages
+
+                    // After openChat, repopulate chatHistory and render messages
+                    chatHistory = data.messages || []; // Restore global chatHistory
+
+                    const chatMessages = document.getElementById('chat-messages');
+                    if (chatMessages) {
+                        chatMessages.innerHTML = chatHistory.map(msg => {
+                            // Determine class based on sender
+                            const messageClass = msg.sender === 'You' ? 'user-message' : 'partner-message';
+
+                            // Use the sender name from the message object
+                            const senderName = msg.sender; // This will be "You" or the partner's name
+
+                            // Format the timestamp if it exists
+                            const messageTimestamp = msg.timestamp 
+                                ? new Date(msg.timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }) 
+                                : '';
+
+                            // Reconstruct the HTML for each message, including class and timestamp span
+                            return `
+                              <p class="${messageClass}">
+                                <strong>${senderName}:</strong> ${msg.text}
+                                ${messageTimestamp ? `<span class="message-time">${messageTimestamp}</span>` : ''}
+                              </p>`;
+                        }).join('');
+
+                        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to the bottom
+                    }
+                };
+            }
+
+            const deleteBtn = document.getElementById('delete-partner-btn');
+            if (deleteBtn) {
+                deleteBtn.onclick = () => {
+                    if (confirm('Are you sure you want to delete the saved chat with ' + data.partner.name + '?')) {
+                        localStorage.removeItem('savedPartner');
+                        banner.style.display = 'none';
+                    }
+                };
+            }
+        } catch (error) {
+            console.error("Error parsing saved partner data:", error);
+            localStorage.removeItem('savedPartner'); // Clear potentially corrupted data
+            banner.style.display = 'none';
+        }
+    } else {
+        banner.style.display = 'none';
     }
 }
 

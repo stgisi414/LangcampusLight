@@ -1099,6 +1099,23 @@
             /* Keep on same line if space allows */
         }
 
+        .message-time {
+            font-size: 0.75em;
+            /* color is handled by specific rules below */
+            margin-left: 8px; /* Adjust if needed based on text-align */
+            display: block;   /* Timestamp on a new line */
+            text-align: right;/* Align timestamp to the right of its bubble */
+            margin-top: 0.25rem;
+        }
+
+        .user-message .message-time {
+            color: rgba(255, 255, 255, 0.8); /* Lighter timestamp for dark user bubble */
+        }
+
+        .partner-message .message-time {
+            color: #555; /* Darker timestamp for light partner bubble */
+        }
+
         /* Audio button from selection */
         .audio-button {
             position: fixed;
