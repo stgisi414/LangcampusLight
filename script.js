@@ -296,6 +296,8 @@ async function openChat(partner) { // Now accepts the full partner object
     `;
 
     modal.style.setProperty('display', 'flex', 'important'); // Use flex to enable centering and force it
+    document.body.style.overflow = 'hidden'; // <<< LOCK body scroll
+
 
     // Add initial placeholder/intro message - DO NOT add to history yet
     chatMessages.innerHTML += `<p id="connecting-message"><em>Connecting you with ${partner.name}...</em></p>`;
@@ -403,24 +405,27 @@ async function openChat(partner) { // Now accepts the full partner object
         geminiIntroTimer = null; // Clear timer ID after it runs or is cleared
     }, 5000); // 5 seconds
 
-    const closeBtn = modal.querySelector('.close'); // More specific selector
+    const closeBtn = modal.querySelector('.close');
     closeBtn.onclick = () => {
         modal.style.display = 'none';
-        if (geminiIntroTimer) { // Clear timer if modal is closed
+        document.body.style.overflow = ''; // <<< UNLOCK body scroll
+        if (geminiIntroTimer) {
             clearTimeout(geminiIntroTimer);
             geminiIntroTimer = null;
         }
     };
 
-    window.onclick = (event) => {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-            if (geminiIntroTimer) { // Clear timer if modal is closed by clicking outside
-                clearTimeout(geminiIntroTimer);
-                geminiIntroTimer = null;
-            }
-        }
-    };
+    // REMOVE the following block from openChat if it exists (it was around line 386):
+    // window.onclick = (event) => {
+    //     if (event.target === modal) {
+    //         modal.style.display = 'none';
+    //         document.body.style.overflow = ''; // This part would have been here
+    //         if (geminiIntroTimer) {
+    //             clearTimeout(geminiIntroTimer);
+    //             geminiIntroTimer = null;
+    //         }
+    //     }
+    // };
 }
 
 // Function to load preferences from localStorage
