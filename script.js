@@ -161,8 +161,8 @@ async function generatePartnerProfiles(prompt) {
             const femaleHairColors = ['2C1B18', '4A312C', 'A55728', 'B58143', 'F5D6A1', '606060', 'E8E1E1', 'FFC0CB', 'C93305'].join(','); // Includes Platinum, Pink, Red
 
             // --- Define skin tone HEX codes based on language origin ---
-            const asianLanguages = ['Chinese', 'Japanese', 'Korean', 'Vietnamese', 'Mongolian'];
-            const europeanLanguages = ['English', 'Spanish', 'French', 'Italian', 'Portuguese'];
+            const asianLanguages = ['Chinese', 'Japanese', 'Korean', 'Vietnamese', 'Mongolian', 'Thai', 'Hindi', 'Arabic'];
+            const europeanLanguages = ['English', 'Spanish', 'French', 'Italian', 'Portuguese', 'Russian', 'German', 'Polish'];
             let skinColor = ''; // Default: Let seed decide if language doesn't match
 
             if (asianLanguages.includes(profile.nativeLanguage)) {
