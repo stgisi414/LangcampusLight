@@ -2024,7 +2024,7 @@ async function startQuiz(topicTitle, language, level) {
                 total: 5,
                 currentQuestion: 0
             };
-            showNextQuestion(chatMessages);
+            showNextQuestion();
         } catch (parseError) {
             console.error('Quiz parsing failed:', parseError);
             endQuiz('Failed to parse quiz data. Please try again.');
@@ -2033,6 +2033,42 @@ async function startQuiz(topicTitle, language, level) {
         console.error('Quiz generation failed:', error);
         endQuiz('Quiz generation failed. Please try again.');
     }
+}
+
+function showNextQuestion() {
+    const chatMessages = document.getElementById('chat-messages');
+    if (!currentQuiz || currentQuiz.currentQuestion >= currentQuiz.questions.length) {
+        const percentage = Math.round((currentQuiz.score / currentQuiz.total) * 100);
+        let grade = '';
+        if (percentage >= 90) grade = 'Excellent! 🌟';
+        else if (percentage >= 80) grade = 'Great job! 👏';
+        else if (percentage >= 70) grade = 'Good work! 👍';
+        else if (percentage >= 60) grade = 'Keep practicing! 💪';
+        else grade = 'More practice needed! 📚';
+        
+        endQuiz(`Quiz complete!\nYour score: ${currentQuiz.score}/${currentQuiz.total} (${percentage}%)\n${grade}`);
+        return;
+    }
+
+    const question = currentQuiz.questions[currentQuiz.currentQuestion];
+    const letters = ['A', 'B', 'C', 'D'];
+    
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'chat-message quiz-question';
+    questionDiv.innerHTML = `
+        <strong>Question ${currentQuiz.currentQuestion + 1}/${currentQuiz.total}:</strong>
+        <p>${question.question}</p>
+        <div class="quiz-options">
+            ${question.options.map((option, i) => `
+                <button class="quiz-choice" onclick="handleAnswer(${i}, ${question.correctIndex})">
+                    ${letters[i]}) ${option}
+                </button>
+            `).join('')}
+        </div>
+    `;
+    
+    chatMessages.appendChild(questionDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 function showNextQuestion(chatMessages) {
