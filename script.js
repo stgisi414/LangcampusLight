@@ -1,4 +1,3 @@
-
 // Store last message for retry functionality
 let lastUserMessage = '';
 
