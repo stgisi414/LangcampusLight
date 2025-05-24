@@ -1582,15 +1582,21 @@ function showNextQuestion() {
         return;
     }
 
+    if (!currentQuiz.questions) {
+        console.error('Quiz questions property missing');
+        endQuiz('Quiz questions not properly initialized', container);
+        return;
+    }
+
     if (!Array.isArray(currentQuiz.questions)) {
-        console.error('Quiz questions not properly initialized');
-        endQuiz('Quiz questions not properly loaded', container);
+        console.error('Quiz questions must be an array');
+        endQuiz('Quiz questions format invalid', container);
         return;
     }
 
     if (currentQuiz.questions.length === 0) {
-        console.error('Invalid quiz questions');
-        endQuiz('Quiz questions not properly loaded', container);
+        console.error('Quiz questions array is empty');
+        endQuiz('No quiz questions available', container);
         return;
     }
 
