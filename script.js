@@ -1653,11 +1653,20 @@ function handleAnswer(selected, correct) {
 
 function endQuiz(message, container) {
     quizActive = false;
+    const score = currentQuiz.score || 0;
+    const total = currentQuiz.total || 0;
+    const percentage = total ? Math.round((score / total) * 100) : 0;
+    let grade = '';
+    if (percentage >= 90) grade = 'Excellent! 🌟';
+    else if (percentage >= 80) grade = 'Great job! 👏';
+    else if (percentage >= 70) grade = 'Good work! 👍';
+    else if (percentage >= 60) grade = 'Keep practicing! 💪';
+    else grade = 'More practice needed! 📚';
 
     container.innerHTML = `
         <div class="quiz-end">
             <strong>Quiz Complete!</strong>
-            <pre style="margin: 10px 0; white-space: pre-wrap;">${message}</pre>
+            <pre style="margin: 10px 0; white-space: pre-wrap;">Your score: ${score}/${total} (${percentage}%)\n${grade}</pre>
             <button onclick="location.reload()" class="chat-button">Start Over</button>
         </div>
     `;
