@@ -1499,6 +1499,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
             return response.json();
         })
         .then(data => {
+            console.log(data.candidates[0].content.parts[0].text);
             let quizText = data.candidates[0].content.parts[0].text;
             quizText = quizText.replace(/```json\s*|\s*```/g, '').trim();
 
