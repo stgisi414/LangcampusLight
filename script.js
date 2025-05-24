@@ -315,23 +315,23 @@ async function openChat(partner) { // Now accepts the full partner object
         if (chatHistory.length === 0) {
             // Generate custom intro with Gemini
             const userLocalDateTime = new Date();
-                        const userTimeOfDay = userLocalDateTime.getHours() < 6 ? "very early morning" :
-                                              userLocalDateTime.getHours() < 12 ? "morning" :
-                                              (userLocalDateTime.getHours() < 18 ? "afternoon" : "evening");
+            const userTimeOfDay = userLocalDateTime.getHours() < 6 ? "very early morning" :
+                userLocalDateTime.getHours() < 12 ? "morning" :
+                    (userLocalDateTime.getHours() < 18 ? "afternoon" : "evening");
 
-                        const partnerNativeLanguage = partner.nativeLanguage;
-                        let timezoneHint = `It's currently ${userTimeOfDay} for the user you are about to greet.`;
+            const partnerNativeLanguage = partner.nativeLanguage;
+            let timezoneHint = `It's currently ${userTimeOfDay} for the user you are about to greet.`;
 
-                        const asianLanguages = ['Chinese', 'Japanese', 'Korean', 'Vietnamese', 'Mongolian'];
-                        if (asianLanguages.includes(partnerNativeLanguage)) {
-                            timezoneHint += ` You, ${partner.name}, are from a country in Asia where ${partnerNativeLanguage} is spoken. This means it's likely a very different time for you (e.g., if it's the user's morning, it might be your evening or night).`;
-                        } else { // For European, English-speaking regions, etc.
-                            timezoneHint += ` You, ${partner.name}, are from a country where ${partnerNativeLanguage} is spoken. Your time of day will also be different from the user's, though the specific difference can vary.`;
-                        }
+            const asianLanguages = ['Chinese', 'Japanese', 'Korean', 'Vietnamese', 'Mongolian'];
+            if (asianLanguages.includes(partnerNativeLanguage)) {
+                timezoneHint += ` You, ${partner.name}, are from a country in Asia where ${partnerNativeLanguage} is spoken. This means it's likely a very different time for you (e.g., if it's the user's morning, it might be your evening or night).`;
+            } else { // For European, English-speaking regions, etc.
+                timezoneHint += ` You, ${partner.name}, are from a country where ${partnerNativeLanguage} is spoken. Your time of day will also be different from the user's, though the specific difference can vary.`;
+            }
 
-                        const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}'); // Ensure myInfo is loaded here
+            const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}'); // Ensure myInfo is loaded here
 
-                        const introPrompt = `You are ${partner.name}. Your native language is ${partner.nativeLanguage}, and you are roleplaying as if you live in a country where it's spoken. You're enthusiastic about learning ${partner.targetLanguage}. Your interests are: ${partner.interests.join(', ')}.
+            const introPrompt = `You are ${partner.name}. Your native language is ${partner.nativeLanguage}, and you are roleplaying as if you live in a country where it's spoken. You're enthusiastic about learning ${partner.targetLanguage}. Your interests are: ${partner.interests.join(', ')}.
 
             You are about to send your *very first message* to a new language partner on the Langcampus Exchange website.
             ${myInfo.name ? `Their name is ${myInfo.name}.` : 'They haven\'t shared their name yet.'} ${myInfo.bio ? `Their bio says: "${myInfo.bio}".` : ''} ${myInfo.hobbies?.length ? `Their hobbies include: ${myInfo.hobbies.join(', ')}.` : 'They haven\'t listed hobbies yet.'}
@@ -716,10 +716,10 @@ async function startVocabularyQuiz(topicTitle, language) {
         questions: [],
         currentQuestion: 0,
         score: 0,
-        total: 3
+        total: 16
     };
 
-    const quizPrompt = `Create a multiple-choice vocabulary quiz (3 questions) about "${topicTitle}" in ${language}. 
+    const quizPrompt = `Create a multiple-choice vocabulary quiz (16 questions) about "${topicTitle}" in ${language}. 
 Questions should test vocabulary understanding through:
 1. Word definitions
 2. Usage in context
@@ -1000,7 +1000,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         questions: [],
         currentQuestion: 0,
         score: 0,
-        total: 3
+        total: 16
     };
 
     // Ensure level is valid
