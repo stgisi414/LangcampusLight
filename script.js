@@ -1420,18 +1420,13 @@ let currentQuiz = null;
 
 async function startQuiz(topicTitle, language, level = 'unknown') {
     const explanationContainer = document.getElementById('grammar-topic-list');
-    console.log(explanationContainer.innerHTML);
     if (!explanationContainer) {
         console.error('Quiz container not found');
         return;
     }
+    console.log(explanationContainer.innerHTML);
 
-    // Find topic level if not provided
-    if (level === 'unknown' && grammarData[language]) {
-        const topic = grammarData[language].find(t => t.title === topicTitle);
-        level = topic ? topic.level : 1;
-    }
-
+    // Initialize quiz state
     quizActive = true;
     currentQuiz = {
         questions: [],
@@ -1439,6 +1434,12 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         score: 0,
         total: 5
     };
+
+    // Find topic level if not provided
+    if (level === 'unknown' && grammarData[language]) {
+        const topic = grammarData[language].find(t => t.title === topicTitle);
+        level = topic ? topic.level : 1;
+    }
 
     explanationContainer.innerHTML = '<p>Loading quiz...</p>';
 
