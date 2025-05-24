@@ -579,8 +579,21 @@ teachMeButton.addEventListener('click', () => {
             const button = document.createElement('button');
             button.dataset.title = topic.title;
             button.dataset.type = 'vocabulary';
-            button.innerHTML = `${topic.title} <span>Level ${topic.level}</span>`;
+            button.style.display = 'block';
+            button.style.width = '100%';
+            button.style.padding = '0.8rem';
+            button.style.marginBottom = '0.5rem';
+            button.style.textAlign = 'left';
+            button.style.backgroundColor = '#f9f9f9';
+            button.style.border = '1px solid #eee';
+            button.style.cursor = 'pointer';
+            button.style.borderRadius = '4px';
+            button.style.transition = 'background-color 0.2s';
+            button.style.color = '#333';
+            button.innerHTML = `${topic.title} <span style="font-size: 0.8em; color: #777; margin-left: 10px; background-color: #eee; padding: 2px 6px; border-radius: 3px;">Level ${topic.level}</span>`;
             button.onclick = () => loadVocabularyContent(topic, targetLang);
+            button.onmouseover = () => button.style.backgroundColor = '#e9e9e9';
+            button.onmouseout = () => button.style.backgroundColor = '#f9f9f9';
             vocabularyTopicList.appendChild(button);
         });
     }
@@ -590,7 +603,11 @@ teachMeButton.addEventListener('click', () => {
 
 async function loadVocabularyContent(topic, targetLang) {
     const container = document.getElementById('vocabulary-topic-list');
-    container.innerHTML = '<p>Loading vocabulary content...</p>';
+    container.innerHTML = `<button style="display: block; width: 100%; padding: 0.8rem; margin-bottom: 0.5rem; text-align: left; background-color: #f9f9f9; border: 1px solid #eee; cursor: pointer; border-radius: 4px; transition: background-color 0.2s; color: #333;">
+        ${topic.title}
+        <span style="font-size: 0.8em; color: #777; margin-left: 10px; background-color: #eee; padding: 2px 6px; border-radius: 3px;">Level ${topic.level}</span>
+    </button>
+    <p>Loading vocabulary content...</p>`;
 
     try {
         const prompt = `Create a vocabulary study guide for "${topic.title}" in ${targetLang}. 
