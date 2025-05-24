@@ -1742,7 +1742,7 @@ function shareQuizResults(grade, percentage, score, total, missedQuestions) {
         : '';
     
     // Construct the message
-    messageInput.value = `I just completed the "${topicTitle}" quiz!\nScore: ${score}/${total} (${percentage}%)\n${grade}${missedSection}`;
+    messageInput.value = `I just completed the "${topicTitle}" quiz!\n\nScore: ${score}/${total} (${percentage}%)\n${grade}\n${missedSection}`;
     
     // Close the teach me modal
     const teachMeModal = document.getElementById('teach-me-modal');
