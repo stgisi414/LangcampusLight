@@ -1538,13 +1538,25 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
                 showNextQuestion(explanationContainer);
             } catch (parseError) {
                 console.error('Quiz parsing failed:', parseError);
-                explanationContainer.innerHTML = '<p>Failed to generate quiz. Please try again.</p>';
+                explanationContainer.innerHTML = `
+                    <div style="text-align: center;">
+                        <p>Failed to generate quiz.</p>
+                        <button onclick="startQuiz('${topicTitle}', '${language}', ${level})" class="chat-button" style="margin-top: 10px;">
+                            Try Again
+                        </button>
+                    </div>`;
                 quizActive = false;
             }
         })
         .catch(error => {
             console.error('Quiz generation failed:', error);
-            explanationContainer.innerHTML = '<p>Failed to generate quiz. Please try again.</p>';
+            explanationContainer.innerHTML = `
+                <div style="text-align: center;">
+                    <p>Failed to generate quiz.</p>
+                    <button onclick="startQuiz('${topicTitle}', '${language}', ${level})" class="chat-button" style="margin-top: 10px;">
+                        Try Again
+                    </button>
+                </div>`;
             quizActive = false;
         });
 }
