@@ -1287,36 +1287,49 @@ teachMeCloseBtn.onclick = () => {
 
 // Event delegation for topic selection
 grammarTopicList.addEventListener('click', async (event) => {
-    // Check if the clicked element is a button within the list
-    if (event.target && event.target.closest('button')) {
-        const button = event.target.closest('button');
+    const button = event.target.closest('button');
+
+    // Only proceed if the clicked button is a grammar topic selection button
+    // (i.e., it's not a quiz answer button and has a 'data-title' attribute).
+    if (button && !button.classList.contains('quiz-choice') && button.dataset.title) {
+        // If a quiz was active, clicking a new topic implies abandoning it.
+        if (quizActive) {
+            console.log("A new grammar topic was selected while a quiz was active. Resetting quiz state.");
+            quizActive = false;
+            currentQuiz = {}; // Reset any ongoing quiz
+        }
+
         const topicTitle = button.dataset.title;
-        const explanationContainer = document.getElementById('grammar-topic-list'); // Target the modal's content area
+        const explanationContainer = document.getElementById('grammar-topic-list'); // This is the same as grammarTopicList
 
-        // Keep the modal open to show the explanation
-        // teachMeModal.style.display = 'none'; // Don't close the modal
-
-        // Show loading state within the modal's content area
+        // Show loading state for the explanation
         explanationContainer.innerHTML = '<p>Loading explanation...</p>';
 
         try {
-            // Find the topic level from embedded grammar data
-            const targetLang = currentPartner.nativeLanguage; // User is learning partner's language
-            const level = grammarData[targetLang]?.find(topic => topic.title === topicTitle)?.level || 'unknown';
+            // Ensure currentPartner is available
+            if (!currentPartner || !currentPartner.nativeLanguage) {
+                explanationContainer.innerHTML = '<p style="color: red;">Cannot load explanation: Partner context is missing.</p>';
+                return;
+            }
+            const targetLang = currentPartner.nativeLanguage;
 
-            // Call the function to fetch and display the explanation IN THE MODAL
-            // This function updates explanationContainer.innerHTML directly.
+            // Determine the level of the topic
+            let level = 'unknown';
+            if (grammarData && grammarData[targetLang]) {
+                const topicData = grammarData[targetLang].find(topic => topic.title === topicTitle);
+                if (topicData) {
+                    level = topicData.level;
+                }
+            }
+
             await getGrammarExplanation(topicTitle, targetLang, level);
-
-            // NO NEED to add anything to the main chatMessages here,
-            // as the explanation is now shown inside the teachMeModal's explanationContainer.
-
         } catch (error) {
-            console.error("Error getting grammar explanation:", error);
-            // Display error within the modal's content area
+            console.error("Error processing grammar topic selection:", error);
             explanationContainer.innerHTML = `<p style="color: red;">Failed to load explanation for "${topicTitle}". Please try again.</p>`;
         }
     }
+    // If it's a .quiz-choice button, its own inline onclick handler will manage it.
+    // No action is needed here for .quiz-choice buttons.
 });
 
 // Close Teach Me modal if clicked outside
