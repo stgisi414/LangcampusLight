@@ -1732,7 +1732,7 @@ function endQuiz(message, container) {
 }
 
 function shareQuizResults(grade, percentage, score, total, missedQuestions) {
-    const topicTitle = document.querySelector('.teach-me-content h2')?.textContent.replace('Grammar Topics', '') || 'grammar quiz';
+    const topicTitle = document.querySelector('#grammar-topic-list h2')?.textContent.replace('Explanation: ', '') || 'grammar quiz';
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-message');
     
