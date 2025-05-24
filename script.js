@@ -671,7 +671,7 @@ Format the response in Markdown with clear sections and examples.`;
 async function startVocabularyQuiz(topicTitle, language) {
     console.log('Starting vocabulary quiz:', { topicTitle, language });
     currentTopicTitle = topicTitle;
-    const container = document.getElementById('vocabulary-section');
+    const container = document.getElementById('vocabulary-content');
     if (!container) {
         console.error('Quiz container not found');
         return;
