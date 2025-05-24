@@ -1419,12 +1419,25 @@ let quizActive = false;
 let currentQuiz = null;
 
 async function startQuiz(topicTitle, language, level = 'unknown') {
+    // Validate inputs
+    if (!topicTitle || !language) {
+        console.error('Quiz initialization failed: Missing topic or language');
+        return;
+    }
+
     const explanationContainer = document.getElementById('grammar-topic-list');
     if (!explanationContainer) {
         console.error('Quiz container not found');
         return;
     }
-    console.log(explanationContainer.innerHTML);
+
+    // Log values for debugging
+    console.log('Starting quiz with:', {
+        topicTitle,
+        language,
+        level,
+        container: explanationContainer
+    });
 
     // Initialize quiz state
     quizActive = true;
@@ -1435,13 +1448,21 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         total: 5
     };
 
-    // Find topic level if not provided
-    if (level === 'unknown' && grammarData[language]) {
-        const topic = grammarData[language].find(t => t.title === topicTitle);
-        level = topic ? topic.level : 1;
+    // Ensure level is valid
+    if (!level || level === 'unknown') {
+        if (grammarData[language]) {
+            const topic = grammarData[language].find(t => t.title === topicTitle);
+            level = topic ? topic.level : 1;
+        } else {
+            level = 1; // Default to level 1 if no data found
+        }
     }
 
-    explanationContainer.innerHTML = '<p>Loading quiz...</p>';
+    // Set a clear loading state
+    explanationContainer.innerHTML = `
+        <p>Loading quiz for "${topicTitle}"...</p>
+        <p>Language: ${language}, Level: ${level}</p>
+    `;
 
     // Find topic level from grammar data if not provided
     if (!level || level === 'unknown') {
