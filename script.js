@@ -1419,9 +1419,47 @@ Your response should be ONLY the chat message text. Do not include your name or 
 let quizActive = false;
 let currentQuiz = null;
 
-async function getGrammarExplanation(topicTitle, language, level = 'unknown') { // Added level parameter
-    const explanationContainer = document.getElementById('grammar-topic-list'); // Assuming this is where we show loading/result
-    explanationContainer.innerHTML = '<p>Loading explanation...</p>'; // Show loading state
+async function startQuiz(topicTitle, language, level) {
+    const explanationContainer = document.getElementById('grammar-topic-list');
+    const chatMessages = document.getElementById('chat-messages');
+    
+    quizActive = true;
+    currentQuiz = null;
+
+    explanationContainer.innerHTML = '<p>Loading quiz...</p>';
+
+    const quizPrompt = `Create a multiple-choice quiz (5 questions) about "${topicTitle}" in ${language} at level ${level}. Format it as a JSON array where each question object has: "question", "options" (array of 4 choices), and "correctIndex" (0-3). Make it challenging but appropriate for the level.`;
+
+    try {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: quizPrompt }] }]
+            })
+        });
+
+        if (!response.ok) throw new Error('Failed to generate quiz');
+        const data = await response.json();
+        const quizText = data.candidates[0].content.parts[0].text;
+        try {
+            currentQuiz = JSON.parse(quizText);
+            showNextQuestion(explanationContainer);
+        } catch (parseError) {
+            console.error('Quiz parsing failed:', parseError);
+            explanationContainer.innerHTML = '<p>Failed to parse quiz data. Please try again.</p>';
+            quizActive = false;
+        }
+    } catch (error) {
+        console.error('Quiz generation failed:', error);
+        explanationContainer.innerHTML = '<p>Failed to generate quiz. Please try again.</p>';
+        quizActive = false;
+    }
+}
+
+async function getGrammarExplanation(topicTitle, language, level = 'unknown') {
+    const explanationContainer = document.getElementById('grammar-topic-list');
+    explanationContainer.innerHTML = '<p>Loading explanation...</p>';
     quizActive = false;
     currentQuiz = null;
 
