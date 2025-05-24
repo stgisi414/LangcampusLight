@@ -1539,19 +1539,109 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('toggleMyInfo').addEventListener('click', () => {
         const content = document.getElementById('myInfoContent');
         const toggle = document.getElementById('toggleMyInfo');
+        const chevron = toggle.querySelector('.chevron');
         content.classList.toggle('hidden');
         toggle.classList.toggle('collapsed');
+        // Rotate chevron when toggled
+        if (content.classList.contains('hidden')) {
+            chevron.style.transform = 'rotate(-90deg)';
+        } else {
+            chevron.style.transform = 'rotate(0deg)';
+        }
     });
     
-    document.getElementById('addHobby').addEventListener('click', () => {
+    document.getElementById('addHobby')?.addEventListener('click', (e) => {
+        e.preventDefault();
         addHobbyInput();
+        saveMyInfo(); // Save after adding new hobby input
     });
     
-    document.getElementById('userName').addEventListener('change', saveMyInfo);
-    document.getElementById('userBio').addEventListener('change', saveMyInfo);
+    // Add input event listeners for real-time saving
+    document.getElementById('userName')?.addEventListener('input', saveMyInfo);
+    document.getElementById('userBio')?.addEventListener('input', saveMyInfo);
+    
+    // Add event delegation for hobby inputs
+    document.getElementById('hobbiesList')?.addEventListener('input', (e) => {
+        if (e.target.matches('input')) {
+            saveMyInfo();
+        }
+    });
+    
     checkSavedPartner();
     initializeTutorial();
 });
+
+function addHobbyInput(value = '') {
+    const hobbiesList = document.getElementById('hobbiesList');
+    if (!hobbiesList) return;
+    
+    const div = document.createElement('div');
+    div.className = 'hobby-input';
+    div.innerHTML = `
+        <input type="text" placeholder="Enter a hobby" value="${value}">
+        <button class="remove-hobby">×</button>
+    `;
+    
+    const removeButton = div.querySelector('.remove-hobby');
+    removeButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        div.remove();
+        saveMyInfo();
+    });
+    
+    hobbiesList.appendChild(div);
+}
+
+function saveMyInfo() {
+    const name = document.getElementById('userName')?.value || '';
+    const bio = document.getElementById('userBio')?.value || '';
+    const hobbyInputs = document.querySelectorAll('.hobby-input input');
+    const hobbies = Array.from(hobbyInputs).map(input => input.value).filter(Boolean);
+    
+    const myInfo = { name, bio, hobbies };
+    localStorage.setItem('myInfo', JSON.stringify(myInfo));
+}
+
+function loadMyInfo() {
+    try {
+        const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+        
+        if (myInfo.name) {
+            const userNameInput = document.getElementById('userName');
+            if (userNameInput) userNameInput.value = myInfo.name;
+        }
+        
+        if (myInfo.bio) {
+            const userBioInput = document.getElementById('userBio');
+            if (userBioInput) userBioInput.value = myInfo.bio;
+        }
+        
+        const hobbiesList = document.getElementById('hobbiesList');
+        if (hobbiesList) {
+            hobbiesList.innerHTML = ''; // Clear existing hobbies
+            if (myInfo.hobbies && myInfo.hobbies.length > 0) {
+                myInfo.hobbies.forEach(hobby => addHobbyInput(hobby));
+            } else {
+                addHobbyInput(); // Add one empty hobby input if none exist
+            }
+        }
+        
+        // Set initial visibility state
+        const content = document.getElementById('myInfoContent');
+        const toggle = document.getElementById('toggleMyInfo');
+        const chevron = toggle?.querySelector('.chevron');
+        if (content && toggle && chevron) {
+            const hasContent = myInfo.name || myInfo.bio || (myInfo.hobbies && myInfo.hobbies.length > 0);
+            if (!hasContent) {
+                content.classList.add('hidden');
+                toggle.classList.add('collapsed');
+                chevron.style.transform = 'rotate(-90deg)';
+            }
+        }
+    } catch (error) {
+        console.error('Error loading my info:', error);
+    }
+}
 
 function initializeTutorial() {
     const tutorialModal = document.getElementById('tutorial-modal');
