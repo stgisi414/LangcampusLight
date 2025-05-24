@@ -1574,11 +1574,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    document.getElementById('addHobby')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        addHobbyInput();
-        saveMyInfo(); // Save after adding new hobby input
-    });
+    document.getElementById('addHobby').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    addHobbyInput();
+    saveMyInfo();
+});
     
     // Add input event listeners for real-time saving
     document.getElementById('userName')?.addEventListener('input', saveMyInfo);
