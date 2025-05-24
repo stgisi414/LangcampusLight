@@ -312,22 +312,42 @@ async function openChat(partner) { // Now accepts the full partner object
         // Check history length instead of DOM elements
         if (chatHistory.length === 0) {
             // Generate custom intro with Gemini
-            const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
-            const timeOfDay = new Date().getHours() < 12 ? 'morning' : (new Date().getHours() < 18 ? 'afternoon' : 'evening');
+            const userLocalDateTime = new Date();
+                        const userTimeOfDay = userLocalDateTime.getHours() < 6 ? "very early morning" :
+                                              userLocalDateTime.getHours() < 12 ? "morning" :
+                                              (userLocalDateTime.getHours() < 18 ? "afternoon" : "evening");
 
-            const introPrompt = `You are ${partner.name}, a language exchange partner. Your native language is ${partner.nativeLanguage} and you're learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
+                        const partnerNativeLanguage = partner.nativeLanguage;
+                        let timezoneHint = `It's currently ${userTimeOfDay} for the user you are about to greet.`;
 
-${myInfo.name ? `You're greeting someone named ${myInfo.name}` : 'You\'re greeting a new language partner'}${myInfo.hobbies?.length ? ` who enjoys ${myInfo.hobbies.join(', ')}` : ''}.
-They speak ${partner.targetLanguage} and are learning your native language (${partner.nativeLanguage}).
+                        const asianLanguages = ['Chinese', 'Japanese', 'Korean', 'Vietnamese', 'Mongolian'];
+                        if (asianLanguages.includes(partnerNativeLanguage)) {
+                            timezoneHint += ` You, ${partner.name}, are from a country in Asia where ${partnerNativeLanguage} is spoken. This means it's likely a very different time for you (e.g., if it's the user's morning, it might be your evening or night).`;
+                        } else { // For European, English-speaking regions, etc.
+                            timezoneHint += ` You, ${partner.name}, are from a country where ${partnerNativeLanguage} is spoken. Your time of day will also be different from the user's, though the specific difference can vary.`;
+                        }
 
-Create a friendly, natural first greeting message that:
-1. Says hello and introduces yourself
-2. Shows enthusiasm about the shared language learning journey
-3. References the time of day (${timeOfDay})
-4. If they have hobbies that match your interests, mention that
-5. End with an engaging question
+                        const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}'); // Ensure myInfo is loaded here
 
-Keep it conversational and natural, about 2-3 sentences. Don't use emojis or excessive punctuation.`;
+                        const introPrompt = `You are ${partner.name}. Your native language is ${partner.nativeLanguage}, and you are roleplaying as if you live in a country where it's spoken. You're enthusiastic about learning ${partner.targetLanguage}. Your interests are: ${partner.interests.join(', ')}.
+
+            You are about to send your *very first message* to a new language partner on the Langcampus Exchange website.
+            ${myInfo.name ? `Their name is ${myInfo.name}.` : 'They haven\'t shared their name yet.'} ${myInfo.bio ? `Their bio says: "${myInfo.bio}".` : ''} ${myInfo.hobbies?.length ? `Their hobbies include: ${myInfo.hobbies.join(', ')}.` : 'They haven\'t listed hobbies yet.'}
+            This user speaks ${partner.targetLanguage} (which you are learning) and wants to learn your native language (${partner.nativeLanguage}).
+
+            IMPORTANT TIMEZONE CONTEXT: ${timezoneHint}
+
+            Your task is to create a friendly, natural, and culturally appropriate first greeting message (keep it to 2-4 sentences).
+            Your message should:
+            1.  Start with a greeting. You should acknowledge the user's time of day (e.g., "Good ${userTimeOfDay} to you!").
+            2.  Briefly introduce yourself (as ${partner.name}).
+            3.  Express genuine enthusiasm for the language exchange opportunity.
+            4.  It's good if you can naturally allude to *your own* current time of day or a general activity appropriate for it, from your perspective as someone in your country (e.g., "It's just about dinner time here in [Your Country/Region]..." or "Hope you're having a great day, I'm just starting mine here."). This makes the interaction feel more real.
+            5.  If you share any interests (${partner.interests.join(', ')}) with the user's listed hobbies (${myInfo.hobbies?.join(', ')}), briefly and naturally mention one if it fits.
+            6.  End with an engaging open-ended question to encourage them to reply and start the conversation.
+
+            Style: Conversational, warm, welcoming, and natural. Avoid using emojis or excessive punctuation.
+            Your response must be ONLY the chat message text itself, without any prefix like your name.`;
 
             let introMessageText;
             try {
@@ -367,9 +387,17 @@ Keep it conversational and natural, about 2-3 sentences. Don't use emojis or exc
             }
 
             // Add partner's intro to UI and history
-            const partnerIntro = { sender: partner.name, text: introMessageText };
+            const timestamp = new Date().toISOString(); // Get current timestamp
+            const partnerIntro = { sender: partner.name, text: introMessageText, timestamp: timestamp }; // Store message with timestamp
             chatHistory.push(partnerIntro);
-            chatMessages.innerHTML += `<p><strong>${partner.name}:</strong> ${introMessageText}</p>`;
+            chatHistory.push(partnerIntro);
+            chatMessages.innerHTML += `
+              <p>
+                <strong>${partner.name}:</strong> ${introMessageText}
+                <span class="message-time" style="font-size: 0.8em; color: #666; margin-left: 8px;">
+                  ${new Date(timestamp).toLocaleTimeString()}
+                </span>
+              </p>`;
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
         geminiIntroTimer = null; // Clear timer ID after it runs or is cleared
@@ -536,7 +564,7 @@ document.querySelectorAll('.tab-button').forEach(button => {
         // Remove active class from all tabs and contents
         document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        
+
         // Add active class to clicked tab and corresponding content
         button.classList.add('active');
         const tabId = button.getAttribute('data-tab');
@@ -551,7 +579,7 @@ teachMeButton.addEventListener('click', () => {
     }
 
     const targetLang = currentPartner.nativeLanguage; // User is learning partner's native language
-    
+
     // Load Grammar Topics
     if (grammarData && grammarData[targetLang]) {
         const topics = grammarData[targetLang];
@@ -574,7 +602,7 @@ teachMeButton.addEventListener('click', () => {
     if (vocabData) {
         vocabularyTopicList.innerHTML = ''; // Clear previous list
         vocabData.sort((a, b) => a.level - b.level); // Sort by level
-        
+
         vocabData.forEach(topic => {
             const button = document.createElement('button');
             button.dataset.title = topic.title;
@@ -648,7 +676,7 @@ Format the response in Markdown with clear sections and examples.`;
 
         const data = await response.json();
         const content = data.candidates[0].content.parts[0].text;
-        
+
         // Convert markdown to HTML and display
         container.innerHTML = `
             ${marked.parse(content)}
@@ -720,30 +748,30 @@ Each question must have exactly 4 options. Do not include backticks or markdown 
         });
 
         if (!response.ok) throw new Error('Failed to generate quiz');
-        
+
         const data = await response.json();
         let quizText = data.candidates[0].content.parts[0].text.trim();
-        
+
         try {
             // Clean the response text by removing markdown code fences and any extra whitespace
             let cleanText = quizText.replace(/```json\s*|\s*```/g, '').trim();
-            
+
             // Ensure it starts with [ and ends with ]
             if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
                 throw new Error('Invalid quiz format: must be a JSON array');
             }
-            
+
             // Parse the cleaned JSON
             const questions = JSON.parse(cleanText);
-            
+
             // Validate the structure
             if (!Array.isArray(questions) || questions.length === 0) {
                 throw new Error('Quiz must be a non-empty array');
             }
-            
+
             // Validate each question
             questions.forEach((q, index) => {
-                if (!q.question || !Array.isArray(q.options) || q.options.length !== 4 || 
+                if (!q.question || !Array.isArray(q.options) || q.options.length !== 4 ||
                     typeof q.correctIndex !== 'number' || q.correctIndex < 0 || q.correctIndex > 3) {
                     throw new Error(`Invalid question format at index ${index}`);
                 }
@@ -753,7 +781,11 @@ Each question must have exactly 4 options. Do not include backticks or markdown 
                 questions: questions,
                 currentQuestion: 0,
                 score: 0,
-                total: questions.length
+                total: questions.length,
+                type: 'vocabulary', // Add quiz type
+                containerId: 'vocabulary-content', // Set specific container ID for vocabulary
+                topicTitle: topicTitle, // Store for "Start Over"
+                language: language      // Store for "Start Over"
             };
 
             showNextQuestion();
@@ -1052,15 +1084,19 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
                     }
                 });
 
-                // Set quiz state after validation succeeds
+                // Inside the .then(data => { try { ... const questions = JSON.parse(cleanText); ... } }) block
                 currentQuiz = {
                     questions: questions,
                     currentQuestion: 0,
                     score: 0,
-                    total: questions.length
+                    total: questions.length,
+                    type: 'grammar', // Add quiz type
+                    containerId: explanationContainer.id, // Store the correct container ID (e.g., 'grammar-topic-list')
+                    topicTitle: topicTitle, // Store for "Start Over" functionality
+                    language: language,     // Store for "Start Over"
+                    level: level            // Store for "Start Over"
                 };
-
-                showNextQuestion(explanationContainer);
+                showNextQuestion(); // No longer needs container as argument
             } catch (parseError) {
                 console.error('Quiz parsing failed:', parseError);
                 explanationContainer.innerHTML = `
@@ -1087,16 +1123,24 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
 }
 
 function showNextQuestion() {
-    const container = document.getElementById('grammar-topic-list');
-    if (!container) {
-        console.error('Quiz container not found');
+    // Ensure currentQuiz and containerId are properly set
+    if (!currentQuiz || !currentQuiz.containerId) {
+        console.error("Quiz context or containerId not set in currentQuiz.");
+        // Attempt to use a fallback or display an error in a default location
+        const fallbackContainer = document.getElementById('grammar-topic-list') || document.getElementById('vocabulary-content');
+        if (fallbackContainer) {
+            fallbackContainer.innerHTML = "<p style='color:red;'>Error: Quiz display container not found. Please select a topic again.</p>";
+        }
         return;
     }
-
-    // Validate quiz state more thoroughly
-    if (!currentQuiz || typeof currentQuiz !== 'object') {
-        console.error('Quiz not initialized');
-        endQuiz('Quiz initialization error', container);
+    const container = document.getElementById(currentQuiz.containerId);
+    if (!container) {
+        console.error(`Container with ID '${currentQuiz.containerId}' not found.`);
+        // Display error in a more general modal area if possible
+        const modalContent = document.querySelector('#teach-me-modal .modal-content');
+        if (modalContent) {
+            modalContent.innerHTML = "<p style='color:red;'>Critical Error: Quiz container missing. Please close and reopen.</p>";
+        }
         return;
     }
 
@@ -1163,10 +1207,15 @@ function showNextQuestion() {
 }
 
 function handleAnswer(selected, correct) {
-    if (!currentQuiz || !currentQuiz.questions) return;
-
-    const container = document.getElementById('grammar-topic-list');
-    if (!container) return;
+    if (!currentQuiz || !currentQuiz.questions || !currentQuiz.containerId) {
+        console.error("Quiz context or containerId not set in handleAnswer.");
+        return; // Exit if critical information is missing
+    }
+    const container = document.getElementById(currentQuiz.containerId);
+    if (!container) {
+        console.error(`Container with ID '${currentQuiz.containerId}' not found in handleAnswer.`);
+        return; // Exit if container is not found
+    }
 
     const buttons = container.querySelectorAll('.quiz-choice');
     if (!buttons.length) return;
@@ -1203,14 +1252,18 @@ function handleAnswer(selected, correct) {
 
     // Move to next question after delay
     currentQuiz.currentQuestion++;
-    setTimeout(() => showNextQuestion(container), 2000);
+    //setTimeout(() => showNextQuestion(container), 2000);
+    setTimeout(() => showNextQuestion(), 2000); // New, container argument no longer needed
+
 }
 
 function endQuiz(message, container) {
     quizActive = false;
-    const score = currentQuiz.score || 0;
-    const total = currentQuiz.total || 0;
+    // Ensure currentQuiz and its properties are valid before proceeding
+    const score = (currentQuiz && typeof currentQuiz.score === 'number') ? currentQuiz.score : 0;
+    const total = (currentQuiz && typeof currentQuiz.total === 'number' && currentQuiz.total > 0) ? currentQuiz.total : 0;
     const percentage = total ? Math.round((score / total) * 100) : 0;
+
     let grade = '';
     if (percentage >= 90) grade = 'Excellent! 🌟';
     else if (percentage >= 80) grade = 'Great job! 👏';
@@ -1218,30 +1271,65 @@ function endQuiz(message, container) {
     else if (percentage >= 60) grade = 'Keep practicing! 💪';
     else grade = 'More practice needed! 📚';
 
-    // Get incorrect questions for sharing
-    const incorrectQuestions = currentQuiz.questions
-        ?.filter((q, idx) => q.userAnswer !== undefined && q.userAnswer !== q.correctIndex)
-        ?.map(q => q.question)
-        ?.slice(0, 3) || []; // Only share up to 3 missed questions
+    const incorrectQuestions = (currentQuiz && Array.isArray(currentQuiz.questions))
+        ? currentQuiz.questions
+            .filter(q => q.userAnswer !== undefined && q.userAnswer !== q.correctIndex)
+            .map(q => q.question)
+            .slice(0, 3)
+        : [];
 
-    // Store the data as a global variable to avoid string encoding issues
+    const topicTitleForResults = (currentQuiz && currentQuiz.topicTitle) ? currentQuiz.topicTitle : "Unknown Topic";
+
     window.lastQuizResults = {
         grade,
         percentage,
         score,
         total,
         incorrectQuestions,
-        topicTitle: currentTopicTitle
+        topicTitle: topicTitleForResults,
+        type: currentQuiz.type
     };
 
+    let startOverButtonHtml = '';
+    if (currentQuiz && currentQuiz.type === 'grammar' && currentQuiz.topicTitle && currentQuiz.language && typeof currentQuiz.level !== 'undefined') {
+        const safeTopicTitle = currentQuiz.topicTitle.replace(/'/g, "\\'");
+        const safeLanguage = currentQuiz.language.replace(/'/g, "\\'");
+        startOverButtonHtml = `<button onclick="startQuiz('${safeTopicTitle}', '${safeLanguage}', ${currentQuiz.level})" class="chat-button">Start Over</button>`;
+    } else if (currentQuiz && currentQuiz.type === 'vocabulary' && currentQuiz.topicTitle && currentQuiz.language) {
+        const safeTopicTitle = currentQuiz.topicTitle.replace(/'/g, "\\'");
+        const safeLanguage = currentQuiz.language.replace(/'/g, "\\'");
+        startOverButtonHtml = `<button onclick="startVocabularyQuiz('${safeTopicTitle}', '${safeLanguage}')" class="chat-button">Start Over</button>`;
+    }
+
+    if (!container) {
+        console.error("Container is null in endQuiz. Cannot display quiz results.");
+        const modalContent = document.querySelector('#teach-me-modal .modal-content');
+        if (modalContent) {
+            const errorP = document.createElement('p');
+            errorP.style.color = 'red';
+            errorP.textContent = "Error: Could not display quiz results area properly.";
+            modalContent.appendChild(errorP);
+        } else {
+            alert("Error displaying quiz results: container not found.");
+        }
+        currentQuiz = {};
+        return;
+    }
+
+    // =====================================================================================
+    // CRITICAL LINE: Ensure this line below uses BACKTICKS (`) at the beginning and end
+    // =====================================================================================
     container.innerHTML = `
         <div class="quiz-end">
             <strong>Quiz Complete!</strong>
-            <pre style="margin: 10px 0; white-space: pre-wrap;">Your score: ${score}/${total} (${percentage}%)\n${grade}</pre>
+            <pre style="margin: 10px 0; white-space: pre-wrap;">Your score: <span class="math-inline">${score}/</span>${total} (<span class="math-inline">${percentage}%\)\n</span>${grade}</pre>
             <button onclick="shareQuizResults()" class="chat-button" style="margin-right: 10px;">Share Results</button>
-            <button onclick="startQuiz('${currentTopicTitle}', '${currentPartner.nativeLanguage}')" class="chat-button">Start Over</button>
+            ${startOverButtonHtml}
         </div>
     `;
+    // =====================================================================================
+    // End of critical section
+    // =====================================================================================
 
     currentQuiz = {};
 }
@@ -1256,23 +1344,27 @@ function shareQuizResults() {
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-message');
 
-    // Format missed questions if any
+    // Determine quiz type string for the message
+    // Use the quizType from lastResults, default to 'grammar' if it's somehow undefined
+    const quizTypeString = lastResults.type === 'vocabulary' ? 'vocabulary' : 'grammar';
+
     const missedSection = lastResults.incorrectQuestions?.length > 0
         ? `\nAreas to review:\n${lastResults.incorrectQuestions.join('\n')}`
         : '';
 
-    // Construct the message
-    messageInput.value = `I just completed the "${lastResults.topicTitle}" grammar quiz!\n\nScore: ${lastResults.score}/${lastResults.total} (${lastResults.percentage}%)\n${lastResults.grade}${missedSection}`;
+    // Construct the message using the determined quizTypeString
+    messageInput.value = `I just completed the "${lastResults.topicTitle}" ${quizTypeString} quiz!\n\nScore: ${lastResults.score}/${lastResults.total} (${lastResults.percentage}%)\n${lastResults.grade}${missedSection}`;
 
-    // Close the teach me modal
     const teachMeModal = document.getElementById('teach-me-modal');
-    teachMeModal.style.display = 'none';
+    if (teachMeModal) {
+        teachMeModal.style.display = 'none';
+    }
 
-    // Send the message
-    sendButton.click();
+    if (sendButton) {
+        sendButton.click();
+    }
 
-    // Clear the stored results
-    window.lastQuizResults = null;
+    window.lastQuizResults = {}; // Clear results after sharing
 }
 
 async function getGrammarExplanation(topicTitle, language, level = null) {
