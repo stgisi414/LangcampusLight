@@ -1729,7 +1729,7 @@ function endQuiz(message, container) {
             <strong>Quiz Complete!</strong>
             <pre style="margin: 10px 0; white-space: pre-wrap;">Your score: ${score}/${total} (${percentage}%)\n${grade}</pre>
             <button onclick="shareQuizResults('${grade}', ${percentage}, ${score}, ${total}, ${JSON.stringify(incorrectQuestions).replace(/'/g, "\\'")})" class="chat-button" style="margin-right: 10px;">Share Results</button>
-            <button onclick="location.reload()" class="chat-button">Start Over</button>
+            <button onclick="startQuiz('${currentTopicTitle}', '${currentPartner.nativeLanguage}')" class="chat-button">Start Over</button>
         </div>
     `;
 
