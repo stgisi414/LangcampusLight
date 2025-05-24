@@ -602,7 +602,12 @@ teachMeButton.addEventListener('click', () => {
 });
 
 async function loadVocabularyContent(topic, targetLang) {
+    console.log('Starting loadVocabularyContent:', { topic, targetLang });
     const vocabSection = document.getElementById('vocabulary-section');
+    if (!vocabSection) {
+        console.error('Vocabulary section element not found');
+        return;
+    }
     vocabSection.innerHTML = `
         <h2>${topic.title}</h2>
         <div id="vocabulary-content">
@@ -610,6 +615,10 @@ async function loadVocabularyContent(topic, targetLang) {
         </div>
     `;
     const container = document.getElementById('vocabulary-content');
+    if (!container) {
+        console.error('Vocabulary content container not found');
+        return;
+    }
 
     try {
         const prompt = `Create a vocabulary study guide for "${topic.title}" in ${targetLang}. 
@@ -660,8 +669,13 @@ Format the response in Markdown with clear sections and examples.`;
 }
 
 async function startVocabularyQuiz(topicTitle, language) {
+    console.log('Starting vocabulary quiz:', { topicTitle, language });
     currentTopicTitle = topicTitle;
     const container = document.getElementById('vocabulary-section');
+    if (!container) {
+        console.error('Quiz container not found');
+        return;
+    }
     container.innerHTML = '<p>Loading quiz...</p>';
 
     quizActive = true;
