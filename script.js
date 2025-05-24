@@ -1419,9 +1419,15 @@ Your response should be ONLY the chat message text. Do not include your name or 
 let quizActive = false;
 let currentQuiz = null;
 
-async function startQuiz(topicTitle, language, level = 1) {
+async function startQuiz(topicTitle, language, level = 'unknown') {
     const explanationContainer = document.getElementById('grammar-topic-list');
     const chatMessages = document.getElementById('chat-messages');
+
+    // Find topic level if not provided
+    if (level === 'unknown' && grammarData[language]) {
+        const topic = grammarData[language].find(t => t.title === topicTitle);
+        level = topic ? topic.level : 1;
+    }
 
     quizActive = true;
     currentQuiz = {
@@ -1459,12 +1465,19 @@ async function startQuiz(topicTitle, language, level = 1) {
                 throw new Error('Invalid quiz format received');
             }
 
-            const questions = JSON.parse(quizText);
-            if (!Array.isArray(questions)) throw new Error('Quiz must be an array');
-
-            currentQuiz.questions = questions;
-            currentQuiz.total = questions.length;
-            showNextQuestion(explanationContainer);
+            let questions;
+            try {
+                questions = JSON.parse(quizText);
+                if (!Array.isArray(questions)) throw new Error('Quiz must be an array');
+                
+                currentQuiz.questions = questions;
+                currentQuiz.total = questions.length;
+                showNextQuestion(explanationContainer);
+            } catch (parseError) {
+                console.error('Quiz parsing failed:', parseError);
+                explanationContainer.innerHTML = '<p>Failed to generate quiz. Please try again.</p>';
+                quizActive = false;
+            }
         })
         .catch(error => {
             console.error('Quiz generation failed:', error);
