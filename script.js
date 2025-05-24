@@ -1505,7 +1505,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
 
     Each quiz question in your JSON should follow this structure. Do not include any markdown formatting or backticks.
     
-    Make sure to generate varied and challenging questions suitable for the specified level. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it.`;
+    Make sure to generate varied and challenging questions suitable for the specified level. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it. In all just make sure multiple answers can ot be correct and the answers must be completely separate from the question example.`;
 
     fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
         method: 'POST',
@@ -1759,7 +1759,7 @@ function shareQuizResults() {
         : '';
     
     // Construct the message
-    messageInput.value = `I just completed the "${topicTitle || 'grammar quiz'}"!\n\nScore: ${score}/${total} (${percentage}%)\n${grade}${missedSection}`;
+    messageInput.value = `I just completed the "${topicTitle}" grammar quiz!\n\n Score: ${score}/${total} (${percentage}%)\n ${grade}${missedSection}`;
     
     // Close the teach me modal
     const teachMeModal = document.getElementById('teach-me-modal');
