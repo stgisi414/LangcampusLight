@@ -1347,10 +1347,10 @@ document.getElementById('corrections-toggle').addEventListener('change', (event)
 // Modified getGeminiChatResponse to include corrections instruction
 async function getGeminiChatResponse(partner, history) {
     console.log("Getting Gemini Response. History:", history);
-    const prompt = `You are ${partner.name}, a language exchange partner on the website http://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
+    const prompt = `You are ${partner.name}, a language exchange partner on the website https://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
 You are chatting with someone whose native language is ${partner.targetLanguage} and who is learning your language (${partner.nativeLanguage}).
 
-Here is the recent chat history (last 10 messages) with timestamps:
+Here is the recent chat history (last 50 messages) with timestamps:
 ${history.map(msg => `[${new Date(msg.timestamp).toLocaleTimeString()}] ${msg.sender}: ${msg.text}`).join('\n')}
 
 Consider the timestamps when crafting your response. If there has been a long gap between messages, you may acknowledge it naturally in your response.
