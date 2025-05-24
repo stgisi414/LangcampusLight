@@ -1482,7 +1482,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         level = grammarData[language]?.find(topic => topic.title === topicTitle)?.level || 1;
     }
 
-    const quizPrompt = `Create a multiple-choice quiz (15 questions) about "${topicTitle}" in ${language} at level ${level}. Your response must be valid JSON structured like this example:
+    const quizPrompt = `Create a multiple-choice quiz (3 questions) about "${topicTitle}" in ${language} at level ${level}. Your response must be valid JSON structured like this example:
 
     [
       {
