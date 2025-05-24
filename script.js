@@ -1482,7 +1482,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         "options": ["Earth", "Mars", "Jupiter", "Venus"],
         "correctIndex": 1
       },
-      // Additional questions...
+      // Additional questiocns...
     ]
 
     Each quiz question in your JSON should follow this structure. Do not include any markdown formatting or backticks.
@@ -1509,7 +1509,6 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
                 throw new Error('Invalid quiz format received');
             }
 
-            let questions;
             try {
                 // Clean and validate the response text
                 let cleanText = quizText.replace(/```json\s*|\s*```/g, '').trim();
@@ -1521,10 +1520,10 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
 
                 // Parse the JSON
                 const questions = JSON.parse(cleanText);
-                console.log(questions);
+                
                 // Validate the structure
-                if (!Array.isArray(questions)) {
-                    throw new Error('Quiz must be an array');
+                if (!Array.isArray(questions) || questions.length === 0) {
+                    throw new Error('Quiz must be a non-empty array');
                 }
 
                 // Validate each question
@@ -1535,9 +1534,14 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
                     }
                 });
 
-                currentQuiz.questions = questions;
-                currentQuiz.total = questions.length;
-                currentQuiz.currentQuestion = 0;
+                // Set quiz state after validation succeeds
+                currentQuiz = {
+                    questions: questions,
+                    currentQuestion: 0,
+                    score: 0,
+                    total: questions.length
+                };
+                
                 showNextQuestion(explanationContainer);
             } catch (parseError) {
                 console.error('Quiz parsing failed:', parseError);
