@@ -1531,72 +1531,25 @@ You are chatting with someone whose native language is ${partner.targetLanguage}
 
     // Rest of the existing function remains the same...
 
-// Create file logger
-function logToFile(msg, type = 'info') {
-    const timestamp = new Date().toISOString();
-    const logMsg = `${timestamp} [${type}] ${msg}\n`;
-    
-    // Create blob and download
-    const blob = new Blob([logMsg], {type: 'text/plain'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'debug.log';
-    a.click();
-    URL.revokeObjectURL(a.href);
-}
-
-// Override console methods
-const originalConsole = { ...console };
-console.log = (...args) => {
-    originalConsole.log(...args);
-    logToFile(args.join(' '));
-};
-console.error = (...args) => {
-    originalConsole.error(...args);
-    logToFile(args.join(' '), 'error');
-};
-
 document.addEventListener('DOMContentLoaded', () => {
-    logToFile('DOM Content Loaded');
+    console.log('DOM Content Loaded');
     loadPreferences();
     loadMyInfo();
-    
-    // Ensure all event listeners are properly attached
-    const elements = {
-        toggleBtn: document.getElementById('toggleMyInfo'),
-        addHobbyBtn: document.getElementById('addHobby'),
-        userName: document.getElementById('userName'),
-        userBio: document.getElementById('userBio'),
-        hobbiesList: document.getElementById('hobbiesList')
-    };
-
-    // Log which elements were found/not found
-    Object.entries(elements).forEach(([name, element]) => {
-        logToFile(`${name} element ${element ? 'found' : 'NOT FOUND'}`);
-    });
     
     // My Info event listeners
     const toggleButton = document.getElementById('toggleMyInfo');
     const content = document.getElementById('myInfoContent');
     
-    if (elements.toggleBtn && content) {
-        elements.toggleBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            logToFile('Toggle clicked');
-            try {
-                content.classList.toggle('hidden');
-                elements.toggleBtn.classList.toggle('collapsed');
-                const chevron = elements.toggleBtn.querySelector('.chevron');
-                if (chevron) {
-                    chevron.style.transform = content.classList.contains('hidden') ? 'rotate(-90deg)' : 'rotate(0deg)';
-                }
-                logToFile('Toggle state changed successfully');
-            } catch (error) {
-                logToFile(`Toggle error: ${error.message}`, 'error');
+    if (toggleButton && content) {
+        toggleButton.addEventListener('click', () => {
+            console.log('Toggle clicked');
+            content.classList.toggle('hidden');
+            toggleButton.classList.toggle('collapsed');
+            const chevron = toggleButton.querySelector('.chevron');
+            if (chevron) {
+                chevron.style.transform = content.classList.contains('hidden') ? 'rotate(-90deg)' : 'rotate(0deg)';
             }
         });
-    } else {
-        logToFile('Toggle button or content not found', 'error');
     }
 
     // Add hobby button handler
