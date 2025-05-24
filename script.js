@@ -1320,8 +1320,13 @@ document.getElementById('corrections-toggle').addEventListener('change', (event)
 
 // Modified getGeminiChatResponse to include corrections instruction
 async function getGeminiChatResponse(partner, history) {
-    console.log("Getting Gemini Response. History:", history);
+    const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+    const userContext = myInfo.name ? 
+        `The user's name is ${myInfo.name}. ${myInfo.bio ? `Their bio: ${myInfo.bio}.` : ''} ${myInfo.hobbies?.length ? `Their hobbies: ${myInfo.hobbies.join(', ')}.` : ''}` : 
+        '';
+
     const prompt = `You are ${partner.name}, a language exchange partner on the website http://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
+${userContext}
 You are chatting with someone whose native language is ${partner.targetLanguage} and who is learning your language (${partner.nativeLanguage}).
 
 Here is the recent chat history (last 10 messages) with timestamps:
