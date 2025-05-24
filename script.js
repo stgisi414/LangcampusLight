@@ -1729,7 +1729,7 @@ function endQuiz(message, container) {
             <strong>Quiz Complete!</strong>
             <pre style="margin: 10px 0; white-space: pre-wrap;">Your score: ${score}/${total} (${percentage}%)\n${grade}</pre>
             <button onclick="shareQuizResults('${grade}', ${percentage}, ${score}, ${total}, ${JSON.stringify(incorrectQuestions).replace(/'/g, "\\'")})" class="chat-button" style="margin-right: 10px;">Share Results</button>
-            <button onclick="restartQuiz('${currentTopicTitle}', '${currentPartner.nativeLanguage}', ${level})" class="chat-button">Start Over</button>
+            <button onclick="startQuiz('${currentTopicTitle}', '${currentPartner.nativeLanguage}')" class="chat-button">Start Over</button>
         </div>
     `;
 
@@ -2751,16 +2751,3 @@ document.addEventListener('mousedown', (event) => {
         removeAudioButton();
     }
 });
-function restartQuiz(topicTitle, language, level) {
-    // Reset quiz state
-    quizActive = true;
-    currentQuiz = {
-        questions: [],
-        currentQuestion: 0,
-        score: 0,
-        total: 16
-    };
-    
-    // Generate new quiz
-    startQuiz(topicTitle, language, level);
-}
