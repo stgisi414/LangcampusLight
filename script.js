@@ -1469,7 +1469,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         level = grammarData[language]?.find(topic => topic.title === topicTitle)?.level || 1;
     }
 
-    const quizPrompt = `Create a multiple-choice quiz (5 questions) about "${topicTitle}" in ${language} at level ${level}. Your response must be valid JSON structured like this example:
+    const quizPrompt = `Create a multiple-choice quiz (15 questions) about "${topicTitle}" in ${language} at level ${level}. Your response must be valid JSON structured like this example:
 
     [
       {
@@ -1485,7 +1485,9 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
       // Additional questions...
     ]
 
-    Each quiz question in your JSON should follow this structure. Do not include any markdown formatting or backticks.`;
+    Each quiz question in your JSON should follow this structure. Do not include any markdown formatting or backticks.
+    
+    Make sure to generate varied and challenging questions suitable for the specified level. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it.`;
 
     fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
         method: 'POST',
@@ -2206,48 +2208,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const contentDiv = document.createElement('div');
                 contentDiv.innerHTML = explanationHtml;
                 explanationDiv.appendChild(contentDiv);
-
-                // Add Quiz button
-                const quizButton = document.createElement('button');
-                quizButton.className = 'chat-button';
-                quizButton.style.marginTop = '10px';
-                quizButton.textContent = 'Quiz Me';
-                quizButton.onclick = async () => {
-                    if (quizActive) return;
-                    quizActive = true;
-                    const messageInput = document.getElementById('message-input');
-                    const sendButton = document.getElementById('send-message');
-                    messageInput.disabled = true;
-                    sendButton.disabled = true;
-
-                    const quizPrompt = `Create a multiple-choice quiz (5-8 questions) about "${topicTitle}" in ${language} at level ${level}. Format it as a JSON array where each question object has: "question", "options" (array of 4 choices), and "correctIndex" (0-3). Make it challenging but appropriate for the level.`;
-
-                    try {
-                        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                contents: [{ parts: [{ text: quizPrompt }] }]
-                            })
-                        });
-
-                        if (!response.ok) throw new Error('Failed to generate quiz');
-                        const data = await response.json();
-                        const quizText = data.candidates[0].content.parts[0].text;
-                        currentQuiz = JSON.parse(quizText);
-                        showNextQuestion(0, chatMessages);
-                    } catch (error) {
-                        console.error('Quiz generation failed:', error);
-                        quizActive = false;
-                        messageInput.disabled = false;
-                        sendButton.disabled = false;
-                        const errorMsg = document.createElement('p');
-                        errorMsg.innerHTML = '<em>Failed to generate quiz. Please try again.</em>';
-                        chatMessages.appendChild(errorMsg);
-                    }
-                };
-                explanationDiv.appendChild(quizButton);
-                chatMessages.appendChild(explanationDiv);
 
             } catch (error) {
                 // Remove the requesting message even if there's an error
