@@ -1421,7 +1421,10 @@ let currentQuiz = null;
 
 async function startQuiz(topicTitle, language, level = 'unknown') {
     const explanationContainer = document.getElementById('grammar-topic-list');
-    const chatMessages = document.getElementById('chat-messages');
+    if (!explanationContainer) {
+        console.error('Quiz container not found');
+        return;
+    }
 
     // Find topic level if not provided
     if (level === 'unknown' && grammarData[language]) {
