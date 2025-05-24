@@ -1576,15 +1576,19 @@ function showNextQuestion() {
     }
 
     // Validate quiz state more thoroughly
-    if (!currentQuiz) {
+    if (!currentQuiz || typeof currentQuiz !== 'object') {
         console.error('Quiz not initialized');
         endQuiz('Quiz initialization error', container);
         return;
     }
 
-    console.log("Is currentquiz.questions array? " + !Array.isArray(currentQuiz.questions))
-    console.log("Are there currently quiz questions? " + currentQuiz.questions.length === 0);
-    if (!Array.isArray(currentQuiz.questions) || currentQuiz.questions.length === 0) {
+    if (!Array.isArray(currentQuiz.questions)) {
+        console.error('Quiz questions not properly initialized');
+        endQuiz('Quiz questions not properly loaded', container);
+        return;
+    }
+
+    if (currentQuiz.questions.length === 0) {
         console.error('Invalid quiz questions');
         endQuiz('Quiz questions not properly loaded', container);
         return;
