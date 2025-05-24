@@ -1082,8 +1082,54 @@ function openChat(partner) { // Now accepts the full partner object
         // Check if the user hasn't sent a message yet (chatMessages only has the intro)
         // Check history length instead of DOM elements
         if (chatHistory.length === 0) {
-            // Generate an intro message roleplaying as the partner
-            const introMessageText = `Hi! I'm ${partner.name}. Nice to meet you! I see you're learning ${partner.nativeLanguage}. Maybe we can practice?`;
+            // Generate custom intro with Gemini
+            const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+            const timeOfDay = new Date().getHours() < 12 ? 'morning' : (new Date().getHours() < 18 ? 'afternoon' : 'evening');
+            
+            const introPrompt = `You are ${partner.name}, a language exchange partner. Your native language is ${partner.nativeLanguage} and you're learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
+
+${myInfo.name ? `You're greeting someone named ${myInfo.name}` : 'You\'re greeting a new language partner'}${myInfo.hobbies?.length ? ` who enjoys ${myInfo.hobbies.join(', ')}` : ''}.
+They speak ${partner.targetLanguage} and are learning your native language (${partner.nativeLanguage}).
+
+Create a friendly, natural first greeting message that:
+1. Says hello and introduces yourself
+2. Shows enthusiasm about the shared language learning journey
+3. References the time of day (${timeOfDay})
+4. If they have hobbies that match your interests, mention that
+5. End with an engaging question
+
+Keep it conversational and natural, about 2-3 sentences. Don't use emojis or excessive punctuation.`;
+
+            let introMessageText;
+            try {
+                const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: introPrompt
+                            }]
+                        }]
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to generate intro');
+                
+                const data = await response.json();
+                introMessageText = data.candidates[0].content.parts[0].text.trim();
+                
+                // Remove quotes if present
+                if (introMessageText.startsWith('"') && introMessageText.endsWith('"')) {
+                    introMessageText = introMessageText.slice(1, -1);
+                }
+            } catch (error) {
+                console.error('Error generating custom intro:', error);
+                // Fallback to default intro if generation fails
+                introMessageText = `Hi! I'm ${partner.name}. Nice to meet you! I see you're learning ${partner.nativeLanguage}. Maybe we can practice?`;
+            }
 
             // Remove the "Connecting..." message
             const connectingMessage = document.getElementById('connecting-message');
