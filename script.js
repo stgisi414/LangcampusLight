@@ -1562,7 +1562,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
 }
 
 function showNextQuestion(container) {
-    if (!currentQuiz || !currentQuiz.questions || currentQuiz.currentQuestion >= currentQuiz.questions.length) {
+    if (!currentQuiz || !currentQuiz.questions || !Array.isArray(currentQuiz.questions) || currentQuiz.currentQuestion >= currentQuiz.questions.length) {
         const total = currentQuiz?.questions?.length || currentQuiz?.total || 0;
         const percentage = total ? Math.round((currentQuiz.score / total) * 100) : 0;
         let grade = '';
@@ -1577,7 +1577,7 @@ function showNextQuestion(container) {
     }
 
     const question = currentQuiz.questions[currentQuiz.currentQuestion];
-    if (!question || !Array.isArray(question.options)) {
+    if (!question || typeof question !== 'object' || !Array.isArray(question.options) || !question.options.length === 4 || typeof question.correctIndex !== 'number') {
         console.error('Invalid question format:', question);
         endQuiz('Quiz error: Invalid question format', container);
         return;
