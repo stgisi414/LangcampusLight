@@ -1424,7 +1424,12 @@ async function startQuiz(topicTitle, language, level = 1) {
     const chatMessages = document.getElementById('chat-messages');
     
     quizActive = true;
-    currentQuiz = null;
+    currentQuiz = {
+        questions: [],
+        currentQuestion: 0,
+        score: 0,
+        total: 5
+    };
 
     explanationContainer.innerHTML = '<p>Loading quiz...</p>';
 
@@ -1435,39 +1440,123 @@ async function startQuiz(topicTitle, language, level = 1) {
 
     const quizPrompt = `Create a multiple-choice quiz (5 questions) about "${topicTitle}" in ${language} at level ${level}. Your response must be a valid JSON array of objects. Each object must have exactly these fields: "question" (string), "options" (array of exactly 4 strings), and "correctIndex" (number 0-3). Do not include any markdown formatting or backticks.`;
 
-    try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: quizPrompt }] }]
-            })
-        });
-
+    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            contents: [{ parts: [{ text: quizPrompt }] }]
+        })
+    })
+    .then(response => {
         if (!response.ok) throw new Error('Failed to generate quiz');
-        const data = await response.json();
+        return response.json();
+    })
+    .then(data => {
         let quizText = data.candidates[0].content.parts[0].text;
-        
-        // Clean up the response to ensure valid JSON
         quizText = quizText.replace(/```json\s*|\s*```/g, '').trim();
+        
         if (!quizText.startsWith('[')) {
             throw new Error('Invalid quiz format received');
         }
 
-        try {
-            currentQuiz = JSON.parse(quizText);
-            if (!Array.isArray(currentQuiz)) throw new Error('Quiz must be an array');
-            showNextQuestion(explanationContainer);
-        } catch (parseError) {
-            console.error('Quiz parsing failed:', parseError);
-            explanationContainer.innerHTML = '<p>Failed to parse quiz data. Please try again.</p>';
-            quizActive = false;
-        }
-    } catch (error) {
+        const questions = JSON.parse(quizText);
+        if (!Array.isArray(questions)) throw new Error('Quiz must be an array');
+        
+        currentQuiz.questions = questions;
+        currentQuiz.total = questions.length;
+        showNextQuestion(explanationContainer);
+    })
+    .catch(error => {
         console.error('Quiz generation failed:', error);
         explanationContainer.innerHTML = '<p>Failed to generate quiz. Please try again.</p>';
         quizActive = false;
+    });
+}
+
+function showNextQuestion(container) {
+    if (!currentQuiz || currentQuiz.currentQuestion >= currentQuiz.questions.length) {
+        const percentage = Math.round((currentQuiz.score / currentQuiz.total) * 100);
+        let grade = '';
+        if (percentage >= 90) grade = 'Excellent! 🌟';
+        else if (percentage >= 80) grade = 'Great job! 👏';
+        else if (percentage >= 70) grade = 'Good work! 👍';
+        else if (percentage >= 60) grade = 'Keep practicing! 💪';
+        else grade = 'More practice needed! 📚';
+        
+        endQuiz(`Quiz complete!\nYour score: ${currentQuiz.score}/${currentQuiz.total} (${percentage}%)\n${grade}`, container);
+        return;
     }
+
+    const question = currentQuiz.questions[currentQuiz.currentQuestion];
+    const letters = ['A', 'B', 'C', 'D'];
+    
+    container.innerHTML = `
+        <div class="quiz-question">
+            <strong>Question ${currentQuiz.currentQuestion + 1}/${currentQuiz.total}:</strong>
+            <p>${question.question}</p>
+            <div class="quiz-options">
+                ${question.options.map((option, i) => `
+                    <button class="quiz-choice" onclick="handleAnswer(${i}, ${question.correctIndex}, ${currentQuiz.currentQuestion})">
+                        ${letters[i]}) ${option}
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function handleAnswer(selected, correct) {
+    if (!currentQuiz) return;
+    
+    const container = document.getElementById('grammar-topic-list');
+    const buttons = container.querySelectorAll('.quiz-choice');
+    
+    // Disable all buttons
+    buttons.forEach(button => button.disabled = true);
+    
+    // Update score if correct
+    if (selected === correct) currentQuiz.score++;
+    
+    // Show result
+    buttons.forEach((button, index) => {
+        if (index === correct) {
+            button.style.backgroundColor = '#4CAF50';
+            button.style.color = 'white';
+        } else if (index === selected && selected !== correct) {
+            button.style.backgroundColor = '#f44336';
+            button.style.color = 'white';
+        }
+        button.style.opacity = '0.7';
+    });
+
+    // Add feedback message
+    const resultDiv = document.createElement('div');
+    resultDiv.className = 'quiz-result';
+    resultDiv.innerHTML = `
+        <p style="color: ${selected === correct ? '#4CAF50' : '#f44336'}">
+            <strong>${selected === correct ? '✓ Correct!' : '✗ Incorrect'}</strong><br>
+            ${selected !== correct ? `The correct answer was: ${buttons[correct].textContent}` : ''}
+        </p>
+    `;
+    container.appendChild(resultDiv);
+    
+    // Move to next question after delay
+    currentQuiz.currentQuestion++;
+    setTimeout(() => showNextQuestion(container), 2000);
+}
+
+function endQuiz(message, container) {
+    quizActive = false;
+    
+    container.innerHTML = `
+        <div class="quiz-end">
+            <strong>Quiz Complete!</strong>
+            <pre style="margin: 10px 0; white-space: pre-wrap;">${message}</pre>
+            <button onclick="location.reload()" class="chat-button">Start Over</button>
+        </div>
+    `;
+    
+    currentQuiz = null;
 }
 
 async function getGrammarExplanation(topicTitle, language, level = 'unknown') {
