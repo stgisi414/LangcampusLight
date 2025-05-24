@@ -1572,11 +1572,28 @@ function endQuiz(message, container) {
     currentQuiz = null;
 }
 
-async function getGrammarExplanation(topicTitle, language, level = 'unknown') {
+async function getGrammarExplanation(topicTitle, language, level = null) {
     const explanationContainer = document.getElementById('grammar-topic-list');
     explanationContainer.innerHTML = '<p>Loading explanation...</p>';
     quizActive = false;
     currentQuiz = null;
+
+    // Handle invalid or undefined topic
+    if (!topicTitle || topicTitle === 'undefined') {
+        explanationContainer.innerHTML = '<p style="color: red;">Error: Invalid grammar topic selected.</p>';
+        return;
+    }
+
+    // Find topic in grammar data
+    if (!level && grammarData[language]) {
+        const topic = grammarData[language].find(t => t.title === topicTitle);
+        if (topic) {
+            level = topic.level;
+        }
+    }
+
+    // If still no level found, default to 1
+    level = level || 1;
 
     console.log(`Requesting grammar explanation for: ${topicTitle} in ${language}, Level: ${level}`);
 
