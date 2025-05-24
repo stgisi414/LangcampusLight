@@ -242,6 +242,22 @@
         button:active, .chat-button:active {
             transform: translateY(0px);
         }
+        .topic-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px; /* Space between buttons */
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+            align-items: center; /* Align items if they wrap */
+        }
+
+        /* Optional: Style for the secondary button to make it less prominent */
+        .chat-button.secondary-button {
+            background-color: var(--text-light-color); /* A muted color like light gray */
+            color: white;
+        }
+        .chat-button.secondary-button:hover {
+            background-color: #5a6268; /* A darker shade for hover */
+        }
         .small-button {
             padding: 0.6rem 1rem;
             font-size: 0.9rem;

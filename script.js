@@ -563,6 +563,86 @@ const teachMeCloseBtn = teachMeModal.querySelector('.teach-me-close');
 const grammarTopicList = document.getElementById('grammar-topic-list');
 const vocabularyTopicList = document.getElementById('vocabulary-topic-list');
 
+//Reloading lists
+function reloadGrammarTopicsList() {
+    if (!currentPartner || !currentPartner.nativeLanguage) {
+        console.error("Cannot reload grammar topics: Partner context is missing.");
+        if (grammarTopicList) {
+            grammarTopicList.innerHTML = '<p style="color: red;">Error: Partner language not set. Please close and reopen "Teach Me".</p>';
+        }
+        return;
+    }
+    const targetLang = currentPartner.nativeLanguage;
+
+    if (!grammarTopicList) return;
+    grammarTopicList.innerHTML = ''; // Clear current content (explanation/quiz)
+
+    if (grammarData && grammarData[targetLang]) {
+        const topics = grammarData[targetLang];
+        if (topics && topics.length > 0) {
+            topics.sort((a, b) => a.level - b.level);
+            topics.forEach(topic => {
+                const button = document.createElement('button');
+                button.dataset.title = topic.title;
+                button.innerHTML = `${topic.title} <span style="font-size: 0.8em; color: #777; margin-left: 10px; background-color: #eee; padding: 2px 6px; border-radius: 3px;">Level ${topic.level}</span>`;
+                // The existing event listener on grammarTopicList (added via event delegation)
+                // will handle clicks on these dynamically created buttons.
+                grammarTopicList.appendChild(button);
+            });
+        } else {
+            grammarTopicList.innerHTML = `<p>No grammar topics available for ${targetLang} yet.</p>`;
+        }
+    } else {
+        grammarTopicList.innerHTML = `<p>Grammar data for ${targetLang} not found.</p>`;
+    }
+    quizActive = false; // Reset quiz state
+    currentQuiz = {};
+}
+
+function reloadVocabularyTopicsList() {
+    if (!vocabularyTopicList) return;
+    vocabularyTopicList.innerHTML = ''; // Clear current content (explanation/quiz)
+
+    if (!currentPartner || !currentPartner.nativeLanguage) {
+        console.error("Cannot reload vocabulary topics: Partner context is missing.");
+        vocabularyTopicList.innerHTML = '<p style="color: red;">Error: Partner language not set. Please close and reopen "Teach Me".</p>';
+        return;
+    }
+    const targetLangForVocab = currentPartner.nativeLanguage;
+
+    if (vocabData && vocabData.length > 0) {
+        vocabData.sort((a, b) => a.level - b.level);
+        vocabData.forEach(topic => {
+            const button = document.createElement('button');
+            button.dataset.title = topic.title;
+            // Apply styles consistent with initial population
+            button.style.display = 'block';
+            button.style.width = '100%';
+            button.style.padding = '0.8rem';
+            button.style.marginBottom = '0.5rem';
+            button.style.textAlign = 'left';
+            button.style.backgroundColor = '#f9f9f9';
+            button.style.border = '1px solid #eee';
+            button.style.cursor = 'pointer';
+            button.style.borderRadius = '4px';
+            button.style.transition = 'background-color 0.2s';
+            button.style.color = '#333';
+            button.innerHTML = `${topic.title} <span style="font-size: 0.8em; color: #777; margin-left: 10px; background-color: #eee; padding: 2px 6px; border-radius: 3px;">Level ${topic.level}</span>`;
+
+            button.onclick = () => loadVocabularyContent(topic, targetLangForVocab);
+
+            button.onmouseover = () => button.style.backgroundColor = '#e9e9e9';
+            button.onmouseout = () => button.style.backgroundColor = '#f9f9f9';
+
+            vocabularyTopicList.appendChild(button);
+        });
+    } else {
+        vocabularyTopicList.innerHTML = `<p>No vocabulary topics available yet.</p>`;
+    }
+    quizActive = false; // Reset quiz state
+    currentQuiz = {};
+}
+
 // Tab switching functionality
 document.querySelectorAll('.tab-button').forEach(button => {
     button.addEventListener('click', () => {
@@ -684,11 +764,12 @@ Format the response in Markdown with clear sections and examples.`;
 
         // Convert markdown to HTML and display
         container.innerHTML = `
-            ${marked.parse(content)}
-            <button class="chat-button" style="margin-top: 20px;" onclick="startVocabularyQuiz('${topic.title}', '${targetLang}')">
-                Quiz Me
-            </button>
-        `;
+               ${marked.parse(content)}
+               <div class="topic-actions" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                   <button class="chat-button" onclick="startVocabularyQuiz('${topic.title.replace(/'/g, "\\'")}', '${targetLang.replace(/'/g, "\\'")}')">Quiz Me</button>
+                   <button class="chat-button secondary-button" onclick="reloadVocabularyTopicsList()">Return to Topics</button>
+               </div>
+           `;
 
     } catch (error) {
         console.error('Error loading vocabulary content:', error);
@@ -1437,10 +1518,13 @@ Do NOT include any text before or after the Markdown content.`;
 
         // Display the HTML content in the modal
         explanationContainer.innerHTML = `
-            <h2>Explanation: ${topicTitle}</h2>
-            ${explanationHtml}
-            <button class="chat-button" style="margin-top: 20px;" onclick="startQuiz('${topicTitle}', '${language}', ${level})">Quiz Me</button>
-        `; // Display parsed HTML
+               <h2>Explanation: ${topicTitle}</h2>
+               ${explanationHtml}
+               <div class="topic-actions" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                   <button class="chat-button" onclick="startQuiz('${topicTitle.replace(/'/g, "\\'")}', '${language.replace(/'/g, "\\'")}', ${level})">Quiz Me</button>
+                   <button class="chat-button secondary-button" onclick="reloadGrammarTopicsList()">Return to Topics</button>
+               </div>
+           `;
 
     } catch (error) {
         console.error('Error getting grammar explanation:', error);
