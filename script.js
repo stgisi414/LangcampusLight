@@ -710,11 +710,29 @@ Each question must have exactly 4 options. Do not include backticks or markdown 
         let quizText = data.candidates[0].content.parts[0].text.trim();
         
         try {
-            const questions = JSON.parse(quizText);
+            // Clean the response text by removing markdown code fences and any extra whitespace
+            let cleanText = quizText.replace(/```json\s*|\s*```/g, '').trim();
             
-            if (!Array.isArray(questions) || questions.length === 0) {
-                throw new Error('Invalid quiz format');
+            // Ensure it starts with [ and ends with ]
+            if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
+                throw new Error('Invalid quiz format: must be a JSON array');
             }
+            
+            // Parse the cleaned JSON
+            const questions = JSON.parse(cleanText);
+            
+            // Validate the structure
+            if (!Array.isArray(questions) || questions.length === 0) {
+                throw new Error('Quiz must be a non-empty array');
+            }
+            
+            // Validate each question
+            questions.forEach((q, index) => {
+                if (!q.question || !Array.isArray(q.options) || q.options.length !== 4 || 
+                    typeof q.correctIndex !== 'number' || q.correctIndex < 0 || q.correctIndex > 3) {
+                    throw new Error(`Invalid question format at index ${index}`);
+                }
+            });
 
             currentQuiz = {
                 questions: questions,
