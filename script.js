@@ -1979,49 +1979,127 @@ document.addEventListener('DOMContentLoaded', () => {
                 explanationDiv.appendChild(quizButton);
                 chatMessages.appendChild(explanationDiv);
 
+async function startQuiz(topicTitle, language, level) {
+    // Close the grammar topics modal
+    document.getElementById('teach-me-modal').style.display = 'none';
+    
+    const chatMessages = document.getElementById('chat-messages');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-message');
+    
+    // Disable input during quiz
+    messageInput.disabled = true;
+    sendButton.disabled = true;
+    quizActive = true;
+    
+    // Add starting message
+    chatMessages.innerHTML += `<p><em>Starting quiz on ${topicTitle}...</em></p>`;
+    
+    const quizPrompt = `Create a multiple-choice quiz (5-8 questions) about "${topicTitle}" in ${language} at level ${level}. Format it as a JSON array where each question object has: "question", "options" (array of 4 choices), and "correctIndex" (0-3). Make it challenging but appropriate for the level.`;
+
+    try {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: quizPrompt }] }]
+            })
+        });
+
+        if (!response.ok) throw new Error('Failed to generate quiz');
+        const data = await response.json();
+        const quizText = data.candidates[0].content.parts[0].text;
+        currentQuiz = JSON.parse(quizText);
+        currentQuiz.score = 0;
+        currentQuiz.total = currentQuiz.length;
+        showNextQuestion(0, chatMessages);
+    } catch (error) {
+        console.error('Quiz generation failed:', error);
+        endQuiz('Quiz generation failed. Please try again.');
+    }
+}
+
 function showNextQuestion(index, chatMessages) {
     if (!currentQuiz || index >= currentQuiz.length) {
-        endQuiz();
+        const percentage = Math.round((currentQuiz.score / currentQuiz.total) * 100);
+        endQuiz(`Quiz completed! Your score: ${currentQuiz.score}/${currentQuiz.total} (${percentage}%)`);
         return;
     }
 
     const questionDiv = document.createElement('div');
     questionDiv.className = 'quiz-question';
-    questionDiv.innerHTML = `<p><strong>Question ${index + 1}:</strong> ${currentQuiz[index].question}</p>`;
+    questionDiv.innerHTML = `
+        <p style="margin-top: 15px;">
+            <strong>Question ${index + 1}/${currentQuiz.length}:</strong><br>
+            ${currentQuiz[index].question}
+        </p>
+    `;
     
+    const optionsDiv = document.createElement('div');
+    optionsDiv.style.display = 'flex';
+    optionsDiv.style.flexDirection = 'column';
+    optionsDiv.style.gap = '8px';
+    optionsDiv.style.marginTop = '10px';
+    
+    const letters = ['A', 'B', 'C', 'D'];
     currentQuiz[index].options.forEach((option, optIndex) => {
         const button = document.createElement('button');
         button.className = 'chat-button quiz-choice';
-        button.textContent = option;
+        button.style.textAlign = 'left';
+        button.innerHTML = `${letters[optIndex]}) ${option}`;
         button.onclick = () => handleAnswer(optIndex, currentQuiz[index].correctIndex, index, chatMessages);
-        questionDiv.appendChild(button);
+        optionsDiv.appendChild(button);
     });
-
+    
+    questionDiv.appendChild(optionsDiv);
     chatMessages.appendChild(questionDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 function handleAnswer(selected, correct, questionIndex, chatMessages) {
+    // Disable all buttons for this question
+    const buttons = chatMessages.querySelectorAll('.quiz-question:last-child .quiz-choice');
+    buttons.forEach(button => button.disabled = true);
+    
+    // Update score
+    if (selected === correct) currentQuiz.score++;
+    
     const resultDiv = document.createElement('div');
+    resultDiv.className = 'quiz-result';
     resultDiv.innerHTML = selected === correct ? 
-        '<p style="color: green;">✓ Correct!</p>' : 
-        `<p style="color: red;">✗ Incorrect. The correct answer was: ${currentQuiz[questionIndex].options[correct]}</p>`;
+        '<p style="color: green; margin-top: 10px;">✓ Correct!</p>' : 
+        `<p style="color: red; margin-top: 10px;">✗ Incorrect. The correct answer was: ${currentQuiz[questionIndex].options[correct]}</p>`;
     chatMessages.appendChild(resultDiv);
     
-    setTimeout(() => showNextQuestion(questionIndex + 1, chatMessages), 1500);
+    // Highlight correct/incorrect answers
+    buttons.forEach((button, index) => {
+        if (index === correct) {
+            button.style.backgroundColor = '#4CAF50';
+            button.style.color = 'white';
+        } else if (index === selected && selected !== correct) {
+            button.style.backgroundColor = '#f44336';
+            button.style.color = 'white';
+        }
+    });
+    
+    setTimeout(() => showNextQuestion(questionIndex + 1, chatMessages), 2000);
 }
 
-function endQuiz() {
+function endQuiz(message) {
     quizActive = false;
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-message');
+    const chatMessages = document.getElementById('chat-messages');
+    
     messageInput.disabled = false;
     sendButton.disabled = false;
     
     const endMessage = document.createElement('div');
-    endMessage.innerHTML = '<p><em>Quiz completed! Feel free to ask any questions about the topic.</em></p>';
+    endMessage.innerHTML = `<p style="margin-top: 15px;"><em>${message}</em></p>`;
     chatMessages.appendChild(endMessage);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    currentQuiz = null;
 }
             } catch (error) {
                 // Remove the requesting message even if there's an error
