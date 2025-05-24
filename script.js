@@ -1505,8 +1505,9 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
 }
 
 function showNextQuestion(container) {
-    if (!currentQuiz || currentQuiz.currentQuestion >= currentQuiz.questions.length) {
-        const percentage = Math.round((currentQuiz.score / currentQuiz.total) * 100);
+    if (!currentQuiz || !currentQuiz.questions || currentQuiz.currentQuestion >= currentQuiz.questions.length) {
+        const total = currentQuiz?.questions?.length || currentQuiz?.total || 0;
+        const percentage = total ? Math.round((currentQuiz.score / total) * 100) : 0;
         let grade = '';
         if (percentage >= 90) grade = 'Excellent! 🌟';
         else if (percentage >= 80) grade = 'Great job! 👏';
@@ -1514,20 +1515,27 @@ function showNextQuestion(container) {
         else if (percentage >= 60) grade = 'Keep practicing! 💪';
         else grade = 'More practice needed! 📚';
 
-        endQuiz(`Quiz complete!\nYour score: ${currentQuiz.score}/${currentQuiz.total} (${percentage}%)\n${grade}`, container);
+        endQuiz(`Quiz complete!\nYour score: ${currentQuiz.score}/${total} (${percentage}%)\n${grade}`, container);
         return;
     }
 
     const question = currentQuiz.questions[currentQuiz.currentQuestion];
+    if (!question || !Array.isArray(question.options)) {
+        console.error('Invalid question format:', question);
+        endQuiz('Quiz error: Invalid question format', container);
+        return;
+    }
+
     const letters = ['A', 'B', 'C', 'D'];
+    const correctIndex = typeof question.correctIndex === 'number' ? question.correctIndex : 0;
 
     container.innerHTML = `
         <div class="quiz-question">
-            <strong>Question ${currentQuiz.currentQuestion + 1}/${currentQuiz.total}:</strong>
+            <strong>Question ${currentQuiz.currentQuestion + 1}/${currentQuiz.questions.length}:</strong>
             <p>${question.question}</p>
             <div class="quiz-options">
                 ${question.options.map((option, i) => `
-                    <button class="quiz-choice" onclick="handleAnswer(${i}, ${question.correctIndex}, ${currentQuiz.currentQuestion})">
+                    <button class="quiz-choice" onclick="handleAnswer(${i}, ${correctIndex})">
                         ${letters[i]}) ${option}
                     </button>
                 `).join('')}
@@ -1537,10 +1545,13 @@ function showNextQuestion(container) {
 }
 
 function handleAnswer(selected, correct) {
-    if (!currentQuiz) return;
+    if (!currentQuiz || !currentQuiz.questions) return;
 
     const container = document.getElementById('grammar-topic-list');
+    if (!container) return;
+
     const buttons = container.querySelectorAll('.quiz-choice');
+    if (!buttons.length) return;
 
     // Disable all buttons
     buttons.forEach(button => button.disabled = true);
