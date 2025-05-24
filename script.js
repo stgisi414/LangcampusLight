@@ -528,33 +528,118 @@ const teachMeModal = document.getElementById('teach-me-modal');
 const teachMeButton = document.getElementById('teach-me-button');
 const teachMeCloseBtn = teachMeModal.querySelector('.teach-me-close');
 const grammarTopicList = document.getElementById('grammar-topic-list');
+const vocabularyTopicList = document.getElementById('vocabulary-topic-list');
+
+// Tab switching functionality
+document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', () => {
+        // Remove active class from all tabs and contents
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab and corresponding content
+        button.classList.add('active');
+        const tabId = button.getAttribute('data-tab');
+        document.getElementById(`${tabId}-section`).classList.add('active');
+    });
+});
 
 teachMeButton.addEventListener('click', () => {
-    if (!currentPartner || !grammarData) {
-        console.error("Partner or grammar data not available.");
-        // Optionally show a message to the user
+    if (!currentPartner) {
+        console.error("Partner not available.");
         return;
     }
 
     const targetLang = currentPartner.nativeLanguage; // User is learning partner's native language
-    const topics = grammarData[targetLang];
+    
+    // Load Grammar Topics
+    if (grammarData && grammarData[targetLang]) {
+        const topics = grammarData[targetLang];
+        grammarTopicList.innerHTML = ''; // Clear previous list
 
-    grammarTopicList.innerHTML = ''; // Clear previous list
+        if (topics && topics.length > 0) {
+            topics.sort((a, b) => a.level - b.level); // Sort by level
+            topics.forEach(topic => {
+                const button = document.createElement('button');
+                button.dataset.title = topic.title;
+                button.innerHTML = `${topic.title} <span>Level ${topic.level}</span>`;
+                grammarTopicList.appendChild(button);
+            });
+        } else {
+            grammarTopicList.innerHTML = `<p>No grammar topics available for ${targetLang} yet.</p>`;
+        }
+    }
 
-    if (topics && topics.length > 0) {
-        topics.sort((a, b) => a.level - b.level); // Sort by level
-        topics.forEach(topic => {
+    // Load Vocabulary Topics
+    if (vocabData) {
+        vocabularyTopicList.innerHTML = ''; // Clear previous list
+        vocabData.sort((a, b) => a.level - b.level); // Sort by level
+        
+        vocabData.forEach(topic => {
             const button = document.createElement('button');
-            button.dataset.title = topic.title; // Store title for later use
+            button.dataset.title = topic.title;
+            button.dataset.type = 'vocabulary';
             button.innerHTML = `${topic.title} <span>Level ${topic.level}</span>`;
-            grammarTopicList.appendChild(button);
+            button.onclick = () => loadVocabularyContent(topic, targetLang);
+            vocabularyTopicList.appendChild(button);
         });
-    } else {
-        grammarTopicList.innerHTML = `<p>No grammar topics available for ${targetLang} yet.</p>`;
     }
 
     teachMeModal.style.setProperty('display', 'flex', 'important');
 });
+
+async function loadVocabularyContent(topic, targetLang) {
+    const container = document.getElementById('vocabulary-topic-list');
+    container.innerHTML = '<p>Loading vocabulary content...</p>';
+
+    try {
+        const prompt = `Create a vocabulary study guide for "${topic.title}" in ${targetLang}. 
+Include:
+1. Key vocabulary words and phrases related to ${topic.title}
+2. Example sentences using these words
+3. Common expressions or idioms related to this topic
+4. Cultural notes if relevant
+
+Format the response in Markdown with clear sections and examples.`;
+
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }]
+            })
+        });
+
+        if (!response.ok) throw new Error('Failed to generate vocabulary content');
+
+        const data = await response.json();
+        const content = data.candidates[0].content.parts[0].text;
+        
+        // Convert markdown to HTML and display
+        container.innerHTML = `
+            <h2>${topic.title}</h2>
+            ${marked.parse(content)}
+            <button class="chat-button" style="margin-top: 20px;" onclick="startVocabularyQuiz('${topic.title}', '${targetLang}')">
+                Quiz Me
+            </button>
+        `;
+
+    } catch (error) {
+        console.error('Error loading vocabulary content:', error);
+        container.innerHTML = `
+            <p style="color: red;">Failed to load vocabulary content. Please try again.</p>
+            <button onclick="loadVocabularyContent('${topic.title}', '${targetLang}')" class="chat-button">
+                Retry
+            </button>
+        `;
+    }
+}
 
 teachMeCloseBtn.onclick = () => {
     teachMeModal.style.display = 'none';
