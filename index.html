@@ -29,6 +29,38 @@
     <link rel="icon" href="img/logo.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+        .teach-me-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-button {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         .my-info-container {
@@ -978,9 +1010,21 @@
         <div id="teach-me-modal" class="modal">
             <div class="modal-content teach-me-content">
                 <span class="close teach-me-close">&times;</span>
-                <h2>Grammar Topics</h2>
-                <div id="grammar-topic-list">
-                    <!-- Grammar topics will be populated here -->
+                <div class="teach-me-tabs">
+                    <button class="tab-button active" data-tab="grammar">Grammar</button>
+                    <button class="tab-button" data-tab="vocabulary">Vocabulary</button>
+                </div>
+                <div id="grammar-section" class="tab-content active">
+                    <h2>Grammar Topics</h2>
+                    <div id="grammar-topic-list">
+                        <!-- Grammar topics will be populated here -->
+                    </div>
+                </div>
+                <div id="vocabulary-section" class="tab-content">
+                    <h2>Vocabulary Groups</h2>
+                    <div id="vocabulary-topic-list">
+                        <!-- Vocabulary topics will be populated here -->
+                    </div>
                 </div>
             </div>
         </div>
