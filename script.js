@@ -1571,8 +1571,22 @@ function showNextQuestion() {
         return;
     }
 
-    if (!currentQuiz || !currentQuiz.questions || !Array.isArray(currentQuiz.questions)) {
-        console.error('Invalid quiz state');
+    // Validate quiz state more thoroughly
+    if (!currentQuiz) {
+        console.error('Quiz not initialized');
+        endQuiz('Quiz initialization error', container);
+        return;
+    }
+
+    if (!Array.isArray(currentQuiz.questions) || currentQuiz.questions.length === 0) {
+        console.error('Invalid quiz questions');
+        endQuiz('Quiz questions not properly loaded', container);
+        return;
+    }
+
+    if (typeof currentQuiz.currentQuestion !== 'number' || typeof currentQuiz.total !== 'number') {
+        console.error('Invalid quiz progress state');
+        endQuiz('Quiz progress tracking error', container);
         return;
     }
 
