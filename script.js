@@ -641,6 +641,96 @@ Format the response in Markdown with clear sections and examples.`;
     }
 }
 
+async function startVocabularyQuiz(topicTitle, language) {
+    currentTopicTitle = topicTitle;
+    const container = document.getElementById('vocabulary-topic-list');
+    container.innerHTML = '<p>Loading quiz...</p>';
+
+    quizActive = true;
+    currentQuiz = {
+        questions: [],
+        currentQuestion: 0,
+        score: 0,
+        total: 3
+    };
+
+    const quizPrompt = `Create a multiple-choice vocabulary quiz (3 questions) about "${topicTitle}" in ${language}. 
+Questions should test vocabulary understanding through:
+1. Word definitions
+2. Usage in context
+3. Synonyms/antonyms
+4. Appropriate word choice
+
+Format as valid JSON with this structure:
+[
+  {
+    "question": "What is the meaning of [word] in ${language}?",
+    "options": ["definition1", "definition2", "definition3", "definition4"],
+    "correctIndex": 0
+  }
+]
+
+Each question must have exactly 4 options. Do not include backticks or markdown formatting.`;
+
+    try {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: quizPrompt
+                    }]
+                }]
+            })
+        });
+
+        if (!response.ok) throw new Error('Failed to generate quiz');
+        
+        const data = await response.json();
+        let quizText = data.candidates[0].content.parts[0].text.trim();
+        
+        try {
+            const questions = JSON.parse(quizText);
+            
+            if (!Array.isArray(questions) || questions.length === 0) {
+                throw new Error('Invalid quiz format');
+            }
+
+            currentQuiz = {
+                questions: questions,
+                currentQuestion: 0,
+                score: 0,
+                total: questions.length
+            };
+
+            showNextQuestion();
+        } catch (parseError) {
+            console.error('Quiz parsing failed:', parseError);
+            container.innerHTML = `
+                <div style="text-align: center;">
+                    <p>Failed to generate vocabulary quiz.</p>
+                    <button onclick="startVocabularyQuiz('${topicTitle}', '${language}')" class="chat-button">
+                        Try Again
+                    </button>
+                </div>`;
+            quizActive = false;
+        }
+    } catch (error) {
+        console.error('Quiz generation failed:', error);
+        container.innerHTML = `
+            <div style="text-align: center;">
+                <p>Failed to generate vocabulary quiz.</p>
+                <button onclick="startVocabularyQuiz('${topicTitle}', '${language}')" class="chat-button">
+                    Try Again
+                </button>
+            </div>`;
+        quizActive = false;
+    }
+}
+
 teachMeCloseBtn.onclick = () => {
     teachMeModal.style.display = 'none';
 };
