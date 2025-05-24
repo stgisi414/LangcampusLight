@@ -603,12 +603,12 @@ teachMeButton.addEventListener('click', () => {
 
 async function loadVocabularyContent(topic, targetLang) {
     console.log('Starting loadVocabularyContent:', { topic, targetLang });
-    const vocabSection = document.getElementById('vocabulary-section');
-    if (!vocabSection) {
-        console.error('Vocabulary section element not found');
+    const vocabTopicList = document.getElementById('vocabulary-topic-list');
+    if (!vocabTopicList) {
+        console.error('Vocabulary topic list element not found');
         return;
     }
-    vocabSection.innerHTML = `
+    vocabTopicList.innerHTML = `
         <h2>${topic.title}</h2>
         <div id="vocabulary-content">
             <p>Loading vocabulary content...</p>
