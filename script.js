@@ -1320,13 +1320,8 @@ document.getElementById('corrections-toggle').addEventListener('change', (event)
 
 // Modified getGeminiChatResponse to include corrections instruction
 async function getGeminiChatResponse(partner, history) {
-    const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
-    const userContext = myInfo.name ? 
-        `The user's name is ${myInfo.name}. ${myInfo.bio ? `Their bio: ${myInfo.bio}.` : ''} ${myInfo.hobbies?.length ? `Their hobbies: ${myInfo.hobbies.join(', ')}.` : ''}` : 
-        '';
-
+    console.log("Getting Gemini Response. History:", history);
     const prompt = `You are ${partner.name}, a language exchange partner on the website http://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
-${userContext}
 You are chatting with someone whose native language is ${partner.targetLanguage} and who is learning your language (${partner.nativeLanguage}).
 
 Here is the recent chat history (last 10 messages) with timestamps:
@@ -1537,54 +1532,28 @@ You are chatting with someone whose native language is ${partner.targetLanguage}
     // Rest of the existing function remains the same...
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM Content Loaded');
     loadPreferences();
     loadMyInfo();
     
     // My Info event listeners
-    const toggleButton = document.getElementById('toggleMyInfo');
-    const content = document.getElementById('myInfoContent');
-    
-    if (toggleButton && content) {
-        toggleButton.addEventListener('click', () => {
-            console.log('Toggle clicked');
-            content.classList.toggle('hidden');
-            toggleButton.classList.toggle('collapsed');
-            const chevron = toggleButton.querySelector('.chevron');
-            if (chevron) {
-                chevron.style.transform = content.classList.contains('hidden') ? 'rotate(-90deg)' : 'rotate(0deg)';
-            }
-        });
-    }
-
-    // Add hobby button handler
-    const addHobbyButton = document.getElementById('addHobby');
-    if (addHobbyButton) {
-        addHobbyButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            console.log('Add hobby clicked');
-            addHobbyInput();
-            saveMyInfo();
-        });
-    }
-    
-    // Real-time saving for inputs
-    ['userName', 'userBio'].forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.addEventListener('input', () => {
-                console.log(`Saving ${id}`);
-                saveMyInfo();
-            });
+    document.getElementById('toggleMyInfo').addEventListener('click', () => {
+        const content = document.getElementById('myInfoContent');
+        const toggle = document.getElementById('toggleMyInfo');
+        const chevron = toggle.querySelector('.chevron');
+        content.classList.toggle('hidden');
+        toggle.classList.toggle('collapsed');
+        // Rotate chevron when toggled
+        if (content.classList.contains('hidden')) {
+            chevron.style.transform = 'rotate(-90deg)';
+        } else {
+            chevron.style.transform = 'rotate(0deg)';
         }
     });
     
-    // Add hobby button click handler
-    document.getElementById('addHobby').addEventListener('click', function(e) {
+    document.getElementById('addHobby')?.addEventListener('click', (e) => {
         e.preventDefault();
-        e.stopPropagation();
-        addHobbyInput('');
-        saveMyInfo();
+        addHobbyInput();
+        saveMyInfo(); // Save after adding new hobby input
     });
     
     // Add input event listeners for real-time saving
@@ -1603,39 +1572,24 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function addHobbyInput(value = '') {
-    console.log('Adding hobby input with value:', value);
     const hobbiesList = document.getElementById('hobbiesList');
-    if (!hobbiesList) {
-        console.error('Hobbies list not found');
-        return;
-    }
+    if (!hobbiesList) return;
     
     const div = document.createElement('div');
     div.className = 'hobby-input';
     div.innerHTML = `
         <input type="text" placeholder="Enter a hobby" value="${value}">
-        <button type="button" class="remove-hobby">×</button>
+        <button class="remove-hobby">×</button>
     `;
     
-    // Add input event listener for real-time saving
-    const input = div.querySelector('input');
-    input.addEventListener('input', () => {
-        console.log('Hobby input changed');
-        saveMyInfo();
-    });
-    
-    // Add remove button handler
     const removeButton = div.querySelector('.remove-hobby');
     removeButton.addEventListener('click', (e) => {
         e.preventDefault();
-        e.stopPropagation();
-        console.log('Removing hobby input');
         div.remove();
         saveMyInfo();
     });
     
     hobbiesList.appendChild(div);
-    console.log('Hobby input added');
 }
 
 function saveMyInfo() {
