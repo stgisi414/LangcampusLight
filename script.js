@@ -1527,9 +1527,62 @@ async function getGeminiChatResponse(partner, history) {
 
     const prompt = `You are ${partner.name}, a language exchange partner on the website http://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
 ${userContext}
-You are chatting with someone whose native language is ${partner.targetLanguage} and who is learning your language (${partner.nativeLanguage}).`;
+You are chatting with someone whose native language is ${partner.targetLanguage} and who is learning your language (${partner.nativeLanguage}).
 
-    // Rest of the existing function remains the same...
+Here is the recent chat history (last 10 messages) with timestamps:
+${history.map(msg => `[${new Date(msg.timestamp).toLocaleTimeString()}] ${msg.sender}: ${msg.text}`).join('\n')}
+
+Consider the timestamps when crafting your response. If there has been a long gap between messages, you may acknowledge it naturally in your response.
+
+Respond naturally to the last message in the chat.
+Keep your response relatively short, like a typical chat message (1-3 sentences), unless directly asked to explain something in detail.
+
+${enableCorrections ? `
+IMPORTANT: The user wants corrections. If their last message contains grammar or spelling errors in ${partner.nativeLanguage}, provide a brief, friendly correction AFTER your main conversational reply.
+Format the correction clearly, like this:
+"By the way, a slightly more natural way to say that in ${partner.nativeLanguage} is: [Corrected Sentence]"
+Only provide a correction if you identify a clear error in ${partner.nativeLanguage} in the user's *last* message.
+` : `
+The user does not currently want corrections. Just provide a natural conversational reply.
+`}
+
+Your response should be ONLY the chat message text. Do not include your name or any other prefix.`;
+
+    try {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }]
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`API request failed: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        if (data?.candidates?.[0]?.content?.parts?.[0]) {
+            let text = data.candidates[0].content.parts[0].text.trim();
+            if (text.startsWith('"') && text.endsWith('"')) {
+                text = text.substring(1, text.length - 1);
+            }
+            return text;
+        }
+        
+        throw new Error('Invalid API response structure');
+    } catch (error) {
+        console.error('Error getting chat response:', error);
+        throw error;
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     loadPreferences();
