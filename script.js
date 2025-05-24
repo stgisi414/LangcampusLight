@@ -1431,7 +1431,12 @@ Your response should be ONLY the chat message text. Do not include your name or 
 let quizActive = false;
 let currentQuiz = {};
 
+let currentTopicTitle = ''; // Add this at the top of your script with other global variables
+
 async function startQuiz(topicTitle, language, level = 'unknown') {
+    // Store topic title globally when quiz starts
+    currentTopicTitle = topicTitle;
+
     // Validate inputs
     if (!topicTitle || !language) {
         console.error('Quiz initialization failed: Missing topic or language');
@@ -1732,7 +1737,7 @@ function endQuiz(message, container) {
 }
 
 function shareQuizResults(grade, percentage, score, total, missedQuestions) {
-    const topicTitle = document.querySelector('.teach-me-content h2')?.textContent.replace('Grammar Topics', '') || 'grammar quiz';
+    const topicTitle = currentTopicTitle || 'grammar quiz';
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-message');
     
