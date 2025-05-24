@@ -536,7 +536,7 @@ document.querySelectorAll('.tab-button').forEach(button => {
         // Remove active class from all tabs and contents
         document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
+        
         // Add active class to clicked tab and corresponding content
         button.classList.add('active');
         const tabId = button.getAttribute('data-tab');
@@ -551,7 +551,7 @@ teachMeButton.addEventListener('click', () => {
     }
 
     const targetLang = currentPartner.nativeLanguage; // User is learning partner's native language
-
+    
     // Load Grammar Topics
     if (grammarData && grammarData[targetLang]) {
         const topics = grammarData[targetLang];
@@ -574,7 +574,7 @@ teachMeButton.addEventListener('click', () => {
     if (vocabData) {
         vocabularyTopicList.innerHTML = ''; // Clear previous list
         vocabData.sort((a, b) => a.level - b.level); // Sort by level
-
+        
         vocabData.forEach(topic => {
             const button = document.createElement('button');
             button.dataset.title = topic.title;
@@ -639,7 +639,7 @@ Format the response in Markdown with clear sections and examples.`;
 
         const data = await response.json();
         const content = data.candidates[0].content.parts[0].text;
-
+        
         // Convert markdown to HTML and display
         container.innerHTML = `
             ${marked.parse(content)}
@@ -659,23 +659,265 @@ Format the response in Markdown with clear sections and examples.`;
     }
 }
 
-function startVocabularyQuiz(topicTitle, language) {
-    const container = document.getElementById('vocabulary-section');
-    const contentDiv = document.getElementById('vocabulary-content');
-    contentDiv.innerHTML = '<p>Loading quiz...</p>';
+async function startVocabularyQuiz(topicTitle, language) {
+    currentTopicTitle = topicTitle;
+    const container = document.getElementById('vocabulary-content');
+    container.innerHTML = '<p>Loading quiz...</p>';
+
+    quizActive = true;
+    currentQuiz = {
+        questions: [],
+        currentQuestion: 0,
+        score: 0,
+        total: 3
+    };
+
+    const quizPrompt = `Create a multiple-choice vocabulary quiz (3 questions) about "${topicTitle}" in ${language}. 
+Questions should test vocabulary understanding through:
+1. Word definitions
+2. Usage in context
+3. Synonyms/antonyms
+4. Appropriate word choice
+
+Format as valid JSON with this structure:
+[
+  {
+    "question": "What is the meaning of [word] in ${language}?",
+    "options": ["definition1", "definition2", "definition3", "definition4"],
+    "correctIndex": 0
+  }
+]
+
+Each question must have exactly 4 options. Do not include backticks or markdown formatting.`;
+
+    try {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: quizPrompt
+                    }]
+                }]
+            })
+        });
+
+        if (!response.ok) throw new Error('Failed to generate quiz');
+        
+        const data = await response.json();
+        let quizText = data.candidates[0].content.parts[0].text.trim();
+        
+        try {
+            // Clean the response text by removing markdown code fences and any extra whitespace
+            let cleanText = quizText.replace(/```json\s*|\s*```/g, '').trim();
+            
+            // Ensure it starts with [ and ends with ]
+            if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
+                throw new Error('Invalid quiz format: must be a JSON array');
+            }
+            
+            // Parse the cleaned JSON
+            const questions = JSON.parse(cleanText);
+            
+            // Validate the structure
+            if (!Array.isArray(questions) || questions.length === 0) {
+                throw new Error('Quiz must be a non-empty array');
+            }
+            
+            // Validate each question
+            questions.forEach((q, index) => {
+                if (!q.question || !Array.isArray(q.options) || q.options.length !== 4 || 
+                    typeof q.correctIndex !== 'number' || q.correctIndex < 0 || q.correctIndex > 3) {
+                    throw new Error(`Invalid question format at index ${index}`);
+                }
+            });
+
+            currentQuiz = {
+                questions: questions,
+                currentQuestion: 0,
+                score: 0,
+                total: questions.length
+            };
+
+            showNextQuestion();
+        } catch (parseError) {
+            console.error('Quiz parsing failed:', parseError);
+            container.innerHTML = `
+                <div style="text-align: center;">
+                    <p>Failed to generate vocabulary quiz.</p>
+                    <button onclick="startVocabularyQuiz('${topicTitle}', '${language}')" class="chat-button">
+                        Try Again
+                    </button>
+                </div>`;
+            quizActive = false;
+        }
+    } catch (error) {
+        console.error('Quiz generation failed:', error);
+        container.innerHTML = `
+            <div style="text-align: center;">
+                <p>Failed to generate vocabulary quiz.</p>
+                <button onclick="startVocabularyQuiz('${topicTitle}', '${language}')" class="chat-button">
+                    Try Again
+                </button>
+            </div>`;
+        quizActive = false;
+    }
 }
 
-async function startVocabularyQuiz(topicTitle, language) {
-    const container = document.getElementById('vocabulary-section');
-    const contentDiv = document.getElementById('vocabulary-content');
-    contentDiv.innerHTML = '<p>Loading quiz...</p>';
+teachMeCloseBtn.onclick = () => {
+    teachMeModal.style.display = 'none';
+};
+
+// Event delegation for topic selection
+grammarTopicList.addEventListener('click', async (event) => {
+    const button = event.target.closest('button');
+
+    // Only proceed if the clicked button is a grammar topic selection button
+    // (i.e., it's not a quiz answer button and has a 'data-title' attribute).
+    if (button && !button.classList.contains('quiz-choice') && button.dataset.title) {
+        // If a quiz was active, clicking a new topic implies abandoning it.
+        if (quizActive) {
+            console.log("A new grammar topic was selected while a quiz was active. Resetting quiz state.");
+            quizActive = false;
+            currentQuiz = {}; // Reset any ongoing quiz
+        }
+
+        const topicTitle = button.dataset.title;
+        const explanationContainer = document.getElementById('grammar-topic-list'); // This is the same as grammarTopicList
+
+        // Show loading state for the explanation
+        explanationContainer.innerHTML = '<p>Loading explanation...</p>';
+
+        try {
+            // Ensure currentPartner is available
+            if (!currentPartner || !currentPartner.nativeLanguage) {
+                explanationContainer.innerHTML = '<p style="color: red;">Cannot load explanation: Partner context is missing.</p>';
+                return;
+            }
+            const targetLang = currentPartner.nativeLanguage;
+
+            // Determine the level of the topic
+            let level = 'unknown';
+            if (grammarData && grammarData[targetLang]) {
+                const topicData = grammarData[targetLang].find(topic => topic.title === topicTitle);
+                if (topicData) {
+                    level = topicData.level;
+                }
+            }
+
+            await getGrammarExplanation(topicTitle, targetLang, level);
+        } catch (error) {
+            console.error("Error processing grammar topic selection:", error);
+            explanationContainer.innerHTML = `<p style="color: red;">Failed to load explanation for "${topicTitle}". Please try again.</p>`;
+        }
+    }
+    // If it's a .quiz-choice button, its own inline onclick handler will manage it.
+    // No action is needed here for .quiz-choice buttons.
+});
+
+// Close Teach Me modal if clicked outside
+window.addEventListener('click', (event) => {
+    if (event.target === teachMeModal) {
+        teachMeModal.style.display = 'none';
+    }
+    // Keep existing logic for closing the main chat modal
+    const chatModal = document.getElementById('chat-modal');
+    if (event.target === chatModal) {
+        chatModal.style.display = 'none';
+        if (geminiIntroTimer) {
+            clearTimeout(geminiIntroTimer);
+            geminiIntroTimer = null;
+        }
+    }
+});
+
+// --- Corrections Toggle Logic ---
+document.getElementById('corrections-toggle').addEventListener('change', (event) => {
+    enableCorrections = event.target.checked;
+    console.log("Corrections enabled:", enableCorrections);
+});
+
+// --- Update API Call Functions ---
+
+// Modified getGeminiChatResponse to include corrections instruction
+async function getGeminiChatResponse(partner, history) {
+    console.log("Getting Gemini Response. History:", history);
+    const prompt = `You are ${partner.name}, a language exchange partner on the website https://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
+You are chatting with someone whose native language is ${partner.targetLanguage} and who is learning your language (${partner.nativeLanguage}).
+
+Here is the recent chat history (last 50 messages) with timestamps:
+${history.map(msg => `[${new Date(msg.timestamp).toLocaleTimeString()}] ${msg.sender}: ${msg.text}`).join('\n')}
+
+Consider the timestamps when crafting your response. If there has been a long gap between messages, you may acknowledge it naturally in your response.
+
+Respond naturally to the last message in the chat.
+Respond in a friendly, encouraging, and informal chat style. Keep your response relatively short, like a typical chat message (1-3 sentences), unless directly asked to explain something in detail or to provide a long story or explanation. The max amount of sentences should be 4-7 for special messages. In all, the most important thing is that you engage directly and positively with the user and do not by any means parrot what they're saying unless appropriate for the context.
+
+${enableCorrections ? `
+IMPORTANT: The user wants corrections. If their last message (sender: 'You') contains grammar or spelling errors in ${partner.nativeLanguage}, provide a brief, friendly correction AFTER your main conversational reply.
+Format the correction clearly, like this:
+"By the way, a slightly more natural way to say that in ${partner.nativeLanguage} is: [Corrected Sentence]"
+Only provide a correction if you identify a clear error in ${partner.nativeLanguage} in the user's *last* message. If there are no errors, just give your conversational reply.
+` : `
+The user does not currently want corrections. Just provide a natural conversational reply.
+`}
+
+Your response should be ONLY the chat message text. Do not include your name or any other prefix.`;
+
+    try {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }]
+            })
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            console.error(`Gemini API request failed with status ${response.status}: ${response.statusText}. Body: ${errorBody}`);
+            throw new Error(`API request failed: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log("Gemini API Response Data:", data);
+
+        if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+            let generatedText = data.candidates[0].content.parts[0].text;
+            generatedText = generatedText.trim();
+            if (generatedText.startsWith('"') && generatedText.endsWith('"')) {
+                generatedText = generatedText.substring(1, generatedText.length - 1);
+            }
+            console.log("Extracted Gemini text:", generatedText);
+            return generatedText;
+        } else if (data && data.candidates && data.candidates[0] && data.candidates[0].finishReason === 'SAFETY') {
+            console.warn("Gemini response blocked due to safety settings.");
+            return "I'm sorry, I can't respond to that.";
+        } else {
+            console.error("Unexpected Gemini API response structure:", data);
+            throw new Error("Unexpected API response structure");
+        }
+
+    } catch (error) {
+        console.error('Error calling Gemini API:', error);
+        throw error;
+    }
 }
 
-async function startVocabularyQuiz(topicTitle, language) {
-    const container = document.getElementById('vocabulary-section');
-    const contentDiv = document.getElementById('vocabulary-content');
-    contentDiv.innerHTML = '<p>Loading quiz...</p>';
-}
+// New function to get grammar explanation
+let quizActive = false;
+let currentQuiz = {};
+
+let currentTopicTitle = ''; // Add this at the top of your script with other global variables
 
 async function startQuiz(topicTitle, language, level = 'unknown') {
     // Store topic title globally when quiz starts
@@ -720,23 +962,8 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         }
     }
 
-    const contentDiv = document.getElementById('grammar-topic-list');
-    if (!contentDiv) {
-        console.error('Quiz container not found');
-        return;
-    }
-
-    // Initialize quiz state
-    quizActive = true;
-    currentQuiz = {
-        questions: [],
-        currentQuestion: 0,
-        score: 0,
-        total: 3
-    };
-
     // Set a clear loading state
-    contentDiv.innerHTML = `
+    explanationContainer.innerHTML = `
         <p>Loading quiz for "${topicTitle}"...</p>
         <p>Language: ${language}, Level: ${level}</p>
     `;
@@ -763,7 +990,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
     ]
 
     Each quiz question in your JSON should follow this structure. Do not include any markdown formatting or backticks.
-
+    
     Make sure to generate varied and challenging questions suitable for the specified level. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it. In all just make sure multiple answers can ot be correct and the answers must be completely separate from the question example.`;
 
     fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
@@ -822,7 +1049,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
                 showNextQuestion(explanationContainer);
             } catch (parseError) {
                 console.error('Quiz parsing failed:', parseError);
-                contentDiv.innerHTML = `
+                explanationContainer.innerHTML = `
                     <div style="text-align: center;">
                         <p>Failed to generate quiz.</p>
                         <button onclick="startQuiz('${topicTitle}', '${language}', ${level})" class="chat-button" style="margin-top: 10px;">
@@ -834,7 +1061,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         })
         .catch(error => {
             console.error('Quiz generation failed:', error);
-            contentDiv.innerHTML = `
+            explanationContainer.innerHTML = `
                 <div style="text-align: center;">
                     <p>Failed to generate quiz.</p>
                     <button onclick="startQuiz('${topicTitle}', '${language}', ${level})" class="chat-button" style="margin-top: 10px;">
@@ -1967,7 +2194,7 @@ document.addEventListener('selectionchange', debounce(function() {
         if (!rect) return;
 
         // For mobile, adjust the rect position to account for scroll
-        const isMobile = /iPhone|iPad/i.test(navigator.userAgent);
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         if (isMobile) {
             const scrollY = window.pageYOffset || document.documentElement.scrollTop;
             rect.top += scrollY;
