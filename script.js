@@ -743,12 +743,21 @@ async function loadVocabularyContent(topic, targetLang) {
     }
 
     try {
-        const prompt = `Create a vocabulary study guide for "${topic.title}" in ${targetLang}. 
+        // Get the user's native language for explanations
+        const userNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
+        
+        const prompt = `You are a ${targetLang} language teacher creating a vocabulary study guide for a student whose native language is ${userNativeLanguage}.
+
+Create a comprehensive vocabulary study guide for "${topic.title}" in ${targetLang}.
+
+IMPORTANT: Write all explanations, definitions, and instructions in ${userNativeLanguage} so the student can understand clearly. Use ${targetLang} only for the vocabulary words, phrases, and example sentences.
+
 Include:
-1. Key vocabulary words and phrases related to ${topic.title}
-2. Example sentences using these words
-3. Common expressions or idioms related to this topic
-4. Cultural notes if relevant
+1. Key vocabulary words and phrases related to ${topic.title} (in ${targetLang}) with definitions in ${userNativeLanguage}
+2. Example sentences in ${targetLang} with ${userNativeLanguage} translations
+3. Common expressions or idioms related to this topic (in ${targetLang}) with explanations in ${userNativeLanguage}
+4. Cultural notes (explained in ${userNativeLanguage}) if relevant
+5. Usage tips and memory aids (in ${userNativeLanguage})
 
 Format the response in Markdown with clear sections and examples.`;
 
@@ -814,7 +823,12 @@ async function startVocabularyQuiz(topicTitle, language) {
     
     const quizPrompt = `Create a multiple-choice vocabulary quiz (16 questions) about "${topicTitle}" in ${language}. 
 
-IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly. The quiz content should be about ${language} vocabulary, but the quiz interface (questions, certain answer choices, explanations) should be written in ${quizTakerNativeLanguage}.
+IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz entirely IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly.
+
+- Write all questions in ${quizTakerNativeLanguage}
+- Write all answer choices in ${quizTakerNativeLanguage}
+- Test their knowledge of ${language} vocabulary through ${quizTakerNativeLanguage} explanations
+- When showing ${language} words, always provide ${quizTakerNativeLanguage} context or translations
 
 Questions should test vocabulary understanding through:
 1. Word definitions
@@ -1125,7 +1139,12 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
     
     const quizPrompt = `Create a multiple-choice quiz (16 questions) about "${topicTitle}" in ${language} at level ${level}. 
 
-IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly. The quiz content should be about ${language} grammar, but the quiz interface (questions, certain answer choices, explanations) should be written in ${quizTakerNativeLanguage}.
+IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz entirely IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly. 
+
+- Write all questions in ${quizTakerNativeLanguage}
+- Write all answer choices in ${quizTakerNativeLanguage} 
+- Only include ${language} text when showing specific examples that need to be identified or analyzed
+- Test their knowledge of ${language} grammar concepts through ${quizTakerNativeLanguage} explanations
 
 Your response must be valid JSON structured like this example:
 
@@ -1498,11 +1517,24 @@ async function getGrammarExplanation(topicTitle, language, level = null) {
 
     console.log(`Requesting grammar explanation for: ${topicTitle} in ${language}, Level: ${level}`);
 
+    // Get the user's native language for explanations
+    const userNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
+    
     // Construct a more detailed prompt requesting Markdown
-    const prompt = `Explain the grammar topic "${topicTitle}" for a learner of ${language} (assume they are at a level suitable for this topic: ${level}).
-Provide a clear explanation with examples. 
-Use simple language suitable for a language learner.
-Format your entire response using Markdown. Use headings, bullet points, bold text, and code blocks for examples where appropriate to make the explanation clear and easy to read.
+    const prompt = `You are a ${language} language teacher explaining grammar to a student whose native language is ${userNativeLanguage}. 
+
+Explain the grammar topic "${topicTitle}" for a learner of ${language} (assume they are at level ${level}).
+
+IMPORTANT: Write your entire explanation in ${userNativeLanguage} so the student can understand it clearly. Only use ${language} for examples and sample sentences.
+
+Your explanation should include:
+1. A clear definition of the grammar concept in ${userNativeLanguage}
+2. When and how to use it (explained in ${userNativeLanguage})
+3. Examples in ${language} with ${userNativeLanguage} translations
+4. Common mistakes to avoid (explained in ${userNativeLanguage})
+5. Practice tips (in ${userNativeLanguage})
+
+Format your entire response using Markdown. Use headings, bullet points, bold text, and code blocks for ${language} examples.
 Do NOT include any text before or after the Markdown content.`;
 
     try {
