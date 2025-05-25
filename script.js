@@ -2074,7 +2074,8 @@ const VOICE_MAPPING = {
     'fr': 'jsCqWAovK2LkecY7zXl4', // French
     'de': 'b3VNW9IEW1aDDStvLk0D', // German
     'ja': 'zcAOhNBS3c14rBihAFp1', // Japanese
-    'zh': 'TxGEqnHWrfWFTfGW9XjX'  // Chinese
+    'zh': 'TxGEqnHWrfWFTfGW9XjX', // Chinese
+    'pl': 'UZBqWwKILHHhN8VO4q3g'  // Polish
 };
 
 // Initialize audio context on user interaction
@@ -2096,6 +2097,8 @@ function detectLanguage(text) {
     if (/[\u4E00-\u9FFF]/.test(text)) return 'zh';
     // Check for Japanese characters (Hiragana, Katakana, Kanji)
     if (/[\u3040-\u30FF\u3400-\u4DBF]/.test(text)) return 'ja';
+    // Check for Polish specific characters
+    if (/[ąćęłńóśźż]/i.test(text)) return 'pl';
     // Check for Spanish/French specific characters
     if (/[áéíóúñ]/i.test(text)) return 'es';
     if (/[àâçéèêëîïôûùüÿ]/i.test(text)) return 'fr';
