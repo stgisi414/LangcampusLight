@@ -1736,8 +1736,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const chevron = toggle.querySelector('.chevron');
         content.classList.toggle('hidden');
         toggle.classList.toggle('collapsed');
+        
+        // Save the toggle state to localStorage
+        const isHidden = content.classList.contains('hidden');
+        localStorage.setItem('myInfoToggleState', isHidden ? 'hidden' : 'visible');
+        
         // Rotate chevron when toggled
-        if (content.classList.contains('hidden')) {
+        if (isHidden) {
             chevron.style.transform = 'rotate(-90deg)';
         } else {
             chevron.style.transform = 'rotate(0deg)';
@@ -1820,16 +1825,33 @@ function loadMyInfo() {
             }
         }
 
-        // Set initial visibility state
+        // Set initial visibility state based on localStorage or content
         const content = document.getElementById('myInfoContent');
         const toggle = document.getElementById('toggleMyInfo');
         const chevron = toggle?.querySelector('.chevron');
         if (content && toggle && chevron) {
-            const hasContent = myInfo.name || myInfo.bio || (myInfo.hobbies && myInfo.hobbies.length > 0);
-            if (!hasContent) {
-                content.classList.add('hidden');
-                toggle.classList.add('collapsed');
-                chevron.style.transform = 'rotate(-90deg)';
+            // Check if user has previously set a toggle state
+            const savedToggleState = localStorage.getItem('myInfoToggleState');
+            
+            if (savedToggleState) {
+                // Use saved state
+                if (savedToggleState === 'hidden') {
+                    content.classList.add('hidden');
+                    toggle.classList.add('collapsed');
+                    chevron.style.transform = 'rotate(-90deg)';
+                } else {
+                    content.classList.remove('hidden');
+                    toggle.classList.remove('collapsed');
+                    chevron.style.transform = 'rotate(0deg)';
+                }
+            } else {
+                // Default behavior: collapse if no content
+                const hasContent = myInfo.name || myInfo.bio || (myInfo.hobbies && myInfo.hobbies.length > 0);
+                if (!hasContent) {
+                    content.classList.add('hidden');
+                    toggle.classList.add('collapsed');
+                    chevron.style.transform = 'rotate(-90deg)';
+                }
             }
         }
     } catch (error) {
