@@ -812,7 +812,7 @@ async function startVocabularyQuiz(topicTitle, language) {
     
     const quizPrompt = `Create a multiple-choice vocabulary quiz (16 questions) about "${topicTitle}" in ${language}. 
 
-IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly. The quiz content should be about ${language} vocabulary, but the quiz interface (questions, answer choices, explanations) should be written in ${quizTakerNativeLanguage}.
+IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly. The quiz content should be about ${language} vocabulary, but the quiz interface (questions, certain answer choices, explanations) should be written in ${quizTakerNativeLanguage}.
 
 Questions should test vocabulary understanding through:
 1. Word definitions
@@ -1123,7 +1123,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
     
     const quizPrompt = `Create a multiple-choice quiz (16 questions) about "${topicTitle}" in ${language} at level ${level}. 
 
-IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly. The quiz content should be about ${language} grammar, but the quiz interface (questions, answer choices, explanations) should be written in ${quizTakerNativeLanguage}.
+IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly. The quiz content should be about ${language} grammar, but the quiz interface (questions, certain answer choices, explanations) should be written in ${quizTakerNativeLanguage}.
 
 Your response must be valid JSON structured like this example:
 
