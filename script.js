@@ -807,7 +807,13 @@ async function startVocabularyQuiz(topicTitle, language) {
         total: 16
     };
 
+    // Get the quiz taker's native language from currentPartner
+    const quizTakerNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
+    
     const quizPrompt = `Create a multiple-choice vocabulary quiz (16 questions) about "${topicTitle}" in ${language}. 
+
+IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly. The quiz content should be about ${language} vocabulary, but the quiz interface (questions, answer choices, explanations) should be written in ${quizTakerNativeLanguage}.
+
 Questions should test vocabulary understanding through:
 1. Word definitions
 2. Usage in context
@@ -1112,7 +1118,14 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         level = grammarData[language]?.find(topic => topic.title === topicTitle)?.level || 1;
     }
 
-    const quizPrompt = `Create a multiple-choice quiz (16 questions) about "${topicTitle}" in ${language} at level ${level}. Your response must be valid JSON structured like this example:
+    // Get the quiz taker's native language from currentPartner
+    const quizTakerNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
+    
+    const quizPrompt = `Create a multiple-choice quiz (16 questions) about "${topicTitle}" in ${language} at level ${level}. 
+
+IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly. The quiz content should be about ${language} grammar, but the quiz interface (questions, answer choices, explanations) should be written in ${quizTakerNativeLanguage}.
+
+Your response must be valid JSON structured like this example:
 
     [
       {
@@ -1125,12 +1138,12 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         "options": ["Earth", "Mars", "Jupiter", "Venus"],
         "correctIndex": 1
       },
-      // Additional questiocns...
+      // Additional questions...
     ]
 
     Each quiz question in your JSON should follow this structure. Do not include any markdown formatting or backticks.
     
-    Make sure to generate varied and challenging questions suitable for the specified level. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it. In all just make sure multiple answers can ot be correct and the answers must be completely separate from the question example.`;
+    Make sure to generate varied and challenging questions suitable for the specified level. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it. In all just make sure multiple answers cannot be correct and the answers must be completely separate from the question example.`;
 
     fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
         method: 'POST',
