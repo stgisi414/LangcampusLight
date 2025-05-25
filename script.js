@@ -280,9 +280,9 @@ async function openChat(partner) { // Now accepts the full partner object
     // It's good practice to check if modal exists, though your existing code doesn't always do this.
     if (!modal) {
         console.error("Chat modal element not found!");
-        return; 
+        return;
     }
-    const chatHeader = modal.querySelector('.chat-header'); 
+    const chatHeader = modal.querySelector('.chat-header');
     const chatMessages = document.getElementById('chat-messages');
     const messageInput = document.getElementById('message-input');
 
@@ -298,8 +298,8 @@ async function openChat(partner) { // Now accepts the full partner object
     chatMessages.innerHTML = '';
     messageInput.value = '';
     chatHistory = []; // Cleared here, then repopulated by resume logic if applicable
-    currentPartner = partner; 
-    currentPartnerName = partner.name; 
+    currentPartner = partner;
+    currentPartnerName = partner.name;
 
     // Populate the chat header
     chatHeader.innerHTML = `
@@ -331,7 +331,7 @@ async function openChat(partner) { // Now accepts the full partner object
     geminiIntroTimer = setTimeout(async () => {
         const connectingMsg = document.getElementById('connecting-message');
         // Only send auto-intro if no messages have been loaded/sent yet
-        if (chatHistory.length === 0 && connectingMsg) { 
+        if (chatHistory.length === 0 && connectingMsg) {
             // ... (existing intro message generation logic) ...
 
             // Example of how intro message is added (ensure you have your full logic here)
@@ -418,11 +418,11 @@ Your response must be ONLY the chat message text itself, without any prefix like
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
         } // End of if (chatHistory.length === 0 && connectingMsg)
-        geminiIntroTimer = null; 
+        geminiIntroTimer = null;
     }, 5000);
 
     const closeBtn = modal.querySelector('.close');
-    if(closeBtn) { // Ensure closeBtn exists
+    if (closeBtn) { // Ensure closeBtn exists
         closeBtn.onclick = () => {
             modal.style.display = 'none';
             document.body.style.overflow = ''; // UNLOCK body scroll
@@ -1851,8 +1851,8 @@ function checkSavedPartner() {
                             const senderName = msg.sender; // This will be "You" or the partner's name
 
                             // Format the timestamp if it exists
-                            const messageTimestamp = msg.timestamp 
-                                ? new Date(msg.timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }) 
+                            const messageTimestamp = msg.timestamp
+                                ? new Date(msg.timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
                                 : '';
 
                             // Reconstruct the HTML for each message, including class and timestamp span
@@ -2075,7 +2075,17 @@ const VOICE_MAPPING = {
     'de': 'b3VNW9IEW1aDDStvLk0D', // German
     'ja': 'zcAOhNBS3c14rBihAFp1', // Japanese
     'zh': 'TxGEqnHWrfWFTfGW9XjX', // Chinese
-    'pl': 'UZBqWwKILHHhN8VO4q3g'  // Polish
+    'pl': 'UZBqWwKILHHhN8VO4q3g',  // Polish
+    'ar': '2EiwWnXFnvbaVjvwvPVb', // Arabic
+    'ru': 'AZnzlk1XvdvUeBnXmlld', // Russian
+    'it': 'EXAVITQu4vr4xnSDxMaL', // Italian
+    'vn': 'zcAOhNBS3c14rBihAFp1', // Vietnamese
+    'hi': 'zcAOhNBS3c14rBihAFp1', // Hindi
+    'pt': 'EXAVITQu4vr4xnSDxMaL', // Portuguese'
+    'ko': 'zcAOhNBS3c14rBihAFp1', //Korean
+    'th': 'zcAOhNBS3c14rBihAFp1', //Thai
+    'mn': 'zcAOhNBS3c14rBihAFp1' //Mongolian
+
 };
 
 // Initialize audio context on user interaction
@@ -2145,11 +2155,11 @@ async function playAudioFromText(text, button, maxRetries = 3) {
                 },
                 body: JSON.stringify({
                     text: encodeURIComponent(text).replace(/%C3%A1/g, 'á')
-                                                .replace(/%C3%A9/g, 'é')
-                                                .replace(/%C3%AD/g, 'í')
-                                                .replace(/%C3%B3/g, 'ó')
-                                                .replace(/%C3%BA/g, 'ú')
-                                                .replace(/%C3%B1/g, 'ñ'),
+                        .replace(/%C3%A9/g, 'é')
+                        .replace(/%C3%AD/g, 'í')
+                        .replace(/%C3%B3/g, 'ó')
+                        .replace(/%C3%BA/g, 'ú')
+                        .replace(/%C3%B1/g, 'ñ'),
                     voice_id: voiceId,
                     model_id: "eleven_multilingual_v2"
                 })
