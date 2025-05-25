@@ -2070,7 +2070,7 @@ console.log('TTS functionality initialized');
 // Voice mapping for different languages
 const VOICE_MAPPING = {
     'en': 'pNInz6obpgDQGcFmaJgB', // English
-    'es': '3zcEGzEYQQUXzdCubewx', // Spanish
+    'es': 'VR6AewLTigWG4xSOukaG', // Spanish
     'fr': 'jsCqWAovK2LkecY7zXl4', // French
     'de': 'b3VNW9IEW1aDDStvLk0D', // German
     'ja': 'zcAOhNBS3c14rBihAFp1', // Japanese
