@@ -2671,53 +2671,132 @@ document.addEventListener('mousedown', (event) => {
     }
 });
 
+// Study guide middleware queue
+let studyGuideQueue = [];
+let isProcessingStudyGuide = false;
+
+// Process study guide queue with delays
+async function processStudyGuideQueue() {
+    if (isProcessingStudyGuide || studyGuideQueue.length === 0) return;
+    
+    isProcessingStudyGuide = true;
+    
+    while (studyGuideQueue.length > 0) {
+        const { messageText, chatContext, resolve } = studyGuideQueue.shift();
+        const result = await studyGuideMiddleware(messageText, chatContext);
+        resolve(result);
+        
+        if (studyGuideQueue.length > 0) {
+            await new Promise(resolve => setTimeout(resolve, 3000)); // 3 second delay
+        }
+    }
+    
+    isProcessingStudyGuide = false;
+}
+
 // Add study guide middleware
 document.getElementById('send-message').addEventListener('click', async () => {
     const messageInput = document.getElementById('message-input');
     const messageText = messageInput.value.trim();
 
-    // Middleware to provide study guide assistance
+    // Middleware to provide study guide assistance using Gemini
     async function studyGuideMiddleware(message, chatContext) {
-        const lowerCaseMessage = message.toLowerCase();
+        return new Promise((resolve) => {
+            studyGuideQueue.push({ messageText: message, chatContext, resolve });
+            processStudyGuideQueue();
+        });
+    }
 
-        if (lowerCaseMessage.includes("teach me") || lowerCaseMessage.includes("what should i study")) {
-            const userLevel = localStorage.getItem('languageLevelRating') || 'Beginner';
-            let studyRecommendations = "";
+    async function studyGuideMiddleware(message, chatContext) {
+        try {
+            // Step 1: Check if this is a study-related request in any language
+            const studyDetectionPrompt = `Analyze this message and determine if the user is asking for language learning help, study guidance, or educational assistance. The user might be asking in any language.
 
-            // Example logic: Customize based on language level and context
-            switch (userLevel) {
-                case '1': // Beginner
-                    studyRecommendations = "Since you're just starting out, focus on basic grammar like verb conjugations and simple sentence structures. Try the 'Basic Greetings' and 'Present Tense' topics in the 'Teach Me' section.";
-                    break;
-                case '2': // Elementary
-                    studyRecommendations = "Now that you know the basics, try expanding your vocabulary and understanding past tenses. Check out 'Common Phrases' and 'Past Tense' in the 'Teach Me' section.";
-                    break;
-                case '3': // Intermediate
-                    studyRecommendations = "You're making great progress! Focus on more complex grammar and idiomatic expressions. Try 'Conditional Sentences' and 'Idioms' in the 'Teach Me' section.";
-                    break;
-                case '4': // Upper Intermediate
-                studyRecommendations = "Honing in! Focus on more complex grammar and idiomatic expressions. Try 'Conditional Sentences' and 'Idioms' in the 'Teach Me' section.";
-                    break;
-                case '5': // Advanced
-                    studyRecommendations = "Superb! Continue expanding your vocabulary and practicing nuances of the language. Try 'Advanced Grammar' and 'Colloquial Expressions' in the 'Teach Me' section.";
-                    break;
-                default:
-                    studyRecommendations = "I can give study recommendations based on your level if I know it. try the 'Basic Greetings' and 'Present Tense' topics in the 'Teach Me' section.";
-                    break;
+Message: "${message}"
+
+Respond with only "YES" if this is a request for study/learning help, or "NO" if it's not.
+
+Examples of study requests:
+- "teach me"
+- "what should I study"
+- "help me learn"
+- "I need help with grammar"
+- "study recommendations"
+- And similar requests in ANY language (Spanish, French, Japanese, Korean, Chinese, etc.)`;
+
+            const detectionResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: studyDetectionPrompt }] }]
+                })
+            });
+
+            if (!detectionResponse.ok) {
+                console.error('Study detection API call failed');
+                return null;
             }
 
-            // Incorporate chat context
-            if (chatContext.length > 0) {
-                const lastMessage = chatContext[chatContext.length - 1];
-                if (lastMessage.sender === 'You') {
-                    studyRecommendations += `\n\nBased on our conversation, you might also want to review topics related to ${lastMessage.text}.`;
-                }
+            const detectionData = await detectionResponse.json();
+            const isStudyRequest = detectionData.candidates[0].content.parts[0].text.trim().toUpperCase() === 'YES';
+
+            if (!isStudyRequest) {
+                return null; // Not a study request
             }
 
-            return `It looks like you're asking for study recommendations. Here's what I suggest:\n\n${studyRecommendations}`;
+            // Step 2: Get current partner's language info
+            const targetLanguage = currentPartner ? currentPartner.nativeLanguage : 'the target language';
+            const userNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
+
+            // Step 3: Get user's current level
+            const userLevel = localStorage.getItem('languageLevelRating') || '1';
+
+            // Step 4: Generate comprehensive study guidance using Gemini
+            const studyGuidancePrompt = `You are a language learning study guide assistant. The user is learning ${targetLanguage} and their native language is ${userNativeLanguage}. Their current proficiency level is ${userLevel} out of 5 (1=beginner, 5=advanced).
+
+User's message: "${message}"
+
+Recent chat context: ${chatContext.length > 0 ? chatContext.slice(-5).map(msg => `${msg.sender}: ${msg.text}`).join('\n') : 'No recent context'}
+
+Please provide personalized study recommendations that include:
+
+1. Specific grammar topics they should focus on based on their level
+2. Vocabulary areas to work on
+3. Practical exercises they can do
+4. How to use the "Teach Me" section effectively
+5. Study tips tailored to their current level
+
+Respond in ${userNativeLanguage} so they can understand clearly. Be encouraging and specific. Mention relevant topics from the "Teach Me" section that would be appropriate for their level.
+
+Make your response conversational and helpful, as if you're a knowledgeable language teacher giving personalized advice.`;
+
+            const guidanceResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: studyGuidancePrompt }] }]
+                })
+            });
+
+            if (!guidanceResponse.ok) {
+                console.error('Study guidance API call failed');
+                return null;
+            }
+
+            const guidanceData = await guidanceResponse.json();
+            let studyRecommendations = guidanceData.candidates[0].content.parts[0].text.trim();
+
+            // Clean up the response
+            if (studyRecommendations.startsWith('"') && studyRecommendations.endsWith('"')) {
+                studyRecommendations = studyRecommendations.slice(1, -1);
+            }
+
+            return studyRecommendations;
+
+        } catch (error) {
+            console.error('Error in study guide middleware:', error);
+            return null;
         }
-
-        return null; // No recommendation
     }
 
     // Get chat history to use as context
