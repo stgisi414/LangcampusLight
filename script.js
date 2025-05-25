@@ -2141,7 +2141,12 @@ async function playAudioFromText(text, button, maxRetries = 3) {
                     'Authorization': 'Bearer wsec_81c54a71adb28dff26425889f84fbdfee3b446707529b33bd0e2a54eb3a43944'
                 },
                 body: JSON.stringify({
-                    text: text,
+                    text: encodeURIComponent(text).replace(/%C3%A1/g, 'á')
+                                                .replace(/%C3%A9/g, 'é')
+                                                .replace(/%C3%AD/g, 'í')
+                                                .replace(/%C3%B3/g, 'ó')
+                                                .replace(/%C3%BA/g, 'ú')
+                                                .replace(/%C3%B1/g, 'ñ'),
                     voice_id: voiceId,
                     model_id: "eleven_multilingual_v2"
                 })
