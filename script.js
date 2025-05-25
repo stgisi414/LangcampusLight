@@ -467,6 +467,55 @@ function loadPreferences() {
     }
 }
 
+// --- Language Level Assessment ---
+const ASSESSMENT_INTERVAL = 4; // Assess every 4 messages
+const ASSESSMENT_COOLDOWN = 60000; // Minimum 60 seconds between assessments
+let messageCountForAssessment = 0;
+let lastAssessmentTime = 0;
+
+async function assessLanguageLevel(messages) {
+    if (!messages || messages.length === 0) {
+        console.warn("No messages to assess.");
+        return;
+    }
+
+    const assessmentPrompt = `Analyze the following chat messages from a language learner and assess their proficiency level in the target language (1-5 stars, 1 being beginner, 5 being advanced):\n\n${messages.map(msg => `${msg.sender}: ${msg.text}`).join('\n')}\n\nProvide ONLY a single number representing the star rating (e.g., 3).`;
+
+    try {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: assessmentPrompt }] }] })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Assessment API request failed: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (!data || !data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+            console.error("Unexpected API response structure for assessment:", data);
+            throw new Error("Unexpected API response structure for assessment");
+        }
+
+        const assessmentResult = data.candidates[0].content.parts[0].text.trim();
+        const rating = parseInt(assessmentResult);
+
+        if (isNaN(rating) || rating < 1 || rating > 5) {
+            console.warn("Invalid assessment rating received:", assessmentResult);
+            return;
+        }
+
+        // Store rating in local storage (secret from user)
+        localStorage.setItem('languageLevelRating', rating.toString());
+        lastAssessmentTime = Date.now();
+        console.log(`Language level assessed: ${rating} stars`);
+
+    } catch (error) {
+        console.error("Error assessing language level:", error);
+    }
+}
 // Event Listeners
 document.getElementById('searchButton').addEventListener('click', searchPartners);
 
@@ -475,33 +524,48 @@ document.getElementById('send-message').addEventListener('click', async () => { 
     const messageText = messageInput.value.trim();
     const chatMessages = document.getElementById('chat-messages');
 
-    if (messageText && currentPartner) { // Ensure partner context is available
-        lastUserMessage = messageText; // Store message for retry functionality
-        // Clear the Gemini intro timer if the user sends a message first
-        if (geminiIntroTimer) {
-            clearTimeout(geminiIntroTimer);
-            geminiIntroTimer = null;
-        }
+        if (messageText && currentPartner) { // Ensure partner context is available
+            lastUserMessage = messageText; // Store message for retry functionality
+            // Clear the Gemini intro timer if the user sends a message first
+            if (geminiIntroTimer) {
+                clearTimeout(geminiIntroTimer);
+                geminiIntroTimer = null;
+            }
 
-        // Remove the initial "Connecting..." message if it's still there
-        const connectingMessage = document.getElementById('connecting-message');
-        if (connectingMessage) {
-            connectingMessage.remove();
-        }
+            // Remove the initial "Connecting..." message if it's still there
+            const connectingMessage = document.getElementById('connecting-message');
+            if (connectingMessage) {
+                connectingMessage.remove();
+            }
 
-        // Add user's message with timestamp to UI and history
-        const timestamp = new Date().toISOString();
-        const userMessage = { sender: 'You', text: messageText, timestamp };
-        chatHistory.push(userMessage);
-        chatMessages.innerHTML += `
-          <p class="user-message">
-            <strong>You:</strong> ${messageText}
-            <span class="message-time" style="font-size: 0.8em; color: #fff; margin-left: 8px;">
-              ${new Date(timestamp).toLocaleTimeString()}
-            </span>
-          </p>`;
-        messageInput.value = ''; // Clear input field
-        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll down
+            // Add user's message with timestamp to UI and history
+            const timestamp = new Date().toISOString();
+            const userMessage = { sender: 'You', text: messageText, timestamp };
+            chatHistory.push(userMessage);
+            chatMessages.innerHTML += `
+              <p class="user-message">
+                <strong>You:</strong> ${messageText}
+                <span class="message-time" style="font-size: 0.8em; color: #fff; margin-left: 8px;">
+                  ${new Date(timestamp).toLocaleTimeString()}
+                </span>
+              </p>`;
+            messageInput.value = ''; // Clear input field
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll down
+
+            // Increment message count and check for assessment
+            messageCountForAssessment++;
+            const timeSinceLastAssessment = Date.now() - lastAssessmentTime;
+
+            if (messageCountForAssessment % ASSESSMENT_INTERVAL === 0 && 
+                timeSinceLastAssessment > ASSESSMENT_COOLDOWN) {
+                // Get last 40 messages or all if less than 40, in multiples of 4
+                const maxMessages = Math.min(40, chatHistory.length);
+                const messagesToAnalyze = Math.floor(maxMessages / 4) * 4;
+                const recentMessages = chatHistory.slice(-messagesToAnalyze);
+
+                // Perform assessment in background
+                assessLanguageLevel(recentMessages);
+            }
 
         // Add a thinking indicator (optional)
         const thinkingIndicator = document.createElement('p');
@@ -625,7 +689,7 @@ function reloadVocabularyTopicsList() {
             const button = document.createElement('button');
             button.dataset.title = topic.title;
             // Apply styles consistent with initial population
-            button.style.display = 'block';
+            button.style.display= 'block';
             button.style.width = '100%';
             button.style.padding = '0.8rem';
             button.style.marginBottom = '0.5rem';
@@ -745,7 +809,7 @@ async function loadVocabularyContent(topic, targetLang) {
     try {
         // Get the user's native language for explanations
         const userNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
-        
+
         const prompt = `You are a ${targetLang} language teacher creating a vocabulary study guide for a student whose native language is ${userNativeLanguage}.
 
 Create a comprehensive vocabulary study guide for "${topic.title}" in ${targetLang}.
@@ -820,7 +884,7 @@ async function startVocabularyQuiz(topicTitle, language) {
 
     // Get the quiz taker's native language from currentPartner
     const quizTakerNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
-    
+
     const quizPrompt = `Create a multiple-choice vocabulary quiz (16 questions) about "${topicTitle}" in ${language}. 
 
 IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz entirely IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly.
@@ -1136,7 +1200,7 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
 
     // Get the quiz taker's native language from currentPartner
     const quizTakerNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
-    
+
     const quizPrompt = `Create a multiple-choice quiz (16 questions) about "${topicTitle}" in ${language} at level ${level}. 
 
 IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz entirely IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly. 
@@ -1163,7 +1227,7 @@ Your response must be valid JSON structured like this example:
     ]
 
     Each quiz question in your JSON should follow this structure. Do not include any markdown formatting or backticks.
-    
+
     Make sure to generate varied and challenging questions suitable for the specified level. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it. In all just make sure multiple answers cannot be correct and the answers must be completely separate from the question example.`;
 
     fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
@@ -1188,7 +1252,7 @@ Your response must be valid JSON structured like this example:
 
             try {
                 // Clean and validate the response text
-                let cleanText = quizText.replace(/```json\s*|\s*```/g, '').trim();
+                let cleanText = quizText.replace(/```json\s*|\s*```g, '').trim();
 
                 // Ensure it starts with [ and ends with ]
                 if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
@@ -1519,7 +1583,7 @@ async function getGrammarExplanation(topicTitle, language, level = null) {
 
     // Get the user's native language for explanations
     const userNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
-    
+
     // Construct a more detailed prompt requesting Markdown
     const prompt = `You are a ${language} language teacher explaining grammar to a student whose native language is ${userNativeLanguage}. 
 
@@ -1736,11 +1800,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const chevron = toggle.querySelector('.chevron');
         content.classList.toggle('hidden');
         toggle.classList.toggle('collapsed');
-        
+
         // Save the toggle state to localStorage
         const isHidden = content.classList.contains('hidden');
         localStorage.setItem('myInfoToggleState', isHidden ? 'hidden' : 'visible');
-        
+
         // Rotate chevron when toggled
         if (isHidden) {
             chevron.style.transform = 'rotate(-90deg)';
@@ -1832,7 +1896,7 @@ function loadMyInfo() {
         if (content && toggle && chevron) {
             // Check if user has previously set a toggle state
             const savedToggleState = localStorage.getItem('myInfoToggleState');
-            
+
             if (savedToggleState) {
                 // Use saved state
                 if (savedToggleState === 'hidden') {
@@ -2013,7 +2077,7 @@ document.getElementById('save-partner-btn').addEventListener('click', () => {
         if (isMobile) {
             // Create a temporary success message element
             const successMsg = document.createElement('div');
-            successMsg.style.position = 'fixed';
+            successMsg.style.position = 'fixed';```text
             successMsg.style.bottom = '20px';
             successMsg.style.left = '50%';
             successMsg.style.transform = 'translateX(-50%)';
@@ -2583,7 +2647,7 @@ document.addEventListener('touchend', function(e) {
             const range = selection?.getRangeAt(0);
             if (!range) return;
 
-            const rect = range.getBoundingClientRect();
+            const rect = range = selection?.getRangeAt(0).getBoundingClientRect();
             if (!rect) return;
 
             // Adjust position for mobile
