@@ -807,23 +807,30 @@ async function startVocabularyQuiz(topicTitle, language) {
         total: 16
     };
 
+    // Get user's native language for context
+    const userNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
+    
     const quizPrompt = `Create a multiple-choice vocabulary quiz (16 questions) about "${topicTitle}" in ${language}. 
-Questions should test vocabulary understanding through:
-1. Word definitions
-2. Usage in context
-3. Synonyms/antonyms
-4. Appropriate word choice
 
-Format as valid JSON with this structure:
-[
-  {
-    "question": "What is the meaning of [word] in ${language}?",
-    "options": ["definition1", "definition2", "definition3", "definition4"],
-    "correctIndex": 0
-  }
-]
+    IMPORTANT CONTEXT: The quiz taker's native language is ${userNativeLanguage}. Please consider this when crafting questions - you can reference their native language for comparisons, false friends, cognates, or cultural context when it would help test their vocabulary understanding.
 
-Each question must have exactly 4 options. Do not include backticks or markdown formatting.`;
+    Questions should test vocabulary understanding through:
+    1. Word definitions
+    2. Usage in context
+    3. Synonyms/antonyms
+    4. Appropriate word choice
+    5. Cultural nuances (when relevant to ${userNativeLanguage} speakers)
+
+    Format as valid JSON with this structure:
+    [
+      {
+        "question": "What is the meaning of [word] in ${language}?",
+        "options": ["definition1", "definition2", "definition3", "definition4"],
+        "correctIndex": 0
+      }
+    ]
+
+    Each question must have exactly 4 options. When helpful, you can reference how words relate to or differ from ${userNativeLanguage}. Do not include backticks or markdown formatting.`;
 
     try {
         const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
@@ -1112,7 +1119,14 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         level = grammarData[language]?.find(topic => topic.title === topicTitle)?.level || 1;
     }
 
-    const quizPrompt = `Create a multiple-choice quiz (16 questions) about "${topicTitle}" in ${language} at level ${level}. Your response must be valid JSON structured like this example:
+    // Get user's native language for context
+    const userNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
+    
+    const quizPrompt = `Create a multiple-choice quiz (16 questions) about "${topicTitle}" in ${language} at level ${level}. 
+
+    IMPORTANT CONTEXT: The quiz taker's native language is ${userNativeLanguage}. Please consider this when crafting questions - you can reference their native language for comparisons, contrasts, or explanations when it would help clarify the concept being tested.
+
+    Your response must be valid JSON structured like this example:
 
     [
       {
@@ -1125,12 +1139,12 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
         "options": ["Earth", "Mars", "Jupiter", "Venus"],
         "correctIndex": 1
       },
-      // Additional questiocns...
+      // Additional questions...
     ]
 
     Each quiz question in your JSON should follow this structure. Do not include any markdown formatting or backticks.
     
-    Make sure to generate varied and challenging questions suitable for the specified level. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it. In all just make sure multiple answers can ot be correct and the answers must be completely separate from the question example.`;
+    Make sure to generate varied and challenging questions suitable for the specified level. When helpful, you can reference how concepts differ from or relate to ${userNativeLanguage}. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it. In all just make sure multiple answers cannot be correct and the answers must be completely separate from the question example.`;
 
     fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
         method: 'POST',
