@@ -373,17 +373,19 @@ This user speaks ${partner.targetLanguage} (which you are learning) and want to 
 
 IMPORTANT TIMEZONE CONTEXT: ${timezoneHintForIntro}
 
-Your task is to create a friendly, natural, and culturally appropriate first greeting message (keep it to 2-4 sentences).
-Your message should:
-1.  Start with a greeting. You should acknowledge the user's time of day (e.g., "Good ${currentUserTimeOfDay}!").
-2.  Briefly introduce yourself (as ${partner.name}).
-3.  Express genuine enthusiasm for the language exchange opportunity.
-4.  It's good if you can naturally allude to *your own* current time of day or a general activity appropriate for it, from your perspective as someone in your country (e.g., "It's just about dinner time here in [Your Country/Region]..." or "Hope you're having a great day, I'm just starting mine here."). This makes the interaction feel more real.
-5.  If you share any interests (${partner.interests.join(', ')}) with the user's listed hobbies (${myInfo.hobbies?.join(', ')}), briefly and naturally mention one if it fits.
-6.  End with an engaging open-ended question to encourage them to reply and start the conversation.
+CRITICAL: You must write your entire message in ${partner.nativeLanguage}. This is a language exchange, so you should communicate in your native language (${partner.nativeLanguage}) to help the user practice.
 
-Style: Conversational, warm, welcoming, and natural. Avoid using emojis or excessive punctuation.
-Your response must be ONLY the chat message text itself, without any prefix like your name.`;
+Your task is to create a friendly, natural, and culturally appropriate first greeting message (keep it to 2-4 sentences) in ${partner.nativeLanguage}.
+Your message should:
+1.  Start with a greeting in ${partner.nativeLanguage}. You should acknowledge the user's time of day appropriately in your language.
+2.  Briefly introduce yourself (as ${partner.name}) in ${partner.nativeLanguage}.
+3.  Express genuine enthusiasm for the language exchange opportunity in ${partner.nativeLanguage}.
+4.  It's good if you can naturally allude to *your own* current time of day or a general activity appropriate for it, from your perspective as someone in your country. This makes the interaction feel more real.
+5.  If you share any interests (${partner.interests.join(', ')}) with the user's listed hobbies (${myInfo.hobbies?.join(', ')}), briefly and naturally mention one if it fits.
+6.  End with an engaging open-ended question in ${partner.nativeLanguage} to encourage them to reply and start the conversation.
+
+Style: Conversational, warm, welcoming, and natural for a native ${partner.nativeLanguage} speaker. Avoid using emojis or excessive punctuation.
+Your response must be ONLY the chat message text itself in ${partner.nativeLanguage}, without any prefix like your name.`;
 
             let introMessageText;
             try {
