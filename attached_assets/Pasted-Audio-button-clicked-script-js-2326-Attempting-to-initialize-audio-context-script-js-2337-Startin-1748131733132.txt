@@ -1,0 +1,41 @@
+Audio button clicked
+script.js:2326 Attempting to initialize audio context...
+script.js:2337 Starting audio playback
+script.js:2110 Starting playAudioFromText with text: qué
+script.js:2308 Button positioned at: {left: 181.13333129882812, top: 360.22222900390625}
+script.js:2404 Audio button created and appended to body
+script.js:2137 
+            
+            
+           POST https://langcamp.us/elevenlbs-exchange-audio/exchange-audio 500 (Internal Server Error)
+playAudioFromText @ script.js:2137
+(anonymous) @ script.js:2362Understand this error
+script.js:2202 TTS attempt 1 failed: Error: TTS API error: 500 - {"error":"ElevenLabs API error","details":"{\"detail\":{\"status\":\"voice_not_found\",\"message\":\"A voice with the voice_id 3zcEGzEYQQUXzdCubewx was not found.\"}}"}
+    at playAudioFromText (script.js:2159:23)
+    at async HTMLButtonElement.<anonymous> (script.js:2362:13)
+playAudioFromText @ script.js:2202
+await in playAudioFromText
+(anonymous) @ script.js:2362Understand this error
+script.js:2137 
+            
+            
+           POST https://langcamp.us/elevenlbs-exchange-audio/exchange-audio 500 (Internal Server Error)
+playAudioFromText @ script.js:2137
+await in playAudioFromText
+(anonymous) @ script.js:2362Understand this error
+script.js:2202 TTS attempt 2 failed: Error: TTS API error: 500 - {"error":"ElevenLabs API error","details":"{\"detail\":{\"status\":\"voice_not_found\",\"message\":\"A voice with the voice_id 3zcEGzEYQQUXzdCubewx was not found.\"}}"}
+    at playAudioFromText (script.js:2159:23)
+    at async HTMLButtonElement.<anonymous> (script.js:2362:13)
+playAudioFromText @ script.js:2202
+await in playAudioFromText
+(anonymous) @ script.js:2362Understand this error
+script.js:2137 
+            
+            
+           POST https://langcamp.us/elevenlbs-exchange-audio/exchange-audio 500 (Internal Server Error)
+playAudioFromText @ script.js:2137
+await in playAudioFromText
+(anonymous) @ script.js:2362Understand this error
+script.js:2202 TTS attempt 3 failed: Error: TTS API error: 500 - {"error":"ElevenLabs API error","details":"{\"detail\":{\"status\":\"voice_not_found\",\"message\":\"A voice with the voice_id 3zcEGzEYQQUXzdCubewx was not found.\"}}"}
+    at playAudioFromText (script.js:2159:23)
+    at async HTMLButtonElement.<anonymous> (script.js:2362:13)
