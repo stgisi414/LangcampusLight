@@ -1,0 +1,120 @@
+2025-05-24 18:38:16.88
+aa38b65a
+User
+via: '1.1 google, 1.1 google',
+2025-05-24 18:38:16.88
+aa38b65a
+User
+'transfer-encoding': 'chunked'
+2025-05-24 18:38:16.88
+aa38b65a
+User
+},
+2025-05-24 18:38:16.88
+aa38b65a
+User
+config: {
+2025-05-24 18:38:16.88
+aa38b65a
+User
+adapter: [Array],
+2025-05-24 18:38:16.88
+aa38b65a
+User
+transformRequest: [Array],
+2025-05-24 18:38:16.88
+aa38b65a
+User
+transformResponse: [Array],
+2025-05-24 18:38:16.88
+aa38b65a
+User
+timeout: 0,
+2025-05-24 18:38:16.88
+aa38b65a
+User
+xsrfCookieName: 'XSRF-TOKEN',
+2025-05-24 18:38:16.88
+aa38b65a
+User
+maxContentLength: -1,
+2025-05-24 18:38:16.88
+aa38b65a
+User
+maxBodyLength: -1,
+2025-05-24 18:38:16.88
+aa38b65a
+User
+env: [Object],
+2025-05-24 18:38:16.88
+aa38b65a
+User
+headers: [Object [AxiosHeaders]],
+2025-05-24 18:38:16.88
+aa38b65a
+User
+url: 'https://api.elevenlabs.io/v1/text-to-speech/3zcEGzEYQQUXzdCubewx',
+2025-05-24 18:38:16.88
+aa38b65a
+User
+data: '{"text":"Me gustaría aprender a tocar la guitarra","model_id":"eleven_multilingual_v2","optimize_streaming_latency":0}',
+2025-05-24 18:38:16.88
+aa38b65a
+User
+allowAbsoluteUrls: true
+2025-05-24 18:38:16.88
+aa38b65a
+User
+},
+2025-05-24 18:38:16.88
+aa38b65a
+User
+request: ClientRequest {
+2025-05-24 18:38:16.88
+aa38b65a
+User
+_events: [Object: null prototype],
+2025-05-24 18:38:16.88
+aa38b65a
+User
+_eventsCount: 7,
+2025-05-24 18:38:16.88
+aa38b65a
+User
+_maxListeners: undefined,
+2025-05-24 18:38:16.88
+aa38b65a
+User
+outputData: [],
+2025-05-24 18:38:16.88
+aa38b65a
+User
+outputSize: 0,
+2025-05-24 18:38:16.88
+aa38b65a
+User
+writable: true,
+2025-05-24 18:38:16.88
+aa38b65a
+User
+chunkedEncoding: false,
+2025-05-24 18:38:16.88
+aa38b65a
+User
+shouldKeepAlive: true,
+2025-05-24 18:38:16.88
+aa38b65a
+User
+_defaultKeepAlive: true,
+2025-05-24 18:38:16.88
+aa38b65a
+User
+_removedContLen: false,
+2025-05-24 18:38:16.88
+aa38b65a
+User
+strictContentLength: false,
+2025-05-24 18:38:16.88
+aa38b65a
+User
+_trailer: '',
