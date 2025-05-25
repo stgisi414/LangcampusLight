@@ -124,6 +124,7 @@
         header {
             background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
+            --text-color: white;
             text-align: center;
             padding: 2rem 1rem;
             display: flex;
@@ -137,9 +138,17 @@
         }
 
         @keyframes gradientSlide {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         header::before {
@@ -149,20 +158,26 @@
             left: -150%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                to right,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0.4) 50%,
-                rgba(255, 255, 255, 0) 100%
-            );
+            background: linear-gradient(to right,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 255, 255, 0.4) 50%,
+                    rgba(255, 255, 255, 0) 100%);
             transform: skewX(-25deg);
             animation: shimmerHeader 4s infinite ease-in-out;
         }
 
         @keyframes shimmerHeader {
-            0% { left: -150%; }
-            50% { left: 150%; }
-            100% { left: -150%; }
+            0% {
+                left: -150%;
+            }
+
+            50% {
+                left: 150%;
+            }
+
+            100% {
+                left: -150%;
+            }
         }
 
         /* --- Main Content & Containers --- */
@@ -209,6 +224,7 @@
                 opacity: 0;
                 transform: translateY(-20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -223,12 +239,10 @@
             left: -150%;
             width: 75%;
             height: 100%;
-            background: linear-gradient(
-                to right,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0.4) 50%,
-                rgba(255, 255, 255, 0) 100%
-            );
+            background: linear-gradient(to right,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 255, 255, 0.4) 50%,
+                    rgba(255, 255, 255, 0) 100%);
             transform: skewX(-25deg);
             animation: shimmer 4s infinite linear;
             opacity: 0;
@@ -243,14 +257,17 @@
                 left: -150%;
                 opacity: 0;
             }
+
             20% {
                 left: -150%;
                 opacity: 0.6;
             }
+
             80% {
                 left: 150%;
                 opacity: 0.6;
             }
+
             100% {
                 left: 150%;
                 opacity: 0;
@@ -283,9 +300,11 @@
             0% {
                 transform: scale(1);
             }
+
             50% {
                 transform: scale(1.15);
             }
+
             100% {
                 transform: scale(1);
             }
@@ -1219,18 +1238,23 @@
         .message-time {
             font-size: 0.75em;
             /* color is handled by specific rules below */
-            margin-left: 8px; /* Adjust if needed based on text-align */
-            display: block;   /* Timestamp on a new line */
-            text-align: right;/* Align timestamp to the right of its bubble */
+            margin-left: 8px;
+            /* Adjust if needed based on text-align */
+            display: block;
+            /* Timestamp on a new line */
+            text-align: right;
+            /* Align timestamp to the right of its bubble */
             margin-top: 0.25rem;
         }
 
         .user-message .message-time {
-            color: rgba(255, 255, 255, 0.8); /* Lighter timestamp for dark user bubble */
+            color: rgba(255, 255, 255, 0.8);
+            /* Lighter timestamp for dark user bubble */
         }
 
         .partner-message .message-time {
-            color: #555; /* Darker timestamp for light partner bubble */
+            color: #555;
+            /* Darker timestamp for light partner bubble */
         }
 
         /* Audio button from selection */
@@ -1297,37 +1321,37 @@
 
             /* Center controls on mobile */
             header h1 {
-            color: #FFFFFF !important;
-            font-weight: 700;
-            font-size: 2.5rem;
-            margin-bottom: 0;
-        }
-
-        header h1 i {
-            color: #FFFFFF !important;
-            font-weight: 400;
-            opacity: 0.9;
-        }
-
-        @media (max-width: 600px) {
-            .modal-content {
-                width: 95%;
-                padding: 1.5rem;
+                color: #FFFFFF !important;
+                font-weight: 700;
+                font-size: 2.5rem;
+                margin-bottom: 0;
             }
 
-            #chat-messages {
-                height: 280px;
+            header h1 i {
+                color: #FFFFFF !important;
+                font-weight: 400;
+                opacity: 0.9;
             }
 
-            header h1 {
-                font-size: 1.75rem;
-            }
+            @media (max-width: 600px) {
+                .modal-content {
+                    width: 95%;
+                    padding: 1.5rem;
+                }
 
-            .header-logo {
-                height: 40px;
-                width: 40px;
+                #chat-messages {
+                    height: 280px;
+                }
+
+                header h1 {
+                    font-size: 1.75rem;
+                }
+
+                .header-logo {
+                    height: 40px;
+                    width: 40px;
+                }
             }
-        }
     </style>
 </head>
 
