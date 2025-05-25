@@ -2067,26 +2067,25 @@ var audioContext = null;
 // Debug logging
 console.log('TTS functionality initialized');
 
-// Voice mapping for different languages
 const VOICE_MAPPING = {
-    'en': 'pNInz6obpgDQGcFmaJgB', // English
-    'es': 'VR6AewLTigWG4xSOukaG', // Spanish
-    'fr': 'jsCqWAovK2LkecY7zXl4', // French
-    'de': 'b3VNW9IEW1aDDStvLk0D', // German
-    'ja': 'zcAOhNBS3c14rBihAFp1', // Japanese
-    'zh': 'TxGEqnHWrfWFTfGW9XjX', // Chinese
-    'pl': 'UZBqWwKILHHhN8VO4q3g',  // Polish
-    'ar': '2EiwWnXFnvbaVjvwvPVb', // Arabic
-    'ru': 'AZnzlk1XvdvUeBnXmlld', // Russian
-    'it': 'EXAVITQu4vr4xnSDxMaL', // Italian
-    'vn': 'zcAOhNBS3c14rBihAFp1', // Vietnamese
-    'hi': 'zcAOhNBS3c14rBihAFp1', // Hindi
-    'pt': 'EXAVITQu4vr4xnSDxMaL', // Portuguese'
-    'ko': 'zcAOhNBS3c14rBihAFp1', //Korean
-    'th': 'zcAOhNBS3c14rBihAFp1', //Thai
-    'mn': 'zcAOhNBS3c14rBihAFp1' //Mongolian
-
+    'en': 'pNInz6obpgDQGcFmaJgB', // English (Rachel - example, choose your preferred English voice)
+    'es': 'VR6AewLTigWG4xSOukaG', // Spanish (Sofia - example)
+    'fr': 'jsCqWAovK2LkecY7zXl4', // French (Manon - example)
+    'de': 'b3VNW9IEW1aDDStvLk0D', // German (Hedda - example)
+    'ja': 'zcAOhNBS3c14rBihAFp1', // Japanese (Koharu - example)
+    'zh': 'TxGEqnHWrfWFTfGW9XjX', // Chinese (Ling - example)
+    'pl': 'UZBqWwKILHHhN8VO4q3g', // Polish (Aniela - example)
+    'ar': '2EiwWnXFnvbaVjvwvPVb', // Arabic (Layla - example)
+    'ru': 'AZnzlk1XvdvUeBnXmlld', // Russian (Dasha - example)
+    'it': 'EXAVITQu4vr4xnSDxMaL', // Italian (Alessia - example)
+    'vn': 'zcAOhNBS3c14rBihAFp1', // Vietnamese (Using Japanese voice - Koharu)
+    'hi': 'zcAOhNBS3c14rBihAFp1', // Hindi (Using Japanese voice - Koharu)
+    'pt': 'EXAVITQu4vr4xnSDxMaL', // Portuguese (Using Italian voice - Alessia) /* Corrected syntax */
+    'ko': 'zcAOhNBS3c14rBihAFp1', // Korean (Using Japanese voice - Koharu)
+    'th': 'zcAOhNBS3c14rBihAFp1', // Thai (Using Japanese voice - Koharu)
+    'mn': 'zcAOhNBS3c14rBihAFp1'  // Mongolian (Using Japanese voice - Koharu)
 };
+
 
 // Initialize audio context on user interaction
 function initAudioContext() {
@@ -2106,15 +2105,39 @@ function detectLanguage(text) {
     // Check for Chinese characters
     if (/[\u4E00-\u9FFF]/.test(text)) return 'zh';
     // Check for Japanese characters (Hiragana, Katakana, Kanji)
-    if (/[\u3040-\u30FF\u3400-\u4DBF]/.test(text)) return 'ja';
-    // Check for Polish specific characters
-    if (/[ąćęłńóśźż]/i.test(text)) return 'pl';
-    // Check for Spanish/French specific characters
-    if (/[áéíóúñ]/i.test(text)) return 'es';
-    if (/[àâçéèêëîïôûùüÿ]/i.test(text)) return 'fr';
-    // Check for German specific characters
-    if (/[äöüß]/i.test(text)) return 'de';
-    // Default to English
+    if (/[\u3040-\u30FF\u3400-\u4DBF\uF900-\uFAFF]/.test(text)) return 'ja'; // Added Kanji range
+    // Check for Korean Hangul
+    if (/[\uAC00-\uD7AF]/.test(text)) return 'ko';
+    // Check for Arabic characters
+    if (/[\u0600-\u06FF]/.test(text)) return 'ar';
+    // Check for Russian Cyrillic characters
+    if (/[\u0400-\u04FF]/.test(text)) return 'ru';
+    // Check for Hindi Devanagari characters
+    if (/[\u0900-\u097F]/.test(text)) return 'hi';
+    // Check for Thai characters
+    if (/[\u0E00-\u0E7F]/.test(text)) return 'th';
+
+    // For European languages based on Latin script, diacritics can help but are not foolproof
+    // Order matters here: more specific checks first
+    if (/[áéíóúñüÁÉÍÓÚÑÜ]/.test(text) && !/[çÇãõÃÕàÀ]/.test(text)) return 'es'; // Spanish-specific somewhat
+    if (/[àâçéèêëîïôûùüÿÀÂÇÉÈÊËÎÏÔÛÙÜŸ]/.test(text) && !/[ãõÃÕ]/.test(text)) return 'fr'; // French-specific somewhat
+    if (/[äöüßÄÖÜ]/.test(text)) return 'de'; // German
+    if (/[àèéìòùÀÈÉÌÒÙ]/.test(text) && !/[çÇãõÃÕ]/.test(text)) return 'it'; // Italian-specific somewhat
+    if (/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(text)) return 'pl'; // Polish
+    if (/[ãõáéíóúâêôçÃÕÁÉÍÓÚÂÊÔÇ]/.test(text)) return 'pt'; // Portuguese (overlaps with Spanish/French)
+
+    // Vietnamese uses Latin script with many diacritics
+    // A more robust check might involve looking for specific tone mark combinations
+    // This is a very basic check for some common Vietnamese diacritics
+    if (/[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđĐ]/.test(text)) return 'vn';
+
+    // Mongolian (Cyrillic) would be caught by Russian check if not distinguished;
+    // If using traditional Mongolian script, that's another unicode range.
+    // For Cyrillic Mongolian, it's harder to distinguish from Russian without more context or specific Mongolian Cyrillic letters like ӨөҮү
+    if (/[ӨөҮү]/.test(text)) return 'mn';
+
+
+    // Default to English if no other language is strongly indicated
     return 'en';
 }
 
