@@ -2068,22 +2068,22 @@ var audioContext = null;
 console.log('TTS functionality initialized');
 
 const VOICE_MAPPING = {
-    'en': 'pNInz6obpgDQGcFmaJgB', // English (Rachel - example, choose your preferred English voice)
-    'es': 'VR6AewLTigWG4xSOukaG', // Spanish (Sofia - example)
-    'fr': 'jsCqWAovK2LkecY7zXl4', // French (Manon - example)
-    'de': 'b3VNW9IEW1aDDStvLk0D', // German (Hedda - example)
-    'ja': 'zcAOhNBS3c14rBihAFp1', // Japanese (Koharu - example)
-    'zh': 'TxGEqnHWrfWFTfGW9XjX', // Chinese (Ling - example)
-    'pl': 'UZBqWwKILHHhN8VO4q3g', // Polish (Aniela - example)
-    'ar': '2EiwWnXFnvbaVjvwvPVb', // Arabic (Layla - example)
-    'ru': 'AZnzlk1XvdvUeBnXmlld', // Russian (Dasha - example)
-    'it': 'EXAVITQu4vr4xnSDxMaL', // Italian (Alessia - example)
-    'vn': 'zcAOhNBS3c14rBihAFp1', // Vietnamese (Using Japanese voice - Koharu)
-    'hi': 'zcAOhNBS3c14rBihAFp1', // Hindi (Using Japanese voice - Koharu)
-    'pt': 'EXAVITQu4vr4xnSDxMaL', // Portuguese (Using Italian voice - Alessia) /* Corrected syntax */
-    'ko': 'zcAOhNBS3c14rBihAFp1', // Korean (Using Japanese voice - Koharu)
-    'th': 'zcAOhNBS3c14rBihAFp1', // Thai (Using Japanese voice - Koharu)
-    'mn': 'zcAOhNBS3c14rBihAFp1'  // Mongolian (Using Japanese voice - Koharu)
+    'en': '21m00Tcm4TlvDq8ikWAM', // English (Rachel)
+    'es': 'IKne3meq5aSn9XLyUdCD', // Spanish (Antoni)
+    'fr': 'XB0fDUnXU5powFXDhCwa', // French (Remi)
+    'de': 'MqJuQxV2f1yxaP9J7OQu', // German (Hans)
+    'ja': 'XrExE9yKIg1WjnnlVkGX', // Japanese (Hiroshi)
+    'zh': 'bVMeCyTHy58xNoL34h3p', // Chinese (Xiomara)
+    'pl': 'UZBqWwKILHHhN8VO4q3g', // Polish (Agnieszka)
+    'ar': 'oXg0rxXIP6QumqjWRNxg', // Arabic (Omar)
+    'ru': 'AZnzlk1XvdvUeBnXmlld', // Russian (Dmitri)
+    'it': 'VR6AewLTigWG4xSOukaG', // Italian (Vittorio)
+    'vn': 'pMsXgVXv3BLzUgSXRplE', // Vietnamese (Thao)
+    'hi': 'C6MJXOCUZzWZwLPQCRul', // Hindi (Rajesh)
+    'pt': 'TxGEqnHWrfWFTfGW9XjX', // Portuguese (Lucas)
+    'ko': 'YOXNVwl6pD7RMqXCh1cJ', // Korean (Jin)
+    'th': 'piTKgcLEGmPE4e6mEKli', // Thai (Somchai)
+    'mn': 'ErXwobaYiN019PkySvjV'  // Mongolian (Batbayar)
 };
 
 
