@@ -2075,7 +2075,7 @@ const VOICE_MAPPING = {
     'ja': 'XrExE9yKIg1WjnnlVkGX', // Japanese (Hiroshi)
     'zh': 'bVMeCyTHy58xNoL34h3p', // Chinese (Xiomara)
     'pl': 'UZBqWwKILHHhN8VO4q3g', // Polish (Agnieszka)
-    'ar': 'oXg0rxXIP6QumqjWRNxg', // Arabic (Omar)
+    'ar': '5Q0t7uMcjvnUXXLTxFqX', // Arabic (Omar)
     'ru': 'AZnzlk1XvdvUeBnXmlld', // Russian (Dmitri)
     'it': 'VR6AewLTigWG4xSOukaG', // Italian (Vittorio)
     'vn': 'pMsXgVXv3BLzUgSXRplE', // Vietnamese (Thao)
