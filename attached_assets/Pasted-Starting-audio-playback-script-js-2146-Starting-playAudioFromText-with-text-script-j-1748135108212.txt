@@ -1,0 +1,40 @@
+Starting audio playback
+script.js:2146 Starting playAudioFromText with text: الجملة الاسمية
+script.js:2173 
+            
+            
+           POST https://langcamp.us/elevenlbs-exchange-audio/exchange-audio 500 (Internal Server Error)
+playAudioFromText @ script.js:2173
+(anonymous) @ script.js:2393Understand this error
+script.js:2233 TTS attempt 1 failed: Error: TTS API error: 500 - {"error":"ElevenLabs API error","details":"{\"detail\":{\"status\":\"voice_not_found\",\"message\":\"A voice with the voice_id oXg0rxXIP6QumqjWRNxg was not found.\"}}"}
+    at playAudioFromText (script.js:2190:23)
+    at async HTMLButtonElement.<anonymous> (script.js:2393:13)
+playAudioFromText @ script.js:2233
+await in playAudioFromText
+(anonymous) @ script.js:2393Understand this error
+script.js:2173 
+            
+            
+           POST https://langcamp.us/elevenlbs-exchange-audio/exchange-audio 500 (Internal Server Error)
+playAudioFromText @ script.js:2173
+await in playAudioFromText
+(anonymous) @ script.js:2393Understand this error
+script.js:2233 TTS attempt 2 failed: Error: TTS API error: 500 - {"error":"ElevenLabs API error","details":"{\"detail\":{\"status\":\"voice_not_found\",\"message\":\"A voice with the voice_id oXg0rxXIP6QumqjWRNxg was not found.\"}}"}
+    at playAudioFromText (script.js:2190:23)
+    at async HTMLButtonElement.<anonymous> (script.js:2393:13)
+playAudioFromText @ script.js:2233
+await in playAudioFromText
+(anonymous) @ script.js:2393Understand this error
+script.js:2173 
+            
+            
+           POST https://langcamp.us/elevenlbs-exchange-audio/exchange-audio 500 (Internal Server Error)
+playAudioFromText @ script.js:2173
+await in playAudioFromText
+(anonymous) @ script.js:2393Understand this error
+script.js:2233 TTS attempt 3 failed: Error: TTS API error: 500 - {"error":"ElevenLabs API error","details":"{\"detail\":{\"status\":\"voice_not_found\",\"message\":\"A voice with the voice_id oXg0rxXIP6QumqjWRNxg was not found.\"}}"}
+    at playAudioFromText (script.js:2190:23)
+    at async HTMLButtonElement.<anonymous> (script.js:2393:13)
+playAudioFromText @ script.js:2233
+await in playAudioFromText
+(anonymous) @ script.js:2393Understand this error
