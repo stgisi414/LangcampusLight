@@ -688,8 +688,7 @@ function reloadVocabularyTopicsList() {
         vocabData.forEach(topic => {
             const button = document.createElement('button');
             button.dataset.title = topic.title;
-            // Apply styles consistent with initial population
-            button.style.display= 'block';
+            // Apply styles consistent with initial populationbutton.style.display= 'block';
             button.style.width = '100%';
             button.style.padding = '0.8rem';
             button.style.marginBottom = '0.5rem';
@@ -776,7 +775,7 @@ teachMeButton.addEventListener('click', () => {
             button.style.borderRadius = '4px';
             button.style.transition = 'background-color 0.2s';
             button.style.color = '#333';
-            button.innerHTML = `${topic.title} <span style="font-size: 0.8em; color: #777; margin-left: 10px; background-color: #eee; padding: 2px 6px; border-radius: 3px;">Level ${topic.level}</span>`;
+            button.innerHTML = `${topic.title} <span style="font-size: 0.8em; color: #777; margin-left: 10px; background-color = #eee; padding: 2px 6px; border-radius: 3px;">Level ${topic.level}</span>`;
             button.onclick = () => loadVocabularyContent(topic, targetLang);
             button.onmouseover = () => button.style.backgroundColor = '#e9e9e9';
             button.onmouseout = () => button.style.backgroundColor = '#f9f9f9';
@@ -1252,7 +1251,7 @@ Your response must be valid JSON structured like this example:
 
             try {
                 // Clean and validate the response text
-                let cleanText = quizText.replace(/```json\s*|\s*```g, '').trim();
+                let cleanText = quizText.replace(/```json\s*|\s*/g, '').trim();
 
                 // Ensure it starts with [ and ends with ]
                 if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
@@ -1452,7 +1451,7 @@ function endQuiz(message, container) {
     quizActive = false;
     // Ensure currentQuiz and its properties are valid before proceeding
     const score = (currentQuiz && typeof currentQuiz.score === 'number') ? currentQuiz.score : 0;
-    const total = (currentQuiz && typeof currentQuiz.total === 'number' && currentQuiz.total > 0) ? currentQuiz.total : 0;
+    const total = (currentQuiz && typeof currentQuiz.total === 'number') ? currentQuiz.total : 0;
     const percentage = total ? Math.round((score / total) * 100) : 0;
 
     let grade = '';
@@ -2077,8 +2076,7 @@ document.getElementById('save-partner-btn').addEventListener('click', () => {
         if (isMobile) {
             // Create a temporary success message element
             const successMsg = document.createElement('div');
-            successMsg.style.position = 'fixed';```text
-            successMsg.style.bottom = '20px';
+            successMsg.style.position = 'fixed';            successMsg.style.bottom = '20px';
             successMsg.style.left = '50%';
             successMsg.style.transform = 'translateX(-50%)';
             successMsg.style.background = '#4CAF50';
@@ -2670,5 +2668,163 @@ document.addEventListener('touchend', function(e) {
 document.addEventListener('mousedown', (event) => {
     if (!event.target.classList.contains('audio-button')) {
         removeAudioButton();
+    }
+});
+
+// Add study guide middleware
+document.getElementById('send-message').addEventListener('click', async () => {
+    const messageInput = document.getElementById('message-input');
+    const messageText = messageInput.value.trim();
+
+    // Middleware to provide study guide assistance
+    async function studyGuideMiddleware(message, chatContext) {
+        const lowerCaseMessage = message.toLowerCase();
+
+        if (lowerCaseMessage.includes("teach me") || lowerCaseMessage.includes("what should i study")) {
+            const userLevel = localStorage.getItem('languageLevelRating') || 'Beginner';
+            let studyRecommendations = "";
+
+            // Example logic: Customize based on language level and context
+            switch (userLevel) {
+                case '1': // Beginner
+                    studyRecommendations = "Since you're just starting out, focus on basic grammar like verb conjugations and simple sentence structures. Try the 'Basic Greetings' and 'Present Tense' topics in the 'Teach Me' section.";
+                    break;
+                case '2': // Elementary
+                    studyRecommendations = "Now that you know the basics, try expanding your vocabulary and understanding past tenses. Check out 'Common Phrases' and 'Past Tense' in the 'Teach Me' section.";
+                    break;
+                case '3': // Intermediate
+                    studyRecommendations = "You're making great progress! Focus on more complex grammar and idiomatic expressions. Try 'Conditional Sentences' and 'Idioms' in the 'Teach Me' section.";
+                    break;
+                case '4': // Upper Intermediate
+                studyRecommendations = "Honing in! Focus on more complex grammar and idiomatic expressions. Try 'Conditional Sentences' and 'Idioms' in the 'Teach Me' section.";
+                    break;
+                case '5': // Advanced
+                    studyRecommendations = "Superb! Continue expanding your vocabulary and practicing nuances of the language. Try 'Advanced Grammar' and 'Colloquial Expressions' in the 'Teach Me' section.";
+                    break;
+                default:
+                    studyRecommendations = "I can give study recommendations based on your level if I know it. try the 'Basic Greetings' and 'Present Tense' topics in the 'Teach Me' section.";
+                    break;
+            }
+
+            // Incorporate chat context
+            if (chatContext.length > 0) {
+                const lastMessage = chatContext[chatContext.length - 1];
+                if (lastMessage.sender === 'You') {
+                    studyRecommendations += `\n\nBased on our conversation, you might also want to review topics related to ${lastMessage.text}.`;
+                }
+            }
+
+            return `It looks like you're asking for study recommendations. Here's what I suggest:\n\n${studyRecommendations}`;
+        }
+
+        return null; // No recommendation
+    }
+
+    // Get chat history to use as context
+    const chatContext = chatHistory.slice(-10); // Last 10 messages
+
+    // Apply middleware if message indicates study help
+    const studyGuideMessage = await studyGuideMiddleware(messageText, chatContext);
+
+    if (studyGuideMessage) {
+        // Insert the study guide message into the chat
+        const chatMessages = document.getElementById('chat-messages');
+        const timestamp = new Date().toISOString();
+        const studyGuideResponse = { sender: 'Study Guide', text: studyGuideMessage, timestamp };
+        chatHistory.push(studyGuideResponse);
+
+        chatMessages.innerHTML += `
+            <p class="partner-message">
+                <strong>Study Guide:</strong> ${studyGuideMessage}
+                <span class="message-time" style="font-size: 0.8em; color: #666; margin-left: 8px;">
+                    ${new Date(timestamp).toLocaleTimeString()}
+                </span>
+            </p>`;
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        return; // Skip normal message processing
+    }
+
+    // Normal message processing
+    if (messageText && currentPartner) {
+        lastUserMessage = messageText;
+        if (geminiIntroTimer) {
+            clearTimeout(geminiIntroTimer);
+            geminiIntroTimer = null;
+        }
+
+        const connectingMessage = document.getElementById('connecting-message');
+        if (connectingMessage) {
+            connectingMessage.remove();
+        }
+
+        const timestamp = new Date().toISOString();
+        const userMessage = { sender: 'You', text: messageText, timestamp };
+        chatHistory.push(userMessage);
+        const chatMessages = document.getElementById('chat-messages');
+        chatMessages.innerHTML += `
+            <p class="user-message">
+                <strong>You:</strong> ${messageText}
+                <span class="message-time" style="font-size: 0.8em; color: #fff; margin-left: 8px;">
+                    ${new Date(timestamp).toLocaleTimeString()}
+                </span>
+            </p>`;
+        messageInput.value = '';
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        messageCountForAssessment++;
+        const timeSinceLastAssessment = Date.now() - lastAssessmentTime;
+
+        if (messageCountForAssessment % ASSESSMENT_INTERVAL === 0 &&
+            timeSinceLastAssessment > ASSESSMENT_COOLDOWN) {
+            const maxMessages = Math.min(40, chatHistory.length);
+            const messagesToAnalyze = Math.floor(maxMessages / 4) * 4;
+            const recentMessages = chatHistory.slice(-messagesToAnalyze);
+
+            assessLanguageLevel(recentMessages);
+        }
+        const thinkingIndicator = document.createElement('p');
+        thinkingIndicator.id = 'thinking-indicator';
+        thinkingIndicator.innerHTML = `<em>${currentPartnerName} is typing...</em>`;
+        chatMessages.appendChild(thinkingIndicator);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        try {
+            const partnerResponseText = await getGeminiChatResponse(currentPartner, chatHistory);
+
+            const thinkingIndicatorToRemove = document.getElementById('thinking-indicator');
+            if (thinkingIndicatorToRemove) {
+                thinkingIndicatorToRemove.remove();
+            }
+
+            if (partnerResponseText) {
+                const partnerResponse = { sender: currentPartnerName, text: partnerResponseText, timestamp };
+                chatHistory.push(partnerResponse);
+                chatMessages.innerHTML += `
+                    <p class="partner-message">
+                        <strong>${currentPartnerName}:</strong> ${partnerResponseText}
+                        <span class="message-time" style="font-size: 0.8em; color: #666; margin-left: 8px;">
+                            ${new Date(timestamp).toLocaleTimeString()}
+                        </span>
+                    </p>`;
+            } else {
+                chatMessages.innerHTML += `<p><em>Sorry, ${currentPartnerName} couldn't respond right now.</em></p>`;
+            }
+        } catch (error) {
+            console.error("Error getting Gemini response:", error);
+            const thinkingIndicatorToRemove = document.getElementById('thinking-indicator');
+            if (thinkingIndicatorToRemove) {
+                thinkingIndicatorToRemove.remove();
+            }
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `
+                <p><em>Error getting response.</em></p>
+                <button onclick="retryLastMessage()" class="chat-button small-button" style="margin-top: 8px;">Retry</button>
+            `;
+            chatMessages.appendChild(errorDiv);
+        } finally {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
     }
 });
