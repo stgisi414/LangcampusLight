@@ -1202,42 +1202,42 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
 
     const quizPrompt = `Create a multiple-choice quiz (16 questions) about "${topicTitle}" in ${language} at level ${level}. 
 
-IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz entirely IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly. 
+CRITICAL: The quiz taker's native language is ${quizTakerNativeLanguage}. Write the ENTIRE quiz in ${quizTakerNativeLanguage}.
 
-CRITICAL FORMATTING REQUIREMENTS:
-- Write all questions in ${quizTakerNativeLanguage} with SPACES between EVERY word
-- Write all answer choices in ${quizTakerNativeLanguage} with SPACES between EVERY word  
-- Each word must be separated by a single space character
-- No words should be concatenated or joined together
-- Only include ${language} text when showing specific examples that need to be identified or analyzed
-- Test their knowledge of ${language} grammar concepts through ${quizTakerNativeLanguage} explanations
+MANDATORY SPACING RULES (VERY IMPORTANT):
+1. Put a SPACE between every single word
+2. Never concatenate words together
+3. Each word must be completely separate
+4. Use normal sentence structure with proper spacing
+5. Double-check every question and answer has spaces between all words
 
-EXAMPLE OF PROPER SPACING:
-Good: "What is the correct answer?"
-Bad: "Whatisthecorrectanswer?"
+CORRECT EXAMPLES:
+✓ "What is the correct form of this verb?"
+✓ "Which option shows proper grammar?"
+✓ "How do you conjugate this correctly?"
 
-Your response must be valid JSON structured like this example:
+WRONG EXAMPLES (DO NOT DO THIS):
+✗ "Whatisthecorrectformofthisverb?"
+✗ "Whichoptionshowspropergrammar?"
+✗ "Howdoyouconjugatethiscorrectly?"
 
+Return ONLY valid JSON in this exact format:
 [
   {
-    "question": "What is the capital of France?",
-    "options": ["Rome", "London", "Paris", "Berlin"],
-    "correctIndex": 2
-  },
-  {
-    "question": "Which planet is known as the Red Planet?",
-    "options": ["Earth", "Mars", "Jupiter", "Venus"],
-    "correctIndex": 1
+    "question": "What is the correct answer?",
+    "options": ["First option", "Second option", "Third option", "Fourth option"],
+    "correctIndex": 0
   }
 ]
 
-FORMATTING RULES:
-- Each quiz question in your JSON should follow this structure exactly
-- Do not include any markdown formatting or backticks
-- Ensure every word in questions and options is separated by spaces
-- Double-check that no text is concatenated without spaces
-- Generate varied and challenging questions suitable for level ${level}
-- Randomize question order and ensure only one correct answer per question`;
+REQUIREMENTS:
+- All text in ${quizTakerNativeLanguage} with proper word spacing
+- 16 questions total
+- 4 options per question
+- Test ${language} grammar knowledge through ${quizTakerNativeLanguage} explanations
+- Level ${level} difficulty
+- No markdown formatting or backticks
+- Ensure JSON is valid and parseable`;
 
     fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
         method: 'POST',
