@@ -2672,208 +2672,106 @@ document.addEventListener('mousedown', (event) => {
     }
 });
 
-// Study guide middleware queue
-let studyGuideQueue = [];
-let isProcessingStudyGuide = false;
-
-// Process study guide queue with delays
-async function processStudyGuideQueue() {
-    if (isProcessingStudyGuide || studyGuideQueue.length === 0) return;
-
-    console.log(`[StudyGuide] Processing queue with ${studyGuideQueue.length} item(s)`);
-    isProcessingStudyGuide = true;
-
-    while (studyGuideQueue.length > 0) {
-        const { messageText, chatContext, resolve } = studyGuideQueue.shift();
-        console.log(`[StudyGuide] Processing message: "${messageText.substring(0, 50)}..."`);
-        
-        const result = await studyGuideMiddleware(messageText, chatContext);
-        resolve(result);
-
-        if (studyGuideQueue.length > 0) {
-            console.log(`[StudyGuide] Waiting 3 seconds before next message (${studyGuideQueue.length} remaining)`);
-            await new Promise(resolve => setTimeout(resolve, 3000)); // 3 second delay
-        }
+// Simplified study guide middleware function
+async function studyGuideMiddleware(message, chatContext) {
+    console.log(`[StudyGuide] Checking message: "${message}"`);
+    
+    // Simple keyword detection first - if any study-related keywords are found, trigger the study guide
+    const studyKeywords = [
+        'teach me', 'help me learn', 'study', 'grammar', 'vocabulary', 'pronouns', 'verbs',
+        'what should i study', 'recommend', 'learn', 'practice', 'explain', 'conjugation',
+        'tense', 'adjective', 'noun', 'lesson', 'guide', 'how do i', 'tutorial'
+    ];
+    
+    const messageLC = message.toLowerCase();
+    const hasStudyKeyword = studyKeywords.some(keyword => messageLC.includes(keyword));
+    
+    console.log(`[StudyGuide] Keyword check result: ${hasStudyKeyword ? 'STUDY KEYWORDS FOUND' : 'NO STUDY KEYWORDS'}`);
+    
+    if (!hasStudyKeyword) {
+        return null; // Skip AI detection if no obvious study keywords
     }
+    
+    try {
+        // If keywords found, proceed with study guidance generation
+        const targetLanguage = currentPartner ? currentPartner.nativeLanguage : 'the target language';
+        const userNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
+        const userLevel = localStorage.getItem('languageLevelRating') || '1';
+        
+        console.log(`[StudyGuide] Generating study guidance for ${targetLanguage} (user level: ${userLevel})`);
 
-    console.log(`[StudyGuide] Queue processing complete`);
-    isProcessingStudyGuide = false;
+        const studyGuidancePrompt = `You are a helpful language learning assistant. The user is learning ${targetLanguage} and their native language is ${userNativeLanguage}. Their current proficiency level is ${userLevel} out of 5.
+
+User's request: "${message}"
+
+Provide specific, actionable study recommendations that include:
+1. Relevant grammar topics for their level
+2. Vocabulary areas to focus on  
+3. Practical next steps
+4. Encouragement
+
+Keep your response concise but helpful (2-3 sentences max). Respond in ${userNativeLanguage}.
+
+Available grammar topics include: ${grammarData[targetLanguage] ? grammarData[targetLanguage].slice(0, 10).map(topic => topic.title).join(', ') : 'basic grammar topics'}`;
+
+        const guidanceResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: studyGuidancePrompt }] }]
+            })
+        });
+
+        if (!guidanceResponse.ok) {
+            console.error('[StudyGuide] API call failed:', guidanceResponse.status);
+            return null;
+        }
+
+        const guidanceData = await guidanceResponse.json();
+        let studyRecommendations = guidanceData.candidates[0].content.parts[0].text.trim();
+
+        if (studyRecommendations.startsWith('"') && studyRecommendations.endsWith('"')) {
+            studyRecommendations = studyRecommendations.slice(1, -1);
+        }
+
+        console.log(`[StudyGuide] Generated recommendations: "${studyRecommendations.substring(0, 100)}..."`);
+        return studyRecommendations;
+
+    } catch (error) {
+        console.error('[StudyGuide] Error:', error);
+        return null;
+    }
 }
 
-// Add study guide middleware
+// Add study guide middleware to send button
 document.getElementById('send-message').addEventListener('click', async () => {
     const messageInput = document.getElementById('message-input');
     const messageText = messageInput.value.trim();
 
-    // Middleware to provide study guide assistance using Gemini
-    async function studyGuideMiddleware(message, chatContext) {
-        return new Promise((resolve) => {
-            studyGuideQueue.push({ messageText: message, chatContext, resolve });
-            processStudyGuideQueue();
-        });
-    }
-
-    async function studyGuideMiddleware(message, chatContext) {
-        console.log(`[StudyGuide] Analyzing message for study request detection`);
-        
-        try {
-            // Step 1: Check if this is a study-related request for the study guide system specifically
-            const studyDetectionPrompt = `Analyze this message and determine if the user is asking for language learning help, study guidance, or wants to learn specific grammar/vocabulary topics.
-
-Message: "${message}"
-
-Respond with only "YES" if this is ANY kind of learning request, or "NO" if it's general conversation.
-
-Examples of LEARNING requests (YES):
-- "teach me grammar"
-- "teach me pronouns" 
-- "help me learn conjunctions"
-- "teach me advanced vocabulary"
-- "what should I study"
-- "I need study recommendations"
-- "help me plan my studies"
-- "what grammar topics should I focus on"
-- "recommend vocabulary to learn"
-- "study guide"
-- "study plan"
-- "explain grammar to me"
-- "help me with vocabulary"
-- Any request asking to learn or be taught something
-
-Examples of GENERAL CONVERSATION (NO):
-- "How was your day?"
-- "What did you do today?"
-- "Tell me about your hobbies"
-- "I like pizza"
-- "The weather is nice"
-- "Nice to meet you"
-- General chat that doesn't involve learning requests`;
-
-            console.log(`[StudyGuide] Sending detection request to Gemini API`);
-            const detectionResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: studyDetectionPrompt }] }]
-                })
-            });
-
-            if (!detectionResponse.ok) {
-                console.error('[StudyGuide] Study detection API call failed with status:', detectionResponse.status);
-                return null;
-            }
-
-            const detectionData = await detectionResponse.json();
-            const isStudyRequest = detectionData.candidates[0].content.parts[0].text.trim().toUpperCase() === 'YES';
-
-            console.log(`[StudyGuide] Detection result: ${isStudyRequest ? 'STUDY REQUEST DETECTED' : 'NOT A STUDY REQUEST'}`);
-
-            if (!isStudyRequest) {
-                return null; // Not a study request
-            }
-
-            // Step 2: Get current partner's language info
-            const targetLanguage = currentPartner ? currentPartner.nativeLanguage : 'the target language';
-            const userNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
-
-            console.log(`[StudyGuide] Target language: ${targetLanguage}, User native language: ${userNativeLanguage}`);
-
-            // Step 3: Get user's current level
-            const userLevel = localStorage.getItem('languageLevelRating') || '1';
-            console.log(`[StudyGuide] User level: ${userLevel}/5`);
-
-            // Step 4: Check available study materials
-            const availableGrammarTopics = grammarData[targetLanguage] ? grammarData[targetLanguage].length : 0;
-            const availableVocabTopics = vocabData ? vocabData.length : 0;
-            
-            console.log(`[StudyGuide] Available study materials:`, {
-                grammarTopics: availableGrammarTopics,
-                vocabularyTopics: availableVocabTopics,
-                targetLanguage: targetLanguage
-            });
-
-            // Step 5: Generate comprehensive study guidance using Gemini
-            const studyGuidancePrompt = `You are a language learning study guide assistant. The user is learning ${targetLanguage} and their native language is ${userNativeLanguage}. Their current proficiency level is ${userLevel} out of 5 (1=beginner, 5=advanced).
-
-User's message: "${message}"
-
-Recent chat context: ${chatContext.length > 0 ? chatContext.slice(-5).map(msg => `${msg.sender}: ${msg.text}`).join('\n') : 'No recent context'}
-
-Please provide personalized study recommendations that include:
-
-1. Specific grammar topics they should focus on based on their level
-2. Vocabulary areas to work on
-3. Practical exercises they can do
-4. How to use the "Teach Me" section effectively
-5. Study tips tailored to their current level
-
-Respond in ${userNativeLanguage} so they can understand clearly. Be encouraging and specific. Mention relevant topics from the "Teach Me" section that would be appropriate for their level.
-
-Make your response conversational and helpful, as if you're a knowledgeable language teacher g"iving personalized advice.
-
-The grammar topics are ${grammarData[targetLanguage] ? grammarData[targetLanguage].map(topic => topic.title).join(', ') : 'none available'}
-
-The vocabulary topics are ${vocabData ? vocabData.map(topic => topic.title).join(', ') : 'none available'}`;
-
-            console.log(`[StudyGuide] Generating personalized study guidance...`);
-            const guidanceResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: studyGuidancePrompt }] }]
-                })
-            });
-
-            if (!guidanceResponse.ok) {
-                console.error('[StudyGuide] Study guidance API call failed with status:', guidanceResponse.status);
-                return null;
-            }
-
-            const guidanceData = await guidanceResponse.json();
-            let studyRecommendations = guidanceData.candidates[0].content.parts[0].text.trim();
-
-            // Clean up the response
-            if (studyRecommendations.startsWith('"') && studyRecommendations.endsWith('"')) {
-                studyRecommendations = studyRecommendations.slice(1, -1);
-            }
-
-            console.log(`[StudyGuide] Successfully generated study recommendations (${studyRecommendations.length} characters)`);
-            console.log(`[StudyGuide] Preview: "${studyRecommendations.substring(0, 100)}..."`);
-
-            return studyRecommendations;
-
-        } catch (error) {
-            console.error('[StudyGuide] Error in study guide middleware:', error);
-            return null;
-        }
-    }
-
-    // Get chat history to use as context
-    const chatContext = chatHistory.slice(-10); // Last 10 messages
-
-    // Apply middleware if message indicates study help
+    // Check for study guide request FIRST
+    const chatContext = chatHistory.slice(-10);
     const studyGuideMessage = await studyGuideMiddleware(messageText, chatContext);
 
     if (studyGuideMessage) {
-        console.log(`[StudyGuide] Inserting study guide response into chat`);
+        console.log(`[StudyGuide] TRIGGERED! Showing study guide response`);
         
-        // Insert the study guide message into the chat
         const chatMessages = document.getElementById('chat-messages');
         const timestamp = new Date().toISOString();
         const studyGuideResponse = { sender: 'Study Guide', text: studyGuideMessage, timestamp };
         chatHistory.push(studyGuideResponse);
 
         chatMessages.innerHTML += `
-            <p class="partner-message">
-                <strong>Study Guide:</strong> ${studyGuideMessage}
+            <p class="partner-message" style="background-color: #e8f5e8; border-left: 4px solid #4CAF50;">
+                <strong>📚 Study Guide:</strong> ${studyGuideMessage}
                 <span class="message-time" style="font-size: 0.8em; color: #666; margin-left: 8px;">
                     ${new Date(timestamp).toLocaleTimeString()}
                 </span>
             </p>`;
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
-        console.log(`[StudyGuide] Study guide response successfully displayed to user`);
-        return; // Skip normal message processing
+        // Clear the input and don't proceed with normal message processing
+        messageInput.value = '';
+        return;
     }
 
     // Normal message processing
