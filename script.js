@@ -1089,7 +1089,9 @@ Only provide a correction if you identify a clear error in ${partner.nativeLangu
 The user does not currently want corrections. Just provide a natural conversational reply.
 `}
 
-Your response should be ONLY the chat message text. Do not include your name or any other prefix.`;
+Your response should be ONLY the chat message text. Do not include your name or any other prefix.
+
+The [Teach Me] button opens a modal where the user can learn about grammar and vocabulary in ${partner.nativeLanguage}.`;
 
     try {
         const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
