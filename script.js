@@ -2681,33 +2681,22 @@ async function studyGuideMiddleware(message, chatContext) {
     
     try {
         // Step 1: Check if this is a study-related request in any language
-        const studyDetectionPrompt = `You must analyze this message and determine if the user is asking for language learning help, study guidance, or educational assistance.
+        const studyDetectionPrompt = `Analyze this message to determine if it's asking for language learning help or study guidance.
 
 Message: "${message}"
 
-CRITICAL: Respond with ONLY the word "YES" if this is a request for study/learning help, or ONLY the word "NO" if it's not.
+Respond with ONLY "YES" or "NO".
 
-These are DEFINITELY study requests (respond YES):
-- "teach me" (any variation including "teach me [topic]")
-- "Can you teach me [anything]"
-- "teach me something"
-- "what should I study"
+Always respond YES if the message contains:
+- "teach me" followed by ANY topic (like "teach me ser vs estar")
+- Grammar topics like "ser vs estar", "present tense", "subjunctive"
+- Requests for explanations of language concepts
 - "help me learn"
-- "I need help with grammar"
-- "study recommendations"
-- "what grammar topics"
-- "level 2 grammar" 
-- "what topics are there"
-- "show me topics"
-- "I want to learn"
-- "help with vocabulary"
-- "explain [grammar concept]"
-- "ser vs estar" or any grammar comparison
-- And similar requests in ANY language
+- "what should I study"
+- "I need help with"
+- "explain" followed by any grammar or vocabulary topic
 
-IMPORTANT: If the message contains "teach me" followed by ANY topic or grammar concept, this is ALWAYS a study request.
-
-The message "${message}" should be classified as a study request if it contains any variation of asking for teaching, learning help, study guidance, or educational assistance.`;
+The message "${message}" is asking for language teaching if it mentions teaching or explaining any grammar, vocabulary, or language concept.`;
 
         console.log('📤 Study Guide Middleware: Sending detection request to API');
         
