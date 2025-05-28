@@ -1204,10 +1204,11 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
 
 IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz entirely IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly. 
 
-- Write all questions in ${quizTakerNativeLanguage}
-- Write all answer choices in ${quizTakerNativeLanguage} 
+- Write all questions in ${quizTakerNativeLanguage} with PROPER SPACING between words
+- Write all answer choices in ${quizTakerNativeLanguage} with PROPER SPACING between words
 - Only include ${language} text when showing specific examples that need to be identified or analyzed
 - Test their knowledge of ${language} grammar concepts through ${quizTakerNativeLanguage} explanations
+- ENSURE ALL TEXT HAS PROPER SPACING AND IS READABLE
 
 Your response must be valid JSON structured like this example:
 
@@ -1221,12 +1222,13 @@ Your response must be valid JSON structured like this example:
         "question": "Which planet is known as the Red Planet?",
         "options": ["Earth", "Mars", "Jupiter", "Venus"],
         "correctIndex": 1
-      },
-      // Additional questions...
+      }
     ]
 
     Each quiz question in your JSON should follow this structure. Do not include any markdown formatting or backticks.
 
+    CRITICAL: Make sure ALL text in questions and options has proper spacing between words. Avoid concatenated text without spaces.
+    
     Make sure to generate varied and challenging questions suitable for the specified level. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it. In all just make sure multiple answers cannot be correct and the answers must be completely separate from the question example.`;
 
     fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
