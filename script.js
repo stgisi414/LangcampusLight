@@ -2681,14 +2681,15 @@ async function studyGuideMiddleware(message, chatContext) {
     
     try {
         // Step 1: Check if this is a study-related request in any language
-        const studyDetectionPrompt = `Analyze this message and determine if the user is asking for language learning help, study guidance, or educational assistance. The user might be asking in any language.
+        const studyDetectionPrompt = `You must analyze this message and determine if the user is asking for language learning help, study guidance, or educational assistance.
 
 Message: "${message}"
 
-Respond with only "YES" if this is a request for study/learning help, or "NO" if it's not.
+CRITICAL: Respond with ONLY the word "YES" if this is a request for study/learning help, or ONLY the word "NO" if it's not.
 
-Examples of study requests:
-- "teach me"
+These are DEFINITELY study requests (respond YES):
+- "teach me" (EXACT MATCH)
+- "teach me something"
 - "what should I study"
 - "help me learn"
 - "I need help with grammar"
@@ -2696,7 +2697,12 @@ Examples of study requests:
 - "what grammar topics"
 - "level 2 grammar"
 - "what topics are there"
-- And similar requests in ANY language (Spanish, French, Japanese, Korean, Chinese, etc.)`;
+- "show me topics"
+- "I want to learn"
+- "help with vocabulary"
+- And similar requests in ANY language
+
+The message "${message}" should be classified as a study request if it contains any variation of asking for teaching, learning help, study guidance, or educational assistance.`;
 
         console.log('📤 Study Guide Middleware: Sending detection request to API');
         
