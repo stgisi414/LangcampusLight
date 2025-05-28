@@ -2717,20 +2717,28 @@ document.getElementById('send-message').addEventListener('click', async () => {
         console.log(`[StudyGuide] Analyzing message for study request detection`);
         
         try {
-            // Step 1: Check if this is a study-related request in any language
-            const studyDetectionPrompt = `Analyze this message and determine if the user is asking for language learning help, study guidance, or educational assistance. The user might be asking in any language.
+            // Step 1: Check if this is a study-related request for the study guide system specifically
+            const studyDetectionPrompt = `Analyze this message and determine if the user is asking for STUDY GUIDE RECOMMENDATIONS or STUDY PLAN ASSISTANCE, not if they're asking their conversation partner to teach them something.
 
 Message: "${message}"
 
-Respond with only "YES" if this is a request for study/learning help, or "NO" if it's not.
+Respond with only "YES" if this is a request for study guide/study plan help, or "NO" if it's not.
 
-Examples of study requests:
-- "teach me"
+Examples of STUDY GUIDE requests (YES):
 - "what should I study"
-- "help me learn"
-- "I need help with grammar"
-- "study recommendations"
-- And similar requests in ANY language (Spanish, French, Japanese, Korean, Chinese, etc.)`;
+- "I need study recommendations"
+- "help me plan my studies"
+- "what grammar topics should I focus on"
+- "recommend vocabulary to learn"
+- "study guide"
+- "study plan"
+
+Examples of CONVERSATION PARTNER requests (NO):
+- "teach me pronouns" (asking partner to teach)
+- "help me learn conjunctions" (asking partner to help)
+- "explain this grammar" (asking partner to explain)
+- "teach me advanced vocabulary" (asking partner to teach)
+- Any request that seems directed at the conversation partner rather than asking for study guidance`;
 
             console.log(`[StudyGuide] Sending detection request to Gemini API`);
             const detectionResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
