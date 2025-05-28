@@ -688,7 +688,7 @@ function reloadVocabularyTopicsList() {
         vocabData.forEach(topic => {
             const button = document.createElement('button');
             button.dataset.title = topic.title;
-            // Apply styles consistent with initial populationbutton.style.json\s*|\s*```/g, '').trim();
+            // Applystyles consistent with initial populationbutton.style.json\s*|\s*```/g, '').trim();
 
             // Ensure it starts with [ and ends with ]
             if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
@@ -1009,7 +1009,7 @@ Your response must be valid JSON structured like this example:
 
             try {
                 // Clean and validate the response text
-                let cleanText = quizText.replace(/```json\s*|\s*/div>`;
+                let cleanText = quizText.replace(/div>`;
             quizActive = false;
         }
     }
@@ -1018,17 +1018,21 @@ Your response must be valid JSON structured like this example:
     const correctIndex = typeof question.correctIndex === 'number' ? question.correctIndex : 0;
 
     container.innerHTML = `
-        <div class="quiz-question">
+        
+
             <strong>Question ${currentQuiz.currentQuestion + 1}/${currentQuiz.questions.length}:</strong>
-            <p>${question.question}</p>
-            <div class="quiz-options">
-                ${question.options.map((option, i) => `
-                    <button class="quiz-choice" onclick="handleAnswer(${i}, ${correctIndex})">
-                        ${letters[i]}) ${option}
-                    </button>
+            
+
+${question.question}
+
+            
+
+${question.options.map((option, i) => `
+                    ${letters[i]}) ${option}
                 `).join('')}
-            </div>
-        </div>
+
+        
+
     `;
 }
 
@@ -1070,8 +1074,10 @@ function handleAnswer(selected, correct) {
     resultDiv.className = 'quiz-result';
     resultDiv.innerHTML = `
         
+
             <strong>${selected === correct ? '✓ Correct!' : '✗ Incorrect'}</strong>
             ${selected !== correct ? `The correct answer was: ${buttons[correct].textContent}` : ''}
+
         
     `;
     container.appendChild(resultDiv);
@@ -1150,13 +1156,14 @@ function endQuiz(message, container) {
 
             <strong>Quiz Complete!</strong>
             
+
 Your score: 
 ${grade}
 
             Share Results
             ${startOverButtonHtml}
-        
 
+        
     `;
     // =====================================================================================
     // End of critical section
@@ -1283,11 +1290,9 @@ Do NOT include any text before or after the Markdown content.`;
         explanationContainer.innerHTML = `
                <h2>Explanation: ${topicTitle}</h2>
                ${explanationHtml}
-               
 
                    Quiz Me
                    Return to Topics
-               
 
            `;
 
@@ -2065,7 +2070,8 @@ function createAudioButton(text, rect) {
 
     button.innerHTML = `
         
-        Play Audio
+            Play Audio
+        
     `;
 
     // Get chat modal for scroll handling
@@ -2157,7 +2163,8 @@ function createAudioButton(text, rect) {
             button.classList.add('playing');
             button.innerHTML = `
                 
-                Loading...
+                    Loading...
+                
             `;
 
             // Initialize audio context on user interaction
@@ -2172,7 +2179,8 @@ function createAudioButton(text, rect) {
 
             button.innerHTML = `
                 
-                Played
+                    Played
+                
             `;
 
             setTimeout(() => button.remove(), 2000);
@@ -2187,7 +2195,8 @@ function createAudioButton(text, rect) {
                 button.style.pointerEvents = 'auto';
                 button.innerHTML = `
                     
-                    Error: ${error.message}
+                        Error: ${error.message}
+                    
                 `;
 
                 // Keep error visible and allow retry
@@ -2195,7 +2204,8 @@ function createAudioButton(text, rect) {
                     if (button && button.parentNode) {
                         button.innerHTML = `
                             
-                            Try Again
+                                Try Again
+                            
                         `;
                     }
                 }, 3000);
@@ -2317,8 +2327,6 @@ document.addEventListener('mousedown', (event) => {
         removeAudioButton();
     }
 });
-
-
 
 // Middleware to provide study guide assistance using Gemini
 async function studyGuideMiddleware(message, chatContext) {
@@ -2475,7 +2483,7 @@ document.getElementById('send-message').addEventListener('click', async () => {
                 
                     ${new Date(timestamp).toLocaleTimeString()}
                 
-            
+
 `;
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -2509,7 +2517,7 @@ document.getElementById('send-message').addEventListener('click', async () => {
                 
                     ${new Date(timestamp).toLocaleTimeString()}
                 
-            
+
 `;
         messageInput.value = '';
         chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -2543,13 +2551,13 @@ document.getElementById('send-message').addEventListener('click', async () => {
                 const partnerResponse = { sender: currentPartnerName, text: partnerResponseText, timestamp };
                 chatHistory.push(partnerResponse);
                 chatMessages.innerHTML += `
-                    
+                
 
                         <strong>${currentPartnerName}:</strong> ${partnerResponseText}
                         
                             ${new Date(timestamp).toLocaleTimeString()}
                         
-                    
+
 `;
             } else {
                 chatMessages.innerHTML += `Sorry, ${currentPartnerName} couldn't respond right now.`;
