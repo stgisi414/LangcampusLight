@@ -524,48 +524,48 @@ document.getElementById('send-message').addEventListener('click', async () => { 
     const messageText = messageInput.value.trim();
     const chatMessages = document.getElementById('chat-messages');
 
-    if (messageText && currentPartner) { // Ensure partner context is available
-        lastUserMessage = messageText; // Store message for retry functionality
-        // Clear the Gemini intro timer if the user sends a message first
-        if (geminiIntroTimer) {
-            clearTimeout(geminiIntroTimer);
-            geminiIntroTimer = null;
-        }
+        if (messageText && currentPartner) { // Ensure partner context is available
+            lastUserMessage = messageText; // Store message for retry functionality
+            // Clear the Gemini intro timer if the user sends a message first
+            if (geminiIntroTimer) {
+                clearTimeout(geminiIntroTimer);
+                geminiIntroTimer = null;
+            }
 
-        // Remove the initial "Connecting..." message if it's still there
-        const connectingMessage = document.getElementById('connecting-message');
-        if (connectingMessage) {
-            connectingMessage.remove();
-        }
+            // Remove the initial "Connecting..." message if it's still there
+            const connectingMessage = document.getElementById('connecting-message');
+            if (connectingMessage) {
+                connectingMessage.remove();
+            }
 
-        // Add user's message with timestamp to UI and history
-        const timestamp = new Date().toISOString();
-        const userMessage = { sender: 'You', text: messageText, timestamp };
-        chatHistory.push(userMessage);
-        chatMessages.innerHTML += `
+            // Add user's message with timestamp to UI and history
+            const timestamp = new Date().toISOString();
+            const userMessage = { sender: 'You', text: messageText, timestamp };
+            chatHistory.push(userMessage);
+            chatMessages.innerHTML += `
               <p class="user-message">
                 <strong>You:</strong> ${messageText}
                 <span class="message-time" style="font-size: 0.8em; color: #fff; margin-left: 8px;">
                   ${new Date(timestamp).toLocaleTimeString()}
                 </span>
               </p>`;
-        messageInput.value = ''; // Clear input field
-        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll down
+            messageInput.value = ''; // Clear input field
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll down
 
-        // Increment message count and check for assessment
-        messageCountForAssessment++;
-        const timeSinceLastAssessment = Date.now() - lastAssessmentTime;
+            // Increment message count and check for assessment
+            messageCountForAssessment++;
+            const timeSinceLastAssessment = Date.now() - lastAssessmentTime;
 
-        if (messageCountForAssessment % ASSESSMENT_INTERVAL === 0 &&
-            timeSinceLastAssessment > ASSESSMENT_COOLDOWN) {
-            // Get last 40 messages or all if less than 40, in multiples of 4
-            const maxMessages = Math.min(40, chatHistory.length);
-            const messagesToAnalyze = Math.floor(maxMessages / 4) * 4;
-            const recentMessages = chatHistory.slice(-messagesToAnalyze);
+            if (messageCountForAssessment % ASSESSMENT_INTERVAL === 0 && 
+                timeSinceLastAssessment > ASSESSMENT_COOLDOWN) {
+                // Get last 40 messages or all if less than 40, in multiples of 4
+                const maxMessages = Math.min(40, chatHistory.length);
+                const messagesToAnalyze = Math.floor(maxMessages / 4) * 4;
+                const recentMessages = chatHistory.slice(-messagesToAnalyze);
 
-            // Perform assessment in background
-            assessLanguageLevel(recentMessages);
-        }
+                // Perform assessment in background
+                assessLanguageLevel(recentMessages);
+            }
 
         // Add a thinking indicator (optional)
         const thinkingIndicator = document.createElement('p');
@@ -1202,42 +1202,32 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
 
     const quizPrompt = `Create a multiple-choice quiz (16 questions) about "${topicTitle}" in ${language} at level ${level}. 
 
-CRITICAL: The quiz taker's native language is ${quizTakerNativeLanguage}. Write the ENTIRE quiz in ${quizTakerNativeLanguage}.
+IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz entirely IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly. 
 
-MANDATORY SPACING RULES (VERY IMPORTANT):
-1. Put a SPACE between every single word
-2. Never concatenate words together
-3. Each word must be completely separate
-4. Use normal sentence structure with proper spacing
-5. Double-check every question and answer has spaces between all words
+- Write all questions in ${quizTakerNativeLanguage}
+- Write all answer choices in ${quizTakerNativeLanguage} 
+- Only include ${language} text when showing specific examples that need to be identified or analyzed
+- Test their knowledge of ${language} grammar concepts through ${quizTakerNativeLanguage} explanations
 
-CORRECT EXAMPLES:
-✓ "What is the correct form of this verb?"
-✓ "Which option shows proper grammar?"
-✓ "How do you conjugate this correctly?"
+Your response must be valid JSON structured like this example:
 
-WRONG EXAMPLES (DO NOT DO THIS):
-✗ "Whatisthecorrectformofthisverb?"
-✗ "Whichoptionshowspropergrammar?"
-✗ "Howdoyouconjugatethiscorrectly?"
+    [
+      {
+        "question": "What is the capital of France?",
+        "options": ["Rome", "London", "Paris", "Berlin"],
+        "correctIndex": 2
+      },
+      {
+        "question": "Which planet is known as the Red Planet?",
+        "options": ["Earth", "Mars", "Jupiter", "Venus"],
+        "correctIndex": 1
+      },
+      // Additional questions...
+    ]
 
-Return ONLY valid JSON in this exact format:
-[
-  {
-    "question": "What is the correct answer?",
-    "options": ["First option", "Second option", "Third option", "Fourth option"],
-    "correctIndex": 0
-  }
-]
+    Each quiz question in your JSON should follow this structure. Do not include any markdown formatting or backticks.
 
-REQUIREMENTS:
-- All text in ${quizTakerNativeLanguage} with proper word spacing
-- 16 questions total
-- 4 options per question
-- Test ${language} grammar knowledge through ${quizTakerNativeLanguage} explanations
-- Level ${level} difficulty
-- No markdown formatting or backticks
-- Ensure JSON is valid and parseable`;
+    Make sure to generate varied and challenging questions suitable for the specified level. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it. In all just make sure multiple answers cannot be correct and the answers must be completely separate from the question example.`;
 
     fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
         method: 'POST',
@@ -1251,8 +1241,6 @@ REQUIREMENTS:
             return response.json();
         })
         .then(data => {
-            console.log('Quiz API response:');
-            console.log(data.candidates[0].content.parts[0].text);
             //console.log(data.candidates[0].content.parts[0].text);
             let quizText = data.candidates[0].content.parts[0].text;
             quizText = quizText.replace(/```json\s*|\s*```/g, '').trim();
@@ -1263,7 +1251,7 @@ REQUIREMENTS:
 
             try {
                 // Clean and validate the response text
-                let cleanText = quizText.replace(/```json\s*|\s*```/g, '').trim();
+                let cleanText = quizText.replace(/```json\s*|\s*/g, '').trim();
 
                 // Ensure it starts with [ and ends with ]
                 if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
@@ -2088,7 +2076,7 @@ document.getElementById('save-partner-btn').addEventListener('click', () => {
         if (isMobile) {
             // Create a temporary success message element
             const successMsg = document.createElement('div');
-            successMsg.style.position = 'fixed'; successMsg.style.bottom = '20px';
+            successMsg.style.position = 'fixed';            successMsg.style.bottom = '20px';
             successMsg.style.left = '50%';
             successMsg.style.transform = 'translateX(-50%)';
             successMsg.style.background = '#4CAF50';
@@ -2690,19 +2678,19 @@ let isProcessingStudyGuide = false;
 // Process study guide queue with delays
 async function processStudyGuideQueue() {
     if (isProcessingStudyGuide || studyGuideQueue.length === 0) return;
-
+    
     isProcessingStudyGuide = true;
-
+    
     while (studyGuideQueue.length > 0) {
         const { messageText, chatContext, resolve } = studyGuideQueue.shift();
         const result = await studyGuideMiddleware(messageText, chatContext);
         resolve(result);
-
+        
         if (studyGuideQueue.length > 0) {
             await new Promise(resolve => setTimeout(resolve, 3000)); // 3 second delay
         }
     }
-
+    
     isProcessingStudyGuide = false;
 }
 
