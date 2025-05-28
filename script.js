@@ -2768,7 +2768,11 @@ Please provide personalized study recommendations that include:
 
 Respond in ${userNativeLanguage} so they can understand clearly. Be encouraging and specific. Mention relevant topics from the "Teach Me" section that would be appropriate for their level.
 
-Make your response conversational and helpful, as if you're a knowledgeable language teacher giving personalized advice.`;
+Make your response conversational and helpful, as if you're a knowledgeable language teacher g"iving personalized advice.
+
+The grammar topics are ${grammarData[targetLanguage] ? grammarData[targetLanguage].map(topic => topic.title)}
+
+The vocabulary topics are ${vocabData ? vocabData.map(topic => topic.title)}`;
 
             const guidanceResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
                 method: 'POST',
