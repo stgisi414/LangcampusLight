@@ -688,7 +688,251 @@ function reloadVocabularyTopicsList() {
         vocabData.forEach(topic => {
             const button = document.createElement('button');
             button.dataset.title = topic.title;
-            // Applystyles consistent with initial populationbutton.style/g, '').trim();
+            // Apply styles consistent with initial populationbutton.style.display= 'block';
+            button.style.width = '100%';
+            button.style.padding = '0.8rem';
+            button.style.marginBottom = '0.5rem';
+            button.style.textAlign = 'left';
+            button.style.backgroundColor = '#f9f9f9';
+            button.style.border = '1px solid #eee';
+            button.style.cursor = 'pointer';
+            button.style.borderRadius = '4px';
+            button.style.transition = 'background-color 0.2s';
+            button.style.color = '#333';
+            button.innerHTML = `${topic.title} <span style="font-size: 0.8em; color: #777; margin-left: 10px; background-color: #eee; padding: 2px 6px; border-radius: 3px;">Level ${topic.level}</span>`;
+
+            button.onclick = () => loadVocabularyContent(topic, targetLangForVocab);
+
+            button.onmouseover = () => button.style.backgroundColor = '#e9e9e9';
+            button.onmouseout = () => button.style.backgroundColor = '#f9f9f9';
+
+            vocabularyTopicList.appendChild(button);
+        });
+    } else {
+        vocabularyTopicList.innerHTML = `<p>No vocabulary topics available yet.</p>`;
+    }
+    quizActive = false; // Reset quiz state
+    currentQuiz = {};
+}
+
+// Tab switching functionality
+document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', () => {
+        // Remove active class from all tabs and contents
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        // Add active class to clicked tab and corresponding content
+        button.classList.add('active');
+        const tabId = button.getAttribute('data-tab');
+        document.getElementById(`${tabId}-section`).classList.add('active');
+    });
+});
+
+teachMeButton.addEventListener('click', () => {
+    if (!currentPartner) {
+        console.error("Partner not available.");
+        return;
+    }
+
+    const targetLang = currentPartner.nativeLanguage; // User is learning partner's native language
+
+    // Load Grammar Topics
+    if (grammarData && grammarData[targetLang]) {
+        const topics = grammarData[targetLang];
+        grammarTopicList.innerHTML = ''; // Clear previous list
+
+        if (topics && topics.length > 0) {
+            topics.sort((a, b) => a.level - b.level); // Sort by level
+            topics.forEach(topic => {
+                const button = document.createElement('button');
+                button.dataset.title = topic.title;
+                button.innerHTML = `${topic.title} <span>Level ${topic.level}</span>`;
+                grammarTopicList.appendChild(button);
+            });
+        } else {
+            grammarTopicList.innerHTML = `<p>No grammar topics available for ${targetLang} yet.</p>`;
+        }
+    }
+
+    // Load Vocabulary Topics
+    if (vocabData) {
+        vocabularyTopicList.innerHTML = ''; // Clear previous list
+        vocabData.sort((a, b) => a.level - b.level); // Sort by level
+
+        vocabData.forEach(topic => {
+            const button = document.createElement('button');
+            button.dataset.title = topic.title;
+            button.dataset.type = 'vocabulary';
+            button.style.display = 'block';
+            button.style.width = '100%';
+            button.style.padding = '0.8rem';
+            button.style.marginBottom = '0.5rem';
+            button.style.textAlign = 'left';
+            button.style.backgroundColor = '#f9f9f9';
+            button.style.border = '1px solid #eee';
+            button.style.cursor = 'pointer';
+            button.style.borderRadius = '4px';
+            button.style.transition = 'background-color 0.2s';
+            button.style.color = '#333';
+            button.innerHTML = `${topic.title} <span style="font-size: 0.8em; color: #777; margin-left: 10px; background-color = #eee; padding: 2px 6px; border-radius: 3px;">Level ${topic.level}</span>`;
+            button.onclick = () => loadVocabularyContent(topic, targetLang);
+            button.onmouseover = () => button.style.backgroundColor = '#e9e9e9';
+            button.onmouseout = () => button.style.backgroundColor = '#f9f9f9';
+            vocabularyTopicList.appendChild(button);
+        });
+    }
+
+    teachMeModal.style.setProperty('display', 'flex', 'important');
+});
+
+async function loadVocabularyContent(topic, targetLang) {
+    console.log('Starting loadVocabularyContent:', { topic, targetLang });
+    const vocabTopicList = document.getElementById('vocabulary-topic-list');
+    if (!vocabTopicList) {
+        console.error('Vocabulary topic list element not found');
+        return;
+    }
+    vocabTopicList.innerHTML = `
+        <h2>${topic.title}</h2>
+        <div id="vocabulary-content">
+            <p>Loading vocabulary content...</p>
+        </div>
+    `;
+    const container = document.getElementById('vocabulary-content');
+    if (!container) {
+        console.error('Vocabulary content container not found');
+        return;
+    }
+
+    try {
+        // Get the user's native language for explanations
+        const userNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
+
+        const prompt = `You are a ${targetLang} language teacher creating a vocabulary study guide for a student whose native language is ${userNativeLanguage}.
+
+Create a comprehensive vocabulary study guide for "${topic.title}" in ${targetLang}.
+
+IMPORTANT: Write all explanations, definitions, and instructions in ${userNativeLanguage} so the student can understand clearly. Use ${targetLang} only for the vocabulary words, phrases, and example sentences.
+
+Include:
+1. Key vocabulary words and phrases related to ${topic.title} (in ${targetLang}) with definitions in ${userNativeLanguage}
+2. Example sentences in ${targetLang} with ${userNativeLanguage} translations
+3. Common expressions or idioms related to this topic (in ${targetLang}) with explanations in ${userNativeLanguage}
+4. Cultural notes (explained in ${userNativeLanguage}) if relevant
+5. Usage tips and memory aids (in ${userNativeLanguage})
+
+Format the response in Markdown with clear sections and examples.`;
+
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }]
+            })
+        });
+
+        if (!response.ok) throw new Error('Failed to generate vocabulary content');
+
+        const data = await response.json();
+        const content = data.candidates[0].content.parts[0].text;
+
+        // Convert markdown to HTML and display
+        container.innerHTML = `
+               ${marked.parse(content)}
+               <div class="topic-actions" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                   <button class="chat-button" onclick="startVocabularyQuiz('${topic.title.replace(/'/g, "\\'")}', '${targetLang.replace(/'/g, "\\'")}')">Quiz Me</button>
+                   <button class="chat-button secondary-button" onclick="reloadVocabularyTopicsList()">Return to Topics</button>
+               </div>
+           `;
+
+    } catch (error) {
+        console.error('Error loading vocabulary content:', error);
+        container.innerHTML = `
+            <p style="color: red;">Failed to load vocabulary content. Please try again.</p>
+            <button onclick="loadVocabularyContent('${topic.title}', '${targetLang}')" class="chat-button">
+                Retry
+            </button>
+        `;
+    }
+}
+
+async function startVocabularyQuiz(topicTitle, language) {
+    console.log('Starting vocabulary quiz:', { topicTitle, language });
+    currentTopicTitle = topicTitle;
+    const container = document.getElementById('vocabulary-content');
+    if (!container) {
+        console.error('Quiz container not found');
+        return;
+    }
+    container.innerHTML = '<p>Loading quiz...</p>';
+
+    quizActive = true;
+    currentQuiz = {
+        questions: [],
+        currentQuestion: 0,
+        score: 0,
+        total: 16
+    };
+
+    // Get the quiz taker's native language from currentPartner
+    const quizTakerNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
+
+    const quizPrompt = `Create a multiple-choice vocabulary quiz (16 questions) about "${topicTitle}" in ${language}. 
+
+IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz entirely IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly.
+
+- Write all questions in ${quizTakerNativeLanguage}
+- Write all answer choices in ${quizTakerNativeLanguage}
+- Test their knowledge of ${language} vocabulary through ${quizTakerNativeLanguage} explanations
+- When showing ${language} words, always provide ${quizTakerNativeLanguage} context or translations
+
+Questions should test vocabulary understanding through:
+1. Word definitions
+2. Usage in context
+3. Synonyms/antonyms
+4. Appropriate word choice
+
+Format as valid JSON with this structure:
+[
+  {
+    "question": "What is the meaning of [word] in ${language}?",
+    "options": ["definition1", "definition2", "definition3", "definition4"],
+    "correctIndex": 0
+  }
+]
+
+Each question must have exactly 4 options. Do not include backticks or markdown formatting.`;
+
+    try {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: quizPrompt
+                    }]
+                }]
+            })
+        });
+
+        if (!response.ok) throw new Error('Failed to generate quiz');
+
+        const data = await response.json();
+        let quizText = data.candidates[0].content.parts[0].text.trim();
+
+        try {
+            // Clean the response text by removing markdown code fences and any extra whitespace
+            let cleanText = quizText.replace(/```json\s*|\s*```/g, '').trim();
 
             // Ensure it starts with [ and ends with ]
             if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
@@ -845,9 +1089,7 @@ Only provide a correction if you identify a clear error in ${partner.nativeLangu
 The user does not currently want corrections. Just provide a natural conversational reply.
 `}
 
-Your response should be ONLY the chat message text. Do not include your name or any other prefix.
-
-The [Teach Me] button opens a modal where the user can learn about grammar and vocabulary in ${partner.nativeLanguage}.`;
+Your response should be ONLY the chat message text. Do not include your name or any other prefix.`;
 
     try {
         const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
@@ -1001,23 +1243,156 @@ Your response must be valid JSON structured like this example:
         .then(data => {
             //console.log(data.candidates[0].content.parts[0].text);
             let quizText = data.candidates[0].content.parts[0].text;
-            quizText = quizText.replace(/```json\s*|\s*The code fixes a missing closing parenthesis in the template literal within the `endQuiz` function.
-```html
+            quizText = quizText.replace(/```json\s*|\s*```/g, '').trim();
 
+            if (!quizText.startsWith('[')) {
+                throw new Error('Invalid quiz format received');
+            }
 
+            try {
+                // Clean and validate the response text
+                let cleanText = quizText.replace(/```json\s*|\s*```/g, '').trim();
+
+                // Ensure it starts with [ and ends with ]
+                if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
+                    throw new Error('Invalid quiz format: must be a JSON array');
+                }
+
+                // Parse the JSON
+                const questions = JSON.parse(cleanText);
+
+                // Validate the structure
+                if (!Array.isArray(questions) || questions.length === 0) {
+                    throw new Error('Quiz must be a non-empty array');
+                }
+
+                // Validate each question
+                questions.forEach((q, index) => {
+                    if (!q.question || !Array.isArray(q.options) || q.options.length !== 4 ||
+                        typeof q.correctIndex !== 'number' || q.correctIndex < 0 || q.correctIndex > 3) {
+                        throw new Error(`Invalid question format at index ${index}`);
+                    }
+                });
+
+                // Inside the .then(data => { try { ... const questions = JSON.parse(cleanText); ... } }) block
+                currentQuiz = {
+                    questions: questions,
+                    currentQuestion: 0,
+                    score: 0,
+                    total: questions.length,
+                    type: 'grammar', // Add quiz type
+                    containerId: explanationContainer.id, // Store the correct container ID (e.g., 'grammar-topic-list')
+                    topicTitle: topicTitle, // Store for "Start Over" functionality
+                    language: language,     // Store for "Start Over"
+                    level: level            // Store for "Start Over"
+                };
+                showNextQuestion(); // No longer needs container as argument
+            } catch (parseError) {
+                console.error('Quiz parsing failed:', parseError);
+                explanationContainer.innerHTML = `
+                    <div style="text-align: center;">
+                        <p>Failed to generate quiz.</p>
+                        <button onclick="startQuiz('${topicTitle}', '${language}', ${level})" class="chat-button" style="margin-top: 10px;">
+                            Try Again
+                        </button>
+                    </div>`;
+                quizActive = false;
+            }
+        })
+        .catch(error => {
+            console.error('Quiz generation failed:', error);
+            explanationContainer.innerHTML = `
+                <div style="text-align: center;">
+                    <p>Failed to generate quiz.</p>
+                    <button onclick="startQuiz('${topicTitle}', '${language}', ${level})" class="chat-button" style="margin-top: 10px;">
+                        Try Again
+                    </button>
+                </div>`;
+            quizActive = false;
+        });
+}
+
+function showNextQuestion() {
+    // Ensure currentQuiz and containerId are properly set
+    if (!currentQuiz || !currentQuiz.containerId) {
+        console.error("Quiz context or containerId not set in currentQuiz.");
+        // Attempt to use a fallback or display an error in a default location
+        const fallbackContainer = document.getElementById('grammar-topic-list') || document.getElementById('vocabulary-content');
+        if (fallbackContainer) {
+            fallbackContainer.innerHTML = "<p style='color:red;'>Error: Quiz display container not found. Please select a topic again.</p>";
+        }
+        return;
+    }
+    const container = document.getElementById(currentQuiz.containerId);
+    if (!container) {
+        console.error(`Container with ID '${currentQuiz.containerId}' not found.`);
+        // Display error in a more general modal area if possible
+        const modalContent = document.querySelector('#teach-me-modal .modal-content');
+        if (modalContent) {
+            modalContent.innerHTML = "<p style='color:red;'>Critical Error: Quiz container missing. Please close and reopen.</p>";
+        }
+        return;
+    }
+
+    if (!currentQuiz.questions) {
+        console.error('Quiz questions property missing');
+        endQuiz('Quiz questions not properly initialized', container);
+        return;
+    }
+
+    if (!Array.isArray(currentQuiz.questions)) {
+        console.error('Quiz questions must be an array');
+        endQuiz('Quiz questions format invalid', container);
+        return;
+    }
+
+    if (currentQuiz.questions.length === 0) {
+        console.error('Quiz questions array is empty');
+        endQuiz('No quiz questions available', container);
+        return;
+    }
+
+    if (typeof currentQuiz.currentQuestion !== 'number' || typeof currentQuiz.total !== 'number') {
+        console.error('Invalid quiz progress state');
+        endQuiz('Quiz progress tracking error', container);
+        return;
+    }
+
+    if (currentQuiz.currentQuestion >= currentQuiz.total) {
+        const percentage = Math.round((currentQuiz.score / currentQuiz.total) * 100);
+        let grade = '';
+        if (percentage >= 90) grade = 'Excellent! 🌟';
+        else if (percentage >= 80) grade = 'Great job! 👏';
+        else if (percentage >= 70) grade = 'Good work! 👍';
+        else if (percentage >= 60) grade = 'Keep practicing! 💪';
+        else grade = 'More practice needed! 📚';
+
+        endQuiz(`Quiz complete!\nYour score: ${currentQuiz.score}/${currentQuiz.total} (${percentage}%)\n${grade}`, container);
+        return;
+    }
+
+    const question = currentQuiz.questions[currentQuiz.currentQuestion];
+    if (!question || typeof question !== 'object' || !Array.isArray(question.options) || question.options.length !== 4 || typeof question.correctIndex !== 'number') {
+        console.error('Invalid question format:', question);
+        endQuiz('Quiz error: Invalid question format', container);
+        return;
+    }
+
+    const letters = ['A', 'B', 'C', 'D'];
+    const correctIndex = typeof question.correctIndex === 'number' ? question.correctIndex : 0;
+
+    container.innerHTML = `
+        <div class="quiz-question">
             <strong>Question ${currentQuiz.currentQuestion + 1}/${currentQuiz.questions.length}:</strong>
-
-
-${question.question}
-
-
-
-${question.options.map((option, i) => `
-                    ${letters[i]}) ${option}
+            <p>${question.question}</p>
+            <div class="quiz-options">
+                ${question.options.map((option, i) => `
+                    <button class="quiz-choice" onclick="handleAnswer(${i}, ${correctIndex})">
+                        ${letters[i]}) ${option}
+                    </button>
                 `).join('')}
-
-
-
+            </div>
+        </div>
     `;
 }
 
@@ -1058,12 +1433,10 @@ function handleAnswer(selected, correct) {
     const resultDiv = document.createElement('div');
     resultDiv.className = 'quiz-result';
     resultDiv.innerHTML = `
-
-
-            <strong>${selected === correct ? '✓ Correct!' : '✗ Incorrect'}</strong>
+        <p style="color: ${selected === correct ? '#4CAF50' : '#f44336'}">
+            <strong>${selected === correct ? '✓ Correct!' : '✗ Incorrect'}</strong><br>
             ${selected !== correct ? `The correct answer was: ${buttons[correct].textContent}` : ''}
-
-
+        </p>
     `;
     container.appendChild(resultDiv);
 
@@ -1137,20 +1510,12 @@ function endQuiz(message, container) {
     // CRITICAL LINE: Ensure this line below uses BACKTICKS (`) at the beginning and end
     // =====================================================================================
     container.innerHTML = `
-        
-
+        <div class="quiz-end">
             <strong>Quiz Complete!</strong>
-
-
-Your score: ${score}/${total} (${percentage}%)
-
-            ${grade}
-
-
-            Share Results
+            <pre style="margin: 10px 0; white-space: pre-wrap;">Your score: <span class="math-inline">${score}/</span>${total} (<span class="math-inline">${percentage}%\)\n</span>${grade}</pre>
+            <button onclick="shareQuizResults()" class="chat-button" style="margin-right: 10px;">Share Results</button>
             ${startOverButtonHtml}
-
-
+        </div>
     `;
     // =====================================================================================
     // End of critical section
@@ -1174,16 +1539,11 @@ function shareQuizResults() {
     const quizTypeString = lastResults.type === 'vocabulary' ? 'vocabulary' : 'grammar';
 
     const missedSection = lastResults.incorrectQuestions?.length > 0
-        ? `
-Areas to review:
-${lastResults.incorrectQuestions.join('\n')}`
+        ? `\nAreas to review:\n${lastResults.incorrectQuestions.join('\n')}`
         : '';
 
     // Construct the message using the determined quizTypeString
-    messageInput.value = `I just completed the "${lastResults.topicTitle}" ${quizTypeString} quiz!
-
-Score: ${lastResults.score}/${lastResults.total} (${lastResults.percentage}%)
-${lastResults.grade}${missedSection}`;
+    messageInput.value = `I just completed the "${lastResults.topicTitle}" ${quizTypeString} quiz!\n\nScore: ${lastResults.score}/${lastResults.total} (${lastResults.percentage}%)\n${lastResults.grade}${missedSection}`;
 
     const teachMeModal = document.getElementById('teach-me-modal');
     if (teachMeModal) {
@@ -1199,7 +1559,7 @@ ${lastResults.grade}${missedSection}`;
 
 async function getGrammarExplanation(topicTitle, language, level = null) {
     const explanationContainer = document.getElementById('grammar-topic-list');
-    explanationContainer.innerHTML = 'Loading explanation...';
+    explanationContainer.innerHTML = '<p>Loading explanation...</p>';
     quizActive = false;
     currentQuiz = {};
 
@@ -1277,15 +1637,15 @@ Do NOT include any text before or after the Markdown content.`;
         explanationContainer.innerHTML = `
                <h2>Explanation: ${topicTitle}</h2>
                ${explanationHtml}
-
-                   Quiz Me
-                   Return to Topics
-
+               <div class="topic-actions" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                   <button class="chat-button" onclick="startQuiz('${topicTitle.replace(/'/g, "\\'")}', '${language.replace(/'/g, "\\'")}', ${level})">Quiz Me</button>
+                   <button class="chat-button secondary-button" onclick="reloadGrammarTopicsList()">Return to Topics</button>
+               </div>
            `;
 
     } catch (error) {
         console.error('Error getting grammar explanation:', error);
-        explanationContainer.innerHTML = `Failed to load explanation for "${topicTitle}". Please try again.`;
+        explanationContainer.innerHTML = `<p style="color: red;">Failed to load explanation for "${topicTitle}". Please try again.</p>`;
     }
 }
 
@@ -1349,8 +1709,8 @@ function addHobbyInput(value = '') {
     const div = document.createElement('div');
     div.className = 'hobby-input';
     div.innerHTML = `
-
-
+        <input type="text" placeholder="Enter a hobby" value="${value}">
+        <button class="remove-hobby">×</button>
     `;
 
     div.querySelector('.remove-hobby').addEventListener('click', () => {
@@ -1480,8 +1840,8 @@ function addHobbyInput(value = '') {
     const div = document.createElement('div');
     div.className = 'hobby-input';
     div.innerHTML = `
-
-
+        <input type="text" placeholder="Enter a hobby" value="${value}">
+        <button class="remove-hobby">×</button>
     `;
 
     const removeButton = div.querySelector('.remove-hobby');
@@ -1629,9 +1989,10 @@ function checkSavedPartner() {
 
                             // Reconstruct the HTML for each message, including class and timestamp span
                             return `
-                              ${senderName}: ${msg.text}
-                                ${messageTimestamp ? `${messageTimestamp}` : ''}
-                            `;
+                              <p class="${messageClass}">
+                                <strong>${senderName}:</strong> ${msg.text}
+                                ${messageTimestamp ? `<span class="message-time">${messageTimestamp}</span>` : ''}
+                              </p>`;
                         }).join('');
 
                         chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to the bottom
@@ -1781,7 +2142,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Add a "requesting explanation" message
             const requestingMsg = document.createElement('p');
-            requestingMsg.innerHTML = `Requesting explanation for "${topicTitle}"...`;
+            requestingMsg.innerHTML = `<em>Requesting explanation for "${topicTitle}"...</em>`;
             requestingMsg.style.fontStyle = 'italic';
             chatMessages.appendChild(requestingMsg);
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -1819,7 +2180,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 console.error("Error getting or parsing grammar explanation:", error);
                 const errorMsg = document.createElement('p');
-                errorMsg.innerHTML = `Sorry, couldn't get an explanation for ${topicTitle}. Error: ${error.message}`;
+                errorMsg.innerHTML = `<p><em>Sorry, couldn't get an explanation for ${topicTitle}. Error: ${error.message}</em></p>`;
                 errorMsg.style.color = 'red';
                 errorMsg.style.fontStyle = 'italic';
                 chatMessages.appendChild(errorMsg);
@@ -1857,7 +2218,7 @@ const VOICE_MAPPING = {
 };
 
 
-//// Initialize audio context on user interaction
+// Initialize audio context on user interaction
 function initAudioContext() {
     if (!audioContext) {
         try {
@@ -1873,19 +2234,19 @@ function initAudioContext() {
 // Detect language using basic character set analysis
 function detectLanguage(text) {
     // Check for Chinese characters
-    if (/[\\u4E00-\\u9FFF]/.test(text)) return 'zh';
+    if (/[\u4E00-\u9FFF]/.test(text)) return 'zh';
     // Check for Japanese characters (Hiragana, Katakana, Kanji)
-    if (/[\\u3040-\\u30FF\\u3400-\\u4DBF\\uF900-\\uFAFF]/.test(text)) return 'ja'; // Added Kanji range
+    if (/[\u3040-\u30FF\u3400-\u4DBF\uF900-\uFAFF]/.test(text)) return 'ja'; // Added Kanji range
     // Check for Korean Hangul
-    if (/[\\uAC00-\\uD7AF]/.test(text)) return 'ko';
+    if (/[\uAC00-\uD7AF]/.test(text)) return 'ko';
     // Check for Arabic characters
-    if (/[\\u0600-\\u06FF]/.test(text)) return 'ar';
+    if (/[\u0600-\u06FF]/.test(text)) return 'ar';
     // Check for Russian Cyrillic characters
-    if (/[\\u0400-\\u04FF]/.test(text)) return 'ru';
+    if (/[\u0400-\u04FF]/.test(text)) return 'ru';
     // Check for Hindi Devanagari characters
-    if (/[\\u0900-\\u097F]/.test(text)) return 'hi';
+    if (/[\u0900-\u097F]/.test(text)) return 'hi';
     // Check for Thai characters
-    if (/[\\u0E00-\\u0E7F]/.test(text)) return 'th';
+    if (/[\u0E00-\u0E7F]/.test(text)) return 'th';
 
     // For European languages based on Latin script, diacritics can help but are not foolproof
     // Order matters here: more specific checks first
@@ -2056,9 +2417,8 @@ function createAudioButton(text, rect) {
     button.style.msUserSelect = 'none'; // For IE/Edge
 
     button.innerHTML = `
-
-            Play Audio
-
+        <span class="button-icon" style="font-size: 16px; pointer-events: none;">🔊</span>
+        <span class="button-text" style="font-weight: 500; pointer-events: none;">Play Audio</span>
     `;
 
     // Get chat modal for scroll handling
@@ -2149,9 +2509,8 @@ function createAudioButton(text, rect) {
             button.disabled = true;
             button.classList.add('playing');
             button.innerHTML = `
-
-                    Loading...
-
+                <span class="button-icon">🔄</span>
+                <span class="button-text">Loading...</span>
             `;
 
             // Initialize audio context on user interaction
@@ -2165,9 +2524,8 @@ function createAudioButton(text, rect) {
             await playAudioFromText(text, button);
 
             button.innerHTML = `
-
-                    Played
-
+                <span class="button-icon">✅</span>
+                <span class="button-text">Played</span>
             `;
 
             setTimeout(() => button.remove(), 2000);
@@ -2181,18 +2539,16 @@ function createAudioButton(text, rect) {
                 button.style.display = 'flex';
                 button.style.pointerEvents = 'auto';
                 button.innerHTML = `
-
-                        Error: ${error.message}
-
+                    <span class="button-icon">❌</span>
+                    <span class="button-text">Error: ${error.message}</span>
                 `;
 
                 // Keep error visible and allow retry
                 const retryTimeout = setTimeout(() => {
                     if (button && button.parentNode) {
                         button.innerHTML = `
-
-                                Try Again
-
+                            <span class="button-icon">🔊</span>
+                            <span class="button-text">Try Again</span>
                         `;
                     }
                 }, 3000);
@@ -2315,148 +2671,145 @@ document.addEventListener('mousedown', (event) => {
     }
 });
 
-// Middleware to provide study guide assistance using Gemini
-async function studyGuideMiddleware(message, chatContext) {
-    console.log('🔍 Study Guide Middleware: Checking message:', message);
+// Study guide middleware queue
+let studyGuideQueue = [];
+let isProcessingStudyGuide = false;
 
-    try {
-        // Step 1: Check if this is a study-related request using Gemini
-        const studyDetectionPrompt = `You are a classifier. Analyze this message and determine if the user is asking for language learning help.
+// Process study guide queue with delays
+async function processStudyGuideQueue() {
+    if (isProcessingStudyGuide || studyGuideQueue.length === 0) return;
+    
+    isProcessingStudyGuide = true;
+    
+    while (studyGuideQueue.length > 0) {
+        const { messageText, chatContext, resolve } = studyGuideQueue.shift();
+        const result = await studyGuideMiddleware(messageText, chatContext);
+        resolve(result);
+        
+        if (studyGuideQueue.length > 0) {
+            await new Promise(resolve => setTimeout(resolve, 3000)); // 3 second delay
+        }
+    }
+    
+    isProcessingStudyGuide = false;
+}
+
+// Add study guide middleware
+document.getElementById('send-message').addEventListener('click', async () => {
+    const messageInput = document.getElementById('message-input');
+    const messageText = messageInput.value.trim();
+
+    // Middleware to provide study guide assistance using Gemini
+    async function studyGuideMiddleware(message, chatContext) {
+        return new Promise((resolve) => {
+            studyGuideQueue.push({ messageText: message, chatContext, resolve });
+            processStudyGuideQueue();
+        });
+    }
+
+    async function studyGuideMiddleware(message, chatContext) {
+        try {
+            // Step 1: Check if this is a study-related request in any language
+            const studyDetectionPrompt = `Analyze this message and determine if the user is asking for language learning help, study guidance, or educational assistance. The user might be asking in any language.
 
 Message: "${message}"
 
-Answer with ONLY "YES" or "NO".
+Respond with only "YES" if this is a request for study/learning help, or "NO" if it's not.
 
-Examples of YES:
-- "teach me ser vs estar"
-- "teach me grammar"
-- "help me learn"
+Examples of study requests:
+- "teach me"
 - "what should I study"
-- "explain present tense"
+- "help me learn"
+- "I need help with grammar"
+- "study recommendations"
+- And similar requests in ANY language (Spanish, French, Japanese, Korean, Chinese, etc.)`;
 
-Examples of NO:
-- "hello how are you"
-- "what's the weather like"
-- "I like pizza"
+            const detectionResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: studyDetectionPrompt }] }]
+                })
+            });
 
-Classification for "${message}":`;
+            if (!detectionResponse.ok) {
+                console.error('Study detection API call failed');
+                return null;
+            }
 
-        console.log('📤 Study Guide Middleware: Sending detection request to API');
+            const detectionData = await detectionResponse.json();
+            const isStudyRequest = detectionData.candidates[0].content.parts[0].text.trim().toUpperCase() === 'YES';
 
-        const detectionResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: studyDetectionPrompt }] }]
-            })
-        });
+            if (!isStudyRequest) {
+                return null; // Not a study request
+            }
 
-        if (!detectionResponse.ok) {
-            console.error('❌ Study Guide Middleware: Detection API call failed');
-            return null;
-        }
+            // Step 2: Get current partner's language info
+            const targetLanguage = currentPartner ? currentPartner.nativeLanguage : 'the target language';
+            const userNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
 
-        const detectionData = await detectionResponse.json();
-        const detectionResult = detectionData.candidates[0].content.parts[0].text.trim().toUpperCase();
-        const isStudyRequest = detectionResult === 'YES';
+            // Step 3: Get user's current level
+            const userLevel = localStorage.getItem('languageLevelRating') || '1';
 
-        console.log('📥 Study Guide Middleware: Detection result:', detectionResult, 'Is study request:', isStudyRequest);
-
-        if (!isStudyRequest) {
-            console.log('⏭️ Study Guide Middleware: Not a study request, passing through');
-            return null; // Not a study request
-        }
-
-        console.log('✅ Study Guide Middleware: Study request detected! Generating response...');
-
-        // Step 2: Get current partner's language info
-        const targetLanguage = currentPartner ? currentPartner.nativeLanguage : 'the target language';
-        const userNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
-
-        // Step 3: Get user's current level
-        const userLevel = localStorage.getItem('languageLevelRating') || '2';
-
-        // Step 4: Generate comprehensive study guidance using Gemini
-        const availableGrammarTopics = grammarData[targetLanguage] ? 
-            grammarData[targetLanguage]
-                .filter(topic => topic.level <= parseInt(userLevel) + 1) // Include current level and one above
-                .map(topic => `${topic.title} (Level ${topic.level})`)
-                .join(', ') : 'none available';
-
-        const availableVocabTopics = vocabData ? 
-            vocabData
-                .filter(topic => topic.level <= parseInt(userLevel) + 1)
-                .map(topic => `${topic.title} (Level ${topic.level})`)
-                .join(', ') : 'none available';
-
-        const studyGuidancePrompt = `You are a language learning study guide assistant. The user is learning ${targetLanguage} and their native language is ${userNativeLanguage}. Their current proficiency level is ${userLevel} out of 5 (1=beginner, 5=advanced).
+            // Step 4: Generate comprehensive study guidance using Gemini
+            const studyGuidancePrompt = `You are a language learning study guide assistant. The user is learning ${targetLanguage} and their native language is ${userNativeLanguage}. Their current proficiency level is ${userLevel} out of 5 (1=beginner, 5=advanced).
 
 User's message: "${message}"
 
 Recent chat context: ${chatContext.length > 0 ? chatContext.slice(-5).map(msg => `${msg.sender}: ${msg.text}`).join('\n') : 'No recent context'}
 
-IMPORTANT: There is a "Teach Me" button in the chat interface that opens a modal with grammar and vocabulary topics. Please mention this feature prominently.
-
 Please provide personalized study recommendations that include:
 
-1. Tell them about the "Teach Me" button that opens grammar and vocabulary topics
-2. Specific grammar topics they should focus on based on their level
-3. Vocabulary areas to work on  
-4. How to use the "Teach Me" section effectively (it has quizzes and explanations)
+1. Specific grammar topics they should focus on based on their level
+2. Vocabulary areas to work on
+3. Practical exercises they can do
+4. How to use the "Teach Me" section effectively
 5. Study tips tailored to their current level
 
-Respond in ${userNativeLanguage} so they can understand clearly. Be encouraging and specific.
+Respond in ${userNativeLanguage} so they can understand clearly. Be encouraging and specific. Mention relevant topics from the "Teach Me" section that would be appropriate for their level.
 
-Available grammar topics for their level: ${availableGrammarTopics}
+Make your response conversational and helpful, as if you're a knowledgeable language teacher g"iving personalized advice.
 
-Available vocabulary topics for their level: ${availableVocabTopics}
+The grammar topics are ${grammarData[targetLanguage] ? grammarData[targetLanguage].map(topic => topic.title).join(', ') : 'none available'}
 
-Make your response conversational and helpful, mentioning the "Teach Me" button feature prominently.`;
+The vocabulary topics are ${vocabData ? vocabData.map(topic => topic.title).join(', ') : 'none available'}`;
 
-        const guidanceResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: studyGuidancePrompt }] }]
-            })
-        });
+            const guidanceResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: studyGuidancePrompt }] }]
+                })
+            });
 
-        if (!guidanceResponse.ok) {
-            console.error('Study guidance API call failed');
+            if (!guidanceResponse.ok) {
+                console.error('Study guidance API call failed');
+                return null;
+            }
+
+            const guidanceData = await guidanceResponse.json();
+            let studyRecommendations = guidanceData.candidates[0].content.parts[0].text.trim();
+
+            // Clean up the response
+            if (studyRecommendations.startsWith('"') && studyRecommendations.endsWith('"')) {
+                studyRecommendations = studyRecommendations.slice(1, -1);
+            }
+
+            return studyRecommendations;
+
+        } catch (error) {
+            console.error('Error in study guide middleware:', error);
             return null;
         }
-
-        const guidanceData = await guidanceResponse.json();
-        let studyRecommendations = guidanceData.candidates[0].content.parts[0].text.trim();
-
-        // Clean up the response
-        if (studyRecommendations.startsWith('"') && studyRecommendations.endsWith('"')) {
-            studyRecommendations = studyRecommendations.slice(1, -1);
-        }
-
-        console.log('🎓 Study Guide Middleware: Generated study recommendations successfully');
-        return studyRecommendations;
-
-    } catch (error) {
-        console.error('❌ Study Guide Middleware Error:', error);
-        return null;
     }
-}
-
-// Add study guide middleware to send message event
-document.getElementById('send-message').addEventListener('click', async () => {
-    const messageInput = document.getElementById('message-input');
-    const messageText = messageInput.value.trim();
 
     // Get chat history to use as context
     const chatContext = chatHistory.slice(-10); // Last 10 messages
 
     // Apply middleware if message indicates study help
-    console.log('🚀 Message Send: Applying study guide middleware to message:', messageText);
     const studyGuideMessage = await studyGuideMiddleware(messageText, chatContext);
 
     if (studyGuideMessage) {
-        console.log('📚 Message Send: Study guide middleware returned response, inserting into chat');
         // Insert the study guide message into the chat
         const chatMessages = document.getElementById('chat-messages');
         const timestamp = new Date().toISOString();
@@ -2464,23 +2817,18 @@ document.getElementById('send-message').addEventListener('click', async () => {
         chatHistory.push(studyGuideResponse);
 
         chatMessages.innerHTML += `
-
-
-                <strong>📚 Study Guide:</strong> ${studyGuideMessage}
-
+            <p class="partner-message">
+                <strong>Study Guide:</strong> ${studyGuideMessage}
+                <span class="message-time" style="font-size: 0.8em; color: #666; margin-left: 8px;">
                     ${new Date(timestamp).toLocaleTimeString()}
-
-
-`;
+                </span>
+            </p>`;
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
-        // Clear input and don't send to partner
-        messageInput.value = '';
         return; // Skip normal message processing
     }
 
-    console.log('💬 Message Send: No study guide response, proceeding with normal chat');
-    // Normal message processing if not handled by study guide middleware
+    // Normal message processing
     if (messageText && currentPartner) {
         lastUserMessage = messageText;
         if (geminiIntroTimer) {
@@ -2498,14 +2846,12 @@ document.getElementById('send-message').addEventListener('click', async () => {
         chatHistory.push(userMessage);
         const chatMessages = document.getElementById('chat-messages');
         chatMessages.innerHTML += `
-
-
+            <p class="user-message">
                 <strong>You:</strong> ${messageText}
-
+                <span class="message-time" style="font-size: 0.8em; color: #fff; margin-left: 8px;">
                     ${new Date(timestamp).toLocaleTimeString()}
-
-
-`;
+                </span>
+            </p>`;
         messageInput.value = '';
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -2538,16 +2884,14 @@ document.getElementById('send-message').addEventListener('click', async () => {
                 const partnerResponse = { sender: currentPartnerName, text: partnerResponseText, timestamp };
                 chatHistory.push(partnerResponse);
                 chatMessages.innerHTML += `
-
-
+                    <p class="partner-message">
                         <strong>${currentPartnerName}:</strong> ${partnerResponseText}
-
+                        <span class="message-time" style="font-size: 0.8em; color: #666; margin-left: 8px;">
                             ${new Date(timestamp).toLocaleTimeString()}
-
-
-`;
+                        </span>
+                    </p>`;
             } else {
-                chatMessages.innerHTML += `Sorry, ${currentPartnerName} couldn't respond right now.`;
+                chatMessages.innerHTML += `<p><em>Sorry, ${currentPartnerName} couldn't respond right now.</em></p>`;
             }
         } catch (error) {
             console.error("Error getting Gemini response:", error);
@@ -2558,11 +2902,8 @@ document.getElementById('send-message').addEventListener('click', async () => {
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error-message';
             errorDiv.innerHTML = `
-
-
-                    Error getting response.
-                    Retry
-
+                <p><em>Error getting response.</em></p>
+                <button onclick="retryLastMessage()" class="chat-button small-button" style="margin-top: 8px;">Retry</button>
             `;
             chatMessages.appendChild(errorDiv);
         } finally {
