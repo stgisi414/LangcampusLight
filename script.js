@@ -2677,6 +2677,8 @@ document.addEventListener('mousedown', (event) => {
 
 // Middleware to provide study guide assistance using Gemini
 async function studyGuideMiddleware(message, chatContext) {
+    console.log('🔍 Study Guide Middleware: Checking message:', message);
+    
     try {
         // Step 1: Check if this is a study-related request in any language
         const studyDetectionPrompt = `Analyze this message and determine if the user is asking for language learning help, study guidance, or educational assistance. The user might be asking in any language.
@@ -2696,6 +2698,8 @@ Examples of study requests:
 - "what topics are there"
 - And similar requests in ANY language (Spanish, French, Japanese, Korean, Chinese, etc.)`;
 
+        console.log('📤 Study Guide Middleware: Sending detection request to API');
+        
         const detectionResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -2705,16 +2709,22 @@ Examples of study requests:
         });
 
         if (!detectionResponse.ok) {
-            console.error('Study detection API call failed');
+            console.error('❌ Study Guide Middleware: Detection API call failed');
             return null;
         }
 
         const detectionData = await detectionResponse.json();
-        const isStudyRequest = detectionData.candidates[0].content.parts[0].text.trim().toUpperCase() === 'YES';
+        const detectionResult = detectionData.candidates[0].content.parts[0].text.trim().toUpperCase();
+        const isStudyRequest = detectionResult === 'YES';
+        
+        console.log('📥 Study Guide Middleware: Detection result:', detectionResult, 'Is study request:', isStudyRequest);
 
         if (!isStudyRequest) {
+            console.log('⏭️ Study Guide Middleware: Not a study request, passing through');
             return null; // Not a study request
         }
+        
+        console.log('✅ Study Guide Middleware: Study request detected! Generating response...');
 
         // Step 2: Get current partner's language info
         const targetLanguage = currentPartner ? currentPartner.nativeLanguage : 'the target language';
@@ -2781,10 +2791,11 @@ Make your response conversational and helpful, mentioning the "Teach Me" button 
             studyRecommendations = studyRecommendations.slice(1, -1);
         }
 
+        console.log('🎓 Study Guide Middleware: Generated study recommendations successfully');
         return studyRecommendations;
 
     } catch (error) {
-        console.error('Error in study guide middleware:', error);
+        console.error('❌ Study Guide Middleware Error:', error);
         return null;
     }
 }
@@ -2798,9 +2809,11 @@ document.getElementById('send-message').addEventListener('click', async () => {
     const chatContext = chatHistory.slice(-10); // Last 10 messages
 
     // Apply middleware if message indicates study help
+    console.log('🚀 Message Send: Applying study guide middleware to message:', messageText);
     const studyGuideMessage = await studyGuideMiddleware(messageText, chatContext);
 
     if (studyGuideMessage) {
+        console.log('📚 Message Send: Study guide middleware returned response, inserting into chat');
         // Insert the study guide message into the chat
         const chatMessages = document.getElementById('chat-messages');
         const timestamp = new Date().toISOString();
@@ -2821,6 +2834,7 @@ document.getElementById('send-message').addEventListener('click', async () => {
         return; // Skip normal message processing
     }
 
+    console.log('💬 Message Send: No study guide response, proceeding with normal chat');
     // Normal message processing if not handled by study guide middleware
     if (messageText && currentPartner) {
         lastUserMessage = messageText;
