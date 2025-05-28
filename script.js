@@ -2688,19 +2688,24 @@ Message: "${message}"
 CRITICAL: Respond with ONLY the word "YES" if this is a request for study/learning help, or ONLY the word "NO" if it's not.
 
 These are DEFINITELY study requests (respond YES):
-- "teach me" (EXACT MATCH)
+- "teach me" (any variation including "teach me [topic]")
+- "Can you teach me [anything]"
 - "teach me something"
 - "what should I study"
 - "help me learn"
 - "I need help with grammar"
 - "study recommendations"
 - "what grammar topics"
-- "level 2 grammar"
+- "level 2 grammar" 
 - "what topics are there"
 - "show me topics"
 - "I want to learn"
 - "help with vocabulary"
+- "explain [grammar concept]"
+- "ser vs estar" or any grammar comparison
 - And similar requests in ANY language
+
+IMPORTANT: If the message contains "teach me" followed by ANY topic or grammar concept, this is ALWAYS a study request.
 
 The message "${message}" should be classified as a study request if it contains any variation of asking for teaching, learning help, study guidance, or educational assistance.`;
 
