@@ -2308,7 +2308,7 @@ async function playAudioFromText(text, button, maxRetries = 3) {
                     'Authorization': 'Bearer wsec_81c54a71adb28dff26425889f84fbdfee3b446707529b33bd0e2a54eb3a43944'
                 },
                 body: JSON.stringify({
-                    text: decodeURIComponent(text),
+                    text: text,
                     voice_id: voiceId,
                     model_id: "eleven_multilingual_v2"
                 })
