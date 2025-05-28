@@ -1251,7 +1251,7 @@ Your response must be valid JSON structured like this example:
 
             try {
                 // Clean and validate the response text
-                let cleanText = quizText.replace(/```json\s*|\s*/g, '').trim();
+                let cleanText = quizText.replace(/```json\s*|\s*```/g, '').trim();
 
                 // Ensure it starts with [ and ends with ]
                 if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
