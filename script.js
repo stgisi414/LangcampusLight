@@ -1204,32 +1204,40 @@ async function startQuiz(topicTitle, language, level = 'unknown') {
 
 IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz entirely IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly. 
 
-- Write all questions in ${quizTakerNativeLanguage} with PROPER SPACING between words
-- Write all answer choices in ${quizTakerNativeLanguage} with PROPER SPACING between words
+CRITICAL FORMATTING REQUIREMENTS:
+- Write all questions in ${quizTakerNativeLanguage} with SPACES between EVERY word
+- Write all answer choices in ${quizTakerNativeLanguage} with SPACES between EVERY word  
+- Each word must be separated by a single space character
+- No words should be concatenated or joined together
 - Only include ${language} text when showing specific examples that need to be identified or analyzed
 - Test their knowledge of ${language} grammar concepts through ${quizTakerNativeLanguage} explanations
-- ENSURE ALL TEXT HAS PROPER SPACING AND IS READABLE
+
+EXAMPLE OF PROPER SPACING:
+Good: "What is the correct answer?"
+Bad: "Whatisthecorrectanswer?"
 
 Your response must be valid JSON structured like this example:
 
-    [
-      {
-        "question": "What is the capital of France?",
-        "options": ["Rome", "London", "Paris", "Berlin"],
-        "correctIndex": 2
-      },
-      {
-        "question": "Which planet is known as the Red Planet?",
-        "options": ["Earth", "Mars", "Jupiter", "Venus"],
-        "correctIndex": 1
-      }
-    ]
+[
+  {
+    "question": "What is the capital of France?",
+    "options": ["Rome", "London", "Paris", "Berlin"],
+    "correctIndex": 2
+  },
+  {
+    "question": "Which planet is known as the Red Planet?",
+    "options": ["Earth", "Mars", "Jupiter", "Venus"],
+    "correctIndex": 1
+  }
+]
 
-    Each quiz question in your JSON should follow this structure. Do not include any markdown formatting or backticks.
-
-    CRITICAL: Make sure ALL text in questions and options has proper spacing between words. Avoid concatenated text without spaces.
-    
-    Make sure to generate varied and challenging questions suitable for the specified level. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it. In all just make sure multiple answers cannot be correct and the answers must be completely separate from the question example.`;
+FORMATTING RULES:
+- Each quiz question in your JSON should follow this structure exactly
+- Do not include any markdown formatting or backticks
+- Ensure every word in questions and options is separated by spaces
+- Double-check that no text is concatenated without spaces
+- Generate varied and challenging questions suitable for level ${level}
+- Randomize question order and ensure only one correct answer per question`;
 
     fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
         method: 'POST',
