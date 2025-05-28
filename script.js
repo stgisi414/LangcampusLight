@@ -2770,9 +2770,9 @@ Respond in ${userNativeLanguage} so they can understand clearly. Be encouraging 
 
 Make your response conversational and helpful, as if you're a knowledgeable language teacher g"iving personalized advice.
 
-The grammar topics are ${grammarData[targetLanguage] ? grammarData[targetLanguage].map(topic => topic.title)}
+The grammar topics are ${grammarData[targetLanguage] ? grammarData[targetLanguage].map(topic => topic.title).join(', ') : 'none available'}
 
-The vocabulary topics are ${vocabData ? vocabData.map(topic => topic.title)}`;
+The vocabulary topics are ${vocabData ? vocabData.map(topic => topic.title).join(', ') : 'none available'}`;
 
             const guidanceResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
                 method: 'POST',
