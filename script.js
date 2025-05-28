@@ -688,7 +688,7 @@ function reloadVocabularyTopicsList() {
         vocabData.forEach(topic => {
             const button = document.createElement('button');
             button.dataset.title = topic.title;
-            // Applystyles consistent with initial populationbutton.style.json\s*|\s*```/g, '').trim();
+            // Applystyles consistent with initial populationbutton.style/g, '').trim();
 
             // Ensure it starts with [ and ends with ]
             if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
@@ -1001,37 +1001,22 @@ Your response must be valid JSON structured like this example:
         .then(data => {
             //console.log(data.candidates[0].content.parts[0].text);
             let quizText = data.candidates[0].content.parts[0].text;
-            quizText = quizText.replace(/```json\s*|\s*```/g, '').trim();
+            quizText = quizText.replace(/```json\s*|\s*The code fixes a missing closing parenthesis in the template literal within the `endQuiz` function.
+```html
 
-            if (!quizText.startsWith('[')) {
-                throw new Error('Invalid quiz format received');
-            }
-
-            try {
-                // Clean and validate the response text
-                let cleanText = quizText.replace(/div>`;
-            quizActive = false;
-        }
-    }
-
-    const letters = ['A', 'B', 'C', 'D'];
-    const correctIndex = typeof question.correctIndex === 'number' ? question.correctIndex : 0;
-
-    container.innerHTML = `
-        
 
             <strong>Question ${currentQuiz.currentQuestion + 1}/${currentQuiz.questions.length}:</strong>
-            
+
 
 ${question.question}
 
-            
+
 
 ${question.options.map((option, i) => `
                     ${letters[i]}) ${option}
                 `).join('')}
 
-        
+
 
     `;
 }
@@ -1073,12 +1058,12 @@ function handleAnswer(selected, correct) {
     const resultDiv = document.createElement('div');
     resultDiv.className = 'quiz-result';
     resultDiv.innerHTML = `
-        
+
 
             <strong>${selected === correct ? '✓ Correct!' : '✗ Incorrect'}</strong>
             ${selected !== correct ? `The correct answer was: ${buttons[correct].textContent}` : ''}
 
-        
+
     `;
     container.appendChild(resultDiv);
 
@@ -1155,15 +1140,17 @@ function endQuiz(message, container) {
         
 
             <strong>Quiz Complete!</strong>
-            
 
-Your score: 
-${grade}
+
+Your score: ${score}/${total} (${percentage}%)
+
+            ${grade}
+
 
             Share Results
             ${startOverButtonHtml}
 
-        
+
     `;
     // =====================================================================================
     // End of critical section
@@ -1362,8 +1349,8 @@ function addHobbyInput(value = '') {
     const div = document.createElement('div');
     div.className = 'hobby-input';
     div.innerHTML = `
-        
-        
+
+
     `;
 
     div.querySelector('.remove-hobby').addEventListener('click', () => {
@@ -1493,8 +1480,8 @@ function addHobbyInput(value = '') {
     const div = document.createElement('div');
     div.className = 'hobby-input';
     div.innerHTML = `
-        
-        
+
+
     `;
 
     const removeButton = div.querySelector('.remove-hobby');
@@ -1886,19 +1873,19 @@ function initAudioContext() {
 // Detect language using basic character set analysis
 function detectLanguage(text) {
     // Check for Chinese characters
-    if (/[\u4E00-\u9FFF]/.test(text)) return 'zh';
+    if (/[\\u4E00-\\u9FFF]/.test(text)) return 'zh';
     // Check for Japanese characters (Hiragana, Katakana, Kanji)
-    if (/[\u3040-\u30FF\u3400-\u4DBF\uF900-\uFAFF]/.test(text)) return 'ja'; // Added Kanji range
+    if (/[\\u3040-\\u30FF\\u3400-\\u4DBF\\uF900-\\uFAFF]/.test(text)) return 'ja'; // Added Kanji range
     // Check for Korean Hangul
-    if (/[\uAC00-\uD7AF]/.test(text)) return 'ko';
+    if (/[\\uAC00-\\uD7AF]/.test(text)) return 'ko';
     // Check for Arabic characters
-    if (/[\u0600-\u06FF]/.test(text)) return 'ar';
+    if (/[\\u0600-\\u06FF]/.test(text)) return 'ar';
     // Check for Russian Cyrillic characters
-    if (/[\u0400-\u04FF]/.test(text)) return 'ru';
+    if (/[\\u0400-\\u04FF]/.test(text)) return 'ru';
     // Check for Hindi Devanagari characters
-    if (/[\u0900-\u097F]/.test(text)) return 'hi';
+    if (/[\\u0900-\\u097F]/.test(text)) return 'hi';
     // Check for Thai characters
-    if (/[\u0E00-\u0E7F]/.test(text)) return 'th';
+    if (/[\\u0E00-\\u0E7F]/.test(text)) return 'th';
 
     // For European languages based on Latin script, diacritics can help but are not foolproof
     // Order matters here: more specific checks first
@@ -2069,9 +2056,9 @@ function createAudioButton(text, rect) {
     button.style.msUserSelect = 'none'; // For IE/Edge
 
     button.innerHTML = `
-        
+
             Play Audio
-        
+
     `;
 
     // Get chat modal for scroll handling
@@ -2162,9 +2149,9 @@ function createAudioButton(text, rect) {
             button.disabled = true;
             button.classList.add('playing');
             button.innerHTML = `
-                
+
                     Loading...
-                
+
             `;
 
             // Initialize audio context on user interaction
@@ -2178,9 +2165,9 @@ function createAudioButton(text, rect) {
             await playAudioFromText(text, button);
 
             button.innerHTML = `
-                
+
                     Played
-                
+
             `;
 
             setTimeout(() => button.remove(), 2000);
@@ -2194,18 +2181,18 @@ function createAudioButton(text, rect) {
                 button.style.display = 'flex';
                 button.style.pointerEvents = 'auto';
                 button.innerHTML = `
-                    
+
                         Error: ${error.message}
-                    
+
                 `;
 
                 // Keep error visible and allow retry
                 const retryTimeout = setTimeout(() => {
                     if (button && button.parentNode) {
                         button.innerHTML = `
-                            
+
                                 Try Again
-                            
+
                         `;
                     }
                 }, 3000);
@@ -2477,12 +2464,12 @@ document.getElementById('send-message').addEventListener('click', async () => {
         chatHistory.push(studyGuideResponse);
 
         chatMessages.innerHTML += `
-            
+
 
                 <strong>📚 Study Guide:</strong> ${studyGuideMessage}
-                
+
                     ${new Date(timestamp).toLocaleTimeString()}
-                
+
 
 `;
         chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -2511,12 +2498,12 @@ document.getElementById('send-message').addEventListener('click', async () => {
         chatHistory.push(userMessage);
         const chatMessages = document.getElementById('chat-messages');
         chatMessages.innerHTML += `
-            
+
 
                 <strong>You:</strong> ${messageText}
-                
+
                     ${new Date(timestamp).toLocaleTimeString()}
-                
+
 
 `;
         messageInput.value = '';
@@ -2551,12 +2538,12 @@ document.getElementById('send-message').addEventListener('click', async () => {
                 const partnerResponse = { sender: currentPartnerName, text: partnerResponseText, timestamp };
                 chatHistory.push(partnerResponse);
                 chatMessages.innerHTML += `
-                
+
 
                         <strong>${currentPartnerName}:</strong> ${partnerResponseText}
-                        
+
                             ${new Date(timestamp).toLocaleTimeString()}
-                        
+
 
 `;
             } else {
@@ -2571,11 +2558,11 @@ document.getElementById('send-message').addEventListener('click', async () => {
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error-message';
             errorDiv.innerHTML = `
-                
+
 
                     Error getting response.
                     Retry
-                
+
             `;
             chatMessages.appendChild(errorDiv);
         } finally {
