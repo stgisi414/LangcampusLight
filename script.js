@@ -2718,13 +2718,17 @@ document.getElementById('send-message').addEventListener('click', async () => {
         
         try {
             // Step 1: Check if this is a study-related request for the study guide system specifically
-            const studyDetectionPrompt = `Analyze this message and determine if the user is asking for STUDY GUIDE RECOMMENDATIONS, STUDY PLAN ASSISTANCE, or DIRECT GRAMMAR/VOCABULARY HELP.
+            const studyDetectionPrompt = `Analyze this message and determine if the user is asking for language learning help, study guidance, or wants to learn specific grammar/vocabulary topics.
 
 Message: "${message}"
 
-Respond with only "YES" if this is a request for study assistance, or "NO" if it's not.
+Respond with only "YES" if this is ANY kind of learning request, or "NO" if it's general conversation.
 
-Examples of STUDY ASSISTANCE requests (YES):
+Examples of LEARNING requests (YES):
+- "teach me grammar"
+- "teach me pronouns" 
+- "help me learn conjunctions"
+- "teach me advanced vocabulary"
 - "what should I study"
 - "I need study recommendations"
 - "help me plan my studies"
@@ -2732,11 +2736,9 @@ Examples of STUDY ASSISTANCE requests (YES):
 - "recommend vocabulary to learn"
 - "study guide"
 - "study plan"
-- "teach me grammar"
-- "teach me pronouns"
-- "help me learn conjunctions"
-- "teach me advanced vocabulary"
-- Direct requests for specific grammar or vocabulary topics
+- "explain grammar to me"
+- "help me with vocabulary"
+- Any request asking to learn or be taught something
 
 Examples of GENERAL CONVERSATION (NO):
 - "How was your day?"
@@ -2744,6 +2746,7 @@ Examples of GENERAL CONVERSATION (NO):
 - "Tell me about your hobbies"
 - "I like pizza"
 - "The weather is nice"
+- "Nice to meet you"
 - General chat that doesn't involve learning requests`;
 
             console.log(`[StudyGuide] Sending detection request to Gemini API`);
