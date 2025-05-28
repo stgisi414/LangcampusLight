@@ -524,48 +524,48 @@ document.getElementById('send-message').addEventListener('click', async () => { 
     const messageText = messageInput.value.trim();
     const chatMessages = document.getElementById('chat-messages');
 
-        if (messageText && currentPartner) { // Ensure partner context is available
-            lastUserMessage = messageText; // Store message for retry functionality
-            // Clear the Gemini intro timer if the user sends a message first
-            if (geminiIntroTimer) {
-                clearTimeout(geminiIntroTimer);
-                geminiIntroTimer = null;
-            }
+    if (messageText && currentPartner) { // Ensure partner context is available
+        lastUserMessage = messageText; // Store message for retry functionality
+        // Clear the Gemini intro timer if the user sends a message first
+        if (geminiIntroTimer) {
+            clearTimeout(geminiIntroTimer);
+            geminiIntroTimer = null;
+        }
 
-            // Remove the initial "Connecting..." message if it's still there
-            const connectingMessage = document.getElementById('connecting-message');
-            if (connectingMessage) {
-                connectingMessage.remove();
-            }
+        // Remove the initial "Connecting..." message if it's still there
+        const connectingMessage = document.getElementById('connecting-message');
+        if (connectingMessage) {
+            connectingMessage.remove();
+        }
 
-            // Add user's message with timestamp to UI and history
-            const timestamp = new Date().toISOString();
-            const userMessage = { sender: 'You', text: messageText, timestamp };
-            chatHistory.push(userMessage);
-            chatMessages.innerHTML += `
+        // Add user's message with timestamp to UI and history
+        const timestamp = new Date().toISOString();
+        const userMessage = { sender: 'You', text: messageText, timestamp };
+        chatHistory.push(userMessage);
+        chatMessages.innerHTML += `
               <p class="user-message">
                 <strong>You:</strong> ${messageText}
                 <span class="message-time" style="font-size: 0.8em; color: #fff; margin-left: 8px;">
                   ${new Date(timestamp).toLocaleTimeString()}
                 </span>
               </p>`;
-            messageInput.value = ''; // Clear input field
-            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll down
+        messageInput.value = ''; // Clear input field
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll down
 
-            // Increment message count and check for assessment
-            messageCountForAssessment++;
-            const timeSinceLastAssessment = Date.now() - lastAssessmentTime;
+        // Increment message count and check for assessment
+        messageCountForAssessment++;
+        const timeSinceLastAssessment = Date.now() - lastAssessmentTime;
 
-            if (messageCountForAssessment % ASSESSMENT_INTERVAL === 0 && 
-                timeSinceLastAssessment > ASSESSMENT_COOLDOWN) {
-                // Get last 40 messages or all if less than 40, in multiples of 4
-                const maxMessages = Math.min(40, chatHistory.length);
-                const messagesToAnalyze = Math.floor(maxMessages / 4) * 4;
-                const recentMessages = chatHistory.slice(-messagesToAnalyze);
+        if (messageCountForAssessment % ASSESSMENT_INTERVAL === 0 &&
+            timeSinceLastAssessment > ASSESSMENT_COOLDOWN) {
+            // Get last 40 messages or all if less than 40, in multiples of 4
+            const maxMessages = Math.min(40, chatHistory.length);
+            const messagesToAnalyze = Math.floor(maxMessages / 4) * 4;
+            const recentMessages = chatHistory.slice(-messagesToAnalyze);
 
-                // Perform assessment in background
-                assessLanguageLevel(recentMessages);
-            }
+            // Perform assessment in background
+            assessLanguageLevel(recentMessages);
+        }
 
         // Add a thinking indicator (optional)
         const thinkingIndicator = document.createElement('p');
@@ -1251,6 +1251,8 @@ REQUIREMENTS:
             return response.json();
         })
         .then(data => {
+            console.log('Quiz API response:');
+            console.log(data.candidates[0].content.parts[0].text);
             //console.log(data.candidates[0].content.parts[0].text);
             let quizText = data.candidates[0].content.parts[0].text;
             quizText = quizText.replace(/```json\s*|\s*```/g, '').trim();
@@ -1261,7 +1263,7 @@ REQUIREMENTS:
 
             try {
                 // Clean and validate the response text
-                let cleanText = quizText.replace(/```json\s*|\s*/g, '').trim();
+                let cleanText = quizText.replace(/```json\s*|\s*```/g, '').trim();
 
                 // Ensure it starts with [ and ends with ]
                 if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
@@ -2086,7 +2088,7 @@ document.getElementById('save-partner-btn').addEventListener('click', () => {
         if (isMobile) {
             // Create a temporary success message element
             const successMsg = document.createElement('div');
-            successMsg.style.position = 'fixed';            successMsg.style.bottom = '20px';
+            successMsg.style.position = 'fixed'; successMsg.style.bottom = '20px';
             successMsg.style.left = '50%';
             successMsg.style.transform = 'translateX(-50%)';
             successMsg.style.background = '#4CAF50';
@@ -2688,19 +2690,19 @@ let isProcessingStudyGuide = false;
 // Process study guide queue with delays
 async function processStudyGuideQueue() {
     if (isProcessingStudyGuide || studyGuideQueue.length === 0) return;
-    
+
     isProcessingStudyGuide = true;
-    
+
     while (studyGuideQueue.length > 0) {
         const { messageText, chatContext, resolve } = studyGuideQueue.shift();
         const result = await studyGuideMiddleware(messageText, chatContext);
         resolve(result);
-        
+
         if (studyGuideQueue.length > 0) {
             await new Promise(resolve => setTimeout(resolve, 3000)); // 3 second delay
         }
     }
-    
+
     isProcessingStudyGuide = false;
 }
 
