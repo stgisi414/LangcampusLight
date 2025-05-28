@@ -2718,13 +2718,13 @@ document.getElementById('send-message').addEventListener('click', async () => {
         
         try {
             // Step 1: Check if this is a study-related request for the study guide system specifically
-            const studyDetectionPrompt = `Analyze this message and determine if the user is asking for STUDY GUIDE RECOMMENDATIONS or STUDY PLAN ASSISTANCE, not if they're asking their conversation partner to teach them something.
+            const studyDetectionPrompt = `Analyze this message and determine if the user is asking for STUDY GUIDE RECOMMENDATIONS, STUDY PLAN ASSISTANCE, or DIRECT GRAMMAR/VOCABULARY HELP.
 
 Message: "${message}"
 
-Respond with only "YES" if this is a request for study guide/study plan help, or "NO" if it's not.
+Respond with only "YES" if this is a request for study assistance, or "NO" if it's not.
 
-Examples of STUDY GUIDE requests (YES):
+Examples of STUDY ASSISTANCE requests (YES):
 - "what should I study"
 - "I need study recommendations"
 - "help me plan my studies"
@@ -2732,13 +2732,19 @@ Examples of STUDY GUIDE requests (YES):
 - "recommend vocabulary to learn"
 - "study guide"
 - "study plan"
+- "teach me grammar"
+- "teach me pronouns"
+- "help me learn conjunctions"
+- "teach me advanced vocabulary"
+- Direct requests for specific grammar or vocabulary topics
 
-Examples of CONVERSATION PARTNER requests (NO):
-- "teach me pronouns" (asking partner to teach)
-- "help me learn conjunctions" (asking partner to help)
-- "explain this grammar" (asking partner to explain)
-- "teach me advanced vocabulary" (asking partner to teach)
-- Any request that seems directed at the conversation partner rather than asking for study guidance`;
+Examples of GENERAL CONVERSATION (NO):
+- "How was your day?"
+- "What did you do today?"
+- "Tell me about your hobbies"
+- "I like pizza"
+- "The weather is nice"
+- General chat that doesn't involve learning requests`;
 
             console.log(`[StudyGuide] Sending detection request to Gemini API`);
             const detectionResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
