@@ -2748,11 +2748,6 @@ document.getElementById('send-message').addEventListener('click', async () => {
     const messageInput = document.getElementById('message-input');
     const messageText = messageInput.value.trim();
 
-    // Only proceed if there's actually a message
-    if (!messageText) {
-        return;
-    }
-
     // Check for study guide request FIRST
     const chatContext = chatHistory.slice(-10);
     const studyGuideMessage = await studyGuideMiddleware(messageText, chatContext);
