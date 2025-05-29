@@ -336,8 +336,21 @@
         let authToken = null;
         let refreshInterval = null;
 
-        // Check if already logged in
-        document.addEventListener('DOMContentLoaded', function() {
+        // Check if already logged in and test API connectivity
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Test API connectivity
+            try {
+                console.log('Testing API connectivity...');
+                const testResponse = await fetch(`${API_BASE}/health`, { 
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                console.log('API health check:', testResponse.status, testResponse.statusText);
+            } catch (error) {
+                console.error('API connectivity test failed:', error);
+                showError('Warning: Cannot connect to admin API. Please check your internet connection.');
+            }
+
             const token = localStorage.getItem('adminToken');
             if (token) {
                 authToken = token;
@@ -369,19 +382,39 @@
                 const timestamp = Date.now();
                 const passwordHash = await hashPassword(password + timestamp);
 
+                const requestBody = {
+                    encryptedPassword: passwordHash,
+                    timestamp: timestamp,
+                    service: service
+                };
+
+                console.log('Login attempt:', {
+                    url: `${API_BASE}/login`,
+                    body: requestBody,
+                    timestamp: new Date(timestamp).toISOString()
+                });
+
                 const response = await fetch(`${API_BASE}/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        encryptedPassword: passwordHash,
-                        timestamp: timestamp,
-                        service: service
-                    })
+                    body: JSON.stringify(requestBody)
                 });
 
-                const data = await response.json();
+                console.log('Response status:', response.status);
+                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
+                let data;
+                try {
+                    data = await response.json();
+                    console.log('Response data:', data);
+                } catch (jsonError) {
+                    const text = await response.text();
+                    console.error('Failed to parse JSON response:', jsonError);
+                    console.error('Raw response text:', text);
+                    throw new Error(`Server returned invalid JSON. Status: ${response.status}, Text: ${text}`);
+                }
 
                 if (response.ok && data.token) {
                     authToken = data.token;
@@ -391,7 +424,20 @@
                         showDashboard();
                     }, 1000);
                 } else {
-                    throw new Error(data.error || 'Login failed');
+                    let errorMessage = 'Login failed';
+                    if (data && data.error) {
+                        errorMessage = data.error;
+                    } else if (response.status === 401) {
+                        errorMessage = 'Invalid credentials or unauthorized access';
+                    } else if (response.status === 404) {
+                        errorMessage = 'Admin API endpoint not found';
+                    } else if (response.status >= 500) {
+                        errorMessage = 'Server error - please try again later';
+                    } else {
+                        errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                    console.error('Login failed:', errorMessage, data);
+                    throw new Error(errorMessage);
                 }
             } catch (error) {
                 console.error('Login error:', error);
