@@ -396,22 +396,17 @@
             loginBtn.textContent = 'Logging in...';
 
             try {
-                // Try multiple potential request body formats
+                // Hash the password as the server expects encryptedPassword
+                const encryptedPassword = await hashPassword(password);
+                
                 const requestBody = {
-                    password: password,
-                    service: service,
-                    serviceName: service, // Some APIs expect serviceName
-                    adminPassword: password, // Some APIs expect adminPassword
-                    pass: password, // Some APIs use shortened 'pass'
-                    adminPass: password, // Some APIs use 'adminPass'
-                    credential: password, // Some APIs use 'credential'
-                    key: password, // Some APIs use 'key'
-                    token: password, // Some APIs use 'token'
-                    secret: password // Some APIs use 'secret'
+                    encryptedPassword: encryptedPassword,
+                    service: service
                 };
 
                 console.log('Password length:', password.length);
                 console.log('Service length:', service.length);
+                console.log('Encrypted password length:', encryptedPassword.length);
                 console.log('Request body before stringify:', requestBody);
                 
                 const bodyString = JSON.stringify(requestBody);
@@ -419,11 +414,11 @@
 
                 console.log('Login attempt:', {
                     url: `${API_BASE}/login`,
-                    body: { service: service, password: '[HIDDEN]' },
+                    body: { service: service, encryptedPassword: '[HIDDEN]' },
                     timestamp: new Date().toISOString()
                 });
 
-                // First try with JSON (current approach)
+                // Send the request with proper encryptedPassword field
                 let response = await fetch(`${API_BASE}/login`, {
                     method: 'POST',
                     headers: {
@@ -431,43 +426,6 @@
                     },
                     body: bodyString
                 });
-
-                // If that fails, try with form data
-                if (!response.ok && response.status === 400) {
-                    console.log('JSON request failed, trying form data...');
-                    const formData = new FormData();
-                    formData.append('password', password);
-                    formData.append('service', service);
-                    formData.append('adminPassword', password);
-                    formData.append('pass', password);
-                    formData.append('key', password);
-                    
-                    response = await fetch(`${API_BASE}/login`, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    console.log('Form data attempt status:', response.status);
-                    
-                    // If FormData fails, try URL-encoded
-                    if (!response.ok && response.status === 400) {
-                        console.log('FormData failed, trying URL-encoded...');
-                        const urlencoded = new URLSearchParams();
-                        urlencoded.append('password', password);
-                        urlencoded.append('service', service);
-                        urlencoded.append('adminPassword', password);
-                        urlencoded.append('pass', password);
-                        urlencoded.append('key', password);
-                        
-                        response = await fetch(`${API_BASE}/login`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: urlencoded
-                        });
-                        console.log('URL-encoded attempt status:', response.status);
-                    }
-                }
 
                 console.log('Response status:', response.status);
                 console.log('Response headers:', Object.fromEntries(response.headers.entries()));
