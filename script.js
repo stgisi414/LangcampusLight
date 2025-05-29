@@ -1683,37 +1683,12 @@ ${enableCorrections ? `
 Your response should be ONLY the chat message text. Do not include your name or any other prefix.`;
 
     try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }]
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`API request failed: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-
-        if (data?.candidates?.[0]?.content?.parts?.[0]) {
-            let text = data.candidates[0].content.parts[0].text.trim();
-            if (text.startsWith('"') && text.endsWith('"')) {
-                text = text.substring(1, text.length - 1);
-            }
-            return text;
-        }
-
-        throw new Error('Invalid API response structure');
+        console.log("Getting Gemini Response. History:", history);
+        const generatedText = await callGeminiAPI(prompt);
+        console.log("Extracted Gemini text:", generatedText);
+        return generatedText;
     } catch (error) {
-        console.error('Error getting chat response:', error);
+        console.error('Error calling Gemini API:', error);
         throw error;
     }
 }
