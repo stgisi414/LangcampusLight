@@ -68,14 +68,38 @@ async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
                 generatedText = generatedText.substring(1, generatedText.length - 1);
             }
 
-            // Log the API call
-            logGeminiApiCall(callType, attempt + 1, prompt, generatedText, response.status);
+            // Log the successful API call
+            const startTime = Date.now();
+            await logGeminiUsage({
+                username: 'practicefor_fun_user',
+                action: callType,
+                model: GEMINI_MODELS[currentModel],
+                inputTokens: prompt.length, // Approximate
+                outputTokens: generatedText.length, // Approximate
+                requestPreview: prompt,
+                responsePreview: generatedText,
+                success: true,
+                duration: Date.now() - startTime,
+                ipAddress: getUserIP(),
+                userAgent: navigator.userAgent
+            });
 
             return generatedText;
 
         } catch (error) {
             console.error(`Gemini API attempt ${attempt + 1} failed:`, error);
-            logGeminiApiCall(callType, attempt + 1, prompt, null, error.message);
+            
+            // Log the failed API call
+            await logGeminiUsage({
+                username: 'practicefor_fun_user',
+                action: callType,
+                model: GEMINI_MODELS[currentModel],
+                success: false,
+                error: error.message,
+                duration: Date.now() - startTime,
+                ipAddress: getUserIP(),
+                userAgent: navigator.userAgent
+            });
 
             if (attempt === retries - 1) {
                 throw error;
@@ -87,36 +111,38 @@ async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
     }
 }
 
-// Function to log Gemini API calls to the admin system
-async function logGeminiApiCall(callType, attempt, prompt, response, status) {
-    try {
-        const logData = {
-            timestamp: new Date().toISOString(),
-            callType: callType,
-            attempt: attempt,
-            model: currentModel,
-            prompt: prompt,
-            response: response,
-            status: status
-        };
+// Function to log Gemini API usage to the admin system
+async function logGeminiUsage(logData) {
+  try {
+    await fetch('https://langcamp.us/api/exchange-admin/log-gemini-usage', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: logData.username || 'anonymous',
+        action: logData.action, // e.g., 'chat_response', 'translation', 'grammar_check'
+        model: logData.model, // e.g., 'gemini-pro', 'gemini-pro-vision'
+        inputTokens: logData.inputTokens,
+        outputTokens: logData.outputTokens,
+        requestPreview: logData.requestPreview?.substring(0, 200),
+        responsePreview: logData.responsePreview?.substring(0, 200),
+        success: logData.success,
+        error: logData.error,
+        duration: logData.duration,
+        ipAddress: logData.ipAddress,
+        userAgent: logData.userAgent
+      })
+    });
+  } catch (error) {
+    console.error('Failed to log API usage:', error);
+  }
+}
 
-        // Send the log data to your admin system endpoint
-        const logResponse = await fetch('/admin/api/gemini_logs', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(logData)
-        });
-
-        if (!logResponse.ok) {
-            console.error('Failed to log Gemini API call:', logResponse.status, logResponse.statusText);
-        } else {
-            console.log('Gemini API call logged successfully.');
-        }
-    } catch (error) {
-        console.error('Error logging Gemini API call:', error);
-    }
+// Helper function to get user IP (simplified)
+function getUserIP() {
+    // In a real implementation, you might want to use a service to get the actual IP
+    return 'unknown';
 }
 
 async function searchPartners() {
