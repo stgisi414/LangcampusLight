@@ -1301,6 +1301,7 @@
             font-weight: 500;
         }
 
+
         /* Responsive Adjustments */
         @media (max-width: 768px) {
             .search-filters {
@@ -1351,60 +1352,6 @@
                     width: 40px;
                 }
             }
-
-            .secondary-button {
-            background-color: #6c757d;
-        }
-
-        .secondary-button:hover {
-            background-color: #5a6268;
-        }
-
-        .model-selector {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 10px 0;
-            padding: 8px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-        }
-
-        .model-label {
-            font-size: 14px;
-            font-weight: 500;
-            color: #495057;
-            margin-right: 8px;
-        }
-
-        .model-button {
-            padding: 6px 12px;
-            border: 1px solid #dee2e6;
-            background-color: #fff;
-            color: #495057;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .model-button:hover {
-            background-color: #e9ecef;
-            border-color: #adb5bd;
-        }
-
-        .model-button.active {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-
-        .model-button.active:hover {
-            background-color: #0056b3;
-            border-color: #004085;
-        }
     </style>
 </head>
 
@@ -1528,53 +1475,49 @@
             </div>
         </div>
         <div class="search-container">
-            <select id="nativeLanguage">
-                <option value="">I speak...</option>
-                <option value="English">English</option>
-                <option value="Spanish">Spanish</option>
-                <option value="French">French</option>
-                <option value="Italian">Italian</option>
-                <option value="Portuguese">Portuguese</option>
-                <option value="German">German</option>
-                <option value="Russian">Russian</option>
-                <option value="Polish">Polish</option>
-                <option value="Arabic">Arabic</option>
-                <option value="Japanese">Japanese</option>
-                <option value="Chinese">Chinese</option>
-                <option value="Korean">Korean</option>
-                <option value="Vietnamese"">Vietnamese</option>
-                <option value=" Mongolian">Mongolian</option>
-                <option value="Hindi">Hindi</option>
-                <option value="Thai">Thai</option>
-            </select>
-            <select id="targetLanguage">
-                <option value="">I want to learn...</option>
-                <option value="English">English</option>
-                <option value="Spanish">Spanish</option>
-                <option value="French">French</option>
-                <option value="Italian">Italian</option>
-                <option value="Portuguese">Portuguese</option>
-                <option value="German">German</option>
-                <option value="Russian">Russian</option>
-                <option value="Polish">Polish</option>
-                <option value="Arabic">Arabic</option>
-                <option value="Japanese">Japanese</option>
-                <option value="Chinese">Chinese</option>
-                <option value="Korean">Korean</option>
-                <option value="Vietnamese"">Vietnamese</option>
-                <option value=" Mongolian">Mongolian</option>
-                <option value="Hindi">Hindi</option>
-                <option value="Thai">Thai</option>
-            </select>
-            <input type="text" id="interestSearch" placeholder="Search by interest...">
-            <div class="model-selector">
-                <span class="model-label">AI Model:</span>
-                <button class="model-button active" data-model="ultra" onclick="setActiveModel('ultra')">Ultra</button>
-                <button class="model-button" data-model="super" onclick="setActiveModel('super')">Super</button>
-                <button class="model-button" data-model="pro" onclick="setActiveModel('pro')">Pro</button>
-                <button class="model-button" data-model="lite" onclick="setActiveModel('lite')">Lite</button>
+            <div class="search-filters">
+                <select id="nativeLanguage">
+                    <option value="">I speak...</option>
+                    <option value="English">English</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="French">French</option>
+                    <option value="Italian">Italian</option>
+                    <option value="Portuguese">Portuguese</option>
+                    <option value="German">German</option>
+                    <option value="Russian">Russian</option>
+                    <option value="Polish">Polish</option>
+                    <option value="Arabic">Arabic</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Korean">Korean</option>
+                    <option value="Vietnamese"">Vietnamese</option>
+                    <option value=" Mongolian">Mongolian</option>
+                    <option value="Hindi">Hindi</option>
+                    <option value="Thai">Thai</option>
+                </select>
+                <select id="targetLanguage">
+                    <option value="">I want to learn...</option>
+                    <option value="English">English</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="French">French</option>
+                    <option value="Italian">Italian</option>
+                    <option value="Portuguese">Portuguese</option>
+                    <option value="German">German</option>
+                    <option value="Russian">Russian</option>
+                    <option value="Polish">Polish</option>
+                    <option value="Arabic">Arabic</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Korean">Korean</option>
+                    <option value="Vietnamese"">Vietnamese</option>
+                    <option value=" Mongolian">Mongolian</option>
+                    <option value="Hindi">Hindi</option>
+                    <option value="Thai">Thai</option>
+                </select>
+
+                <button id="searchButton">Find Partners</button>
+                <input type="text" id="interestSearch" placeholder="Search by interest...">
             </div>
-            <button id="searchButton">Find Partners</button>
         </div>
 
         <div id="results" class="results-container" style="min-height: 300px; display: grid; place-items: center;">
@@ -1650,34 +1593,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="teachme.js"></script>
-    <script>
-        let activeModel = 'ultra'; // Default model
-
-        function setActiveModel(model) {
-            activeModel = model;
-            const buttons = document.querySelectorAll('.model-button');
-            buttons.forEach(button => button.classList.remove('active'));
-            document.querySelector(`.model-button[data-model="${model}"]`).classList.add('active');
-            // Here you would also update the API endpoint or any relevant configuration
-            console.log(`Active model set to: ${model}`);
-        }
-
-        // Example usage in your fetch function:
-        function getGeminiFlashEndpoint() {
-            switch (activeModel) {
-                case 'ultra':
-                    return 'gemini-2.5-flash-preview-05-20';
-                case 'super':
-                    return 'gemini-2.0.-flash';
-                case 'pro':
-                    return 'gemini-2.0-flash-thinking-exp-01-21';
-                case 'lite':
-                    return 'gemini-2.0-flash-lite';
-                default:
-                    return 'gemini-2.0.-flash'; // Default model
-            }
-        }
-    </script>
     <script src="script.js"></script>
 </body>
 

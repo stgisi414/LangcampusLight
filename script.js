@@ -18,83 +18,6 @@ async function retryLastMessage() {
 
 const API_KEY = 'AIzaSyDIFeql6HUpkZ8JJlr_kuN0WDFHUyOhijA';
 
-// Model configuration
-const GEMINI_MODELS = {
-    'ultra': 'gemini-2.5-flash-preview-05-20',
-    'super': 'gemini-2.0-flash',
-    'pro': 'gemini-2.0-flash-thinking-exp-01-21',
-    'lite': 'gemini-2.0-flash-lite'
-};
-
-let currentModel = 'super'; // Default model
-
-// Centralized Gemini API service
-async function callGeminiAPI(prompt, modelType = currentModel) {
-    const model = GEMINI_MODELS[modelType];
-    if (!model) {
-        throw new Error(`Invalid model type: ${modelType}`);
-    }
-
-    try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }]
-            })
-        });
-
-        if (!response.ok) {
-            const errorBody = await response.text();
-            throw new Error(`API request failed with status ${response.status}: ${response.statusText}. Body: ${errorBody}`);
-        }
-
-        const data = await response.json();
-
-        if (!data || !data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
-            console.error("Unexpected API response structure:", data);
-            throw new Error("Unexpected API response structure");
-        }
-
-        let generatedText = data.candidates[0].content.parts[0].text;
-        
-        // Clean up response text
-        generatedText = generatedText.trim();
-        if (generatedText.startsWith('"') && generatedText.endsWith('"')) {
-            generatedText = generatedText.substring(1, generatedText.length - 1);
-        }
-
-        return generatedText;
-    } catch (error) {
-        console.error('Error calling Gemini API:', error);
-        throw error;
-    }
-}
-
-// Model selector functions
-function setActiveModel(modelType) {
-    currentModel = modelType;
-    updateModelButtons();
-    console.log(`Switched to model: ${GEMINI_MODELS[modelType]}`);
-}
-
-function updateModelButtons() {
-    const buttons = document.querySelectorAll('.model-button');
-    buttons.forEach(button => {
-        if (button.dataset.model === currentModel) {
-            button.classList.add('active');
-        } else {
-            button.classList.remove('active');
-        }
-    });
-}
-
 async function searchPartners() {
     const nativeLanguage = document.getElementById('nativeLanguage').value;
     const targetLanguage = document.getElementById('targetLanguage').value;
@@ -173,7 +96,33 @@ ${exampleJson}`;
 
 async function generatePartnerProfiles(prompt) {
     try {
-        let generatedText = await callGeminiAPI(prompt);
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: prompt // Send the prompt exactly as constructed
+                    }]
+                }]
+            })
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`API request failed with status ${response.status}: ${response.statusText}. Body: ${errorBody}`);
+        }
+
+        const data = await response.json();
+
+        if (!data || !data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+            console.error("Unexpected API response structure:", data);
+            throw new Error("Unexpected API response structure");
+        }
+
+        let generatedText = data.candidates[0].content.parts[0].text;
 
         // Attempt to strip markdown code fences if present
         const jsonRegex = /```json\n?(\[.*\]|\[[\s\S]*?\])\n?```/;
@@ -440,7 +389,17 @@ Your response must be ONLY the chat message text itself in ${partner.nativeLangu
 
             let introMessageText;
             try {
-                introMessageText = await callGeminiAPI(introPrompt);
+                const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, { // Ensure API_KEY is defined
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: introPrompt }] }] })
+                });
+                if (!response.ok) throw new Error('Failed to generate intro from API');
+                const data = await response.json();
+                introMessageText = data.candidates[0].content.parts[0].text.trim();
+                if (introMessageText.startsWith('"') && introMessageText.endsWith('"')) {
+                    introMessageText = introMessageText.slice(1, -1);
+                }
             } catch (error) {
                 console.error('Error generating custom intro:', error);
                 introMessageText = `Hi! I'm ${partner.name}. It's nice to meet you! I see you're learning ${partner.nativeLanguage}. How's it going so far?`; // Fallback
@@ -523,7 +482,24 @@ async function assessLanguageLevel(messages) {
     const assessmentPrompt = `Analyze the following chat messages from a language learner and assess their proficiency level in the target language (1-5 stars, 1 being beginner, 5 being advanced):\n\n${messages.map(msg => `${msg.sender}: ${msg.text}`).join('\n')}\n\nProvide ONLY a single number representing the star rating (e.g., 3).`;
 
     try {
-        const assessmentResult = await callGeminiAPI(assessmentPrompt);
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: assessmentPrompt }] }] })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Assessment API request failed: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (!data || !data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+            console.error("Unexpected API response structure for assessment:", data);
+            throw new Error("Unexpected API response structure for assessment");
+        }
+
+        const assessmentResult = data.candidates[0].content.parts[0].text.trim();
         const rating = parseInt(assessmentResult);
 
         if (isNaN(rating) || rating < 1 || rating > 5) {
@@ -848,7 +824,24 @@ Include:
 
 Format the response in Markdown with clear sections and examples.`;
 
-        const content = await callGeminiAPI(prompt);
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }]
+            })
+        });
+
+        if (!response.ok) throw new Error('Failed to generate vocabulary content');
+
+        const data = await response.json();
+        const content = data.candidates[0].content.parts[0].text;
 
         // Convert markdown to HTML and display
         container.innerHTML = `
@@ -918,7 +911,24 @@ Format as valid JSON with this structure:
 Each question must have exactly 4 options. Do not include backticks or markdown formatting.`;
 
     try {
-        let quizText = await callGeminiAPI(quizPrompt);
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: quizPrompt
+                    }]
+                }]
+            })
+        });
+
+        if (!response.ok) throw new Error('Failed to generate quiz');
+
+        const data = await response.json();
+        let quizText = data.candidates[0].content.parts[0].text.trim();
 
         try {
             // Clean the response text by removing markdown code fences and any extra whitespace
@@ -1082,9 +1092,37 @@ The user does not currently want corrections. Just provide a natural conversatio
 Your response should be ONLY the chat message text. Do not include your name or any other prefix.`;
 
     try {
-        let generatedText = await callGeminiAPI(prompt);
-        console.log("Extracted Gemini text:", generatedText);
-        return generatedText;
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }]
+            })
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            console.error(`Gemini API request failed with status ${response.status}: ${response.statusText}. Body: ${errorBody}`);
+            throw new Error(`API request failed: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log("Gemini API Response Data:", data);
+
+        if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+            let generatedText = data.candidates[0].content.parts[0].text;
+            generatedText = generatedText.trim();
+            if (generatedText.startsWith('"') && generatedText.endsWith('"')) {
+                generatedText = generatedText.substring(1, generatedText.length - 1);
+            }
+            console.log("Extracted Gemini text:", generatedText);
+            return generatedText;
         } else if (data && data.candidates && data.candidates[0] && data.candidates[0].finishReason === 'SAFETY') {
             console.warn("Gemini response blocked due to safety settings.");
             return "I'm sorry, I can't respond to that.";
@@ -1191,9 +1229,21 @@ Your response must be valid JSON structured like this example:
 
     Make sure to generate varied and challenging questions suitable for the specified level. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it. In all just make sure multiple answers cannot be correct and the answers must be completely separate from the question example.`;
 
-    callGeminiAPI(quizPrompt)
-        .then(quizText => {
-            console.log("Quiz API response:", quizText);
+    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            contents: [{ parts: [{ text: quizPrompt }] }]
+        })
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to generate quiz');
+            return response.json();
+        })
+        .then(data => {
+            console.log("Quiz API response:");
+            console.log(data.candidates[0].content.parts[0].text);
+            let quizText = data.candidates[0].content.parts[0].text;
             quizText = quizText.replace(/```json\s*|\s*```/g, '').trim();
 
             if (!quizText.startsWith('[')) {
@@ -1552,7 +1602,33 @@ Format your entire response using Markdown. Use headings, bullet points, bold te
 Do NOT include any text before or after the Markdown content.`;
 
     try {
-        let explanationMarkdown = await callGeminiAPI(prompt);
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }]
+            })
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`API request failed with status ${response.status}: ${response.statusText}. Body: ${errorBody}`);
+        }
+
+        const data = await response.json();
+
+        if (!data || !data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+            console.error("Unexpected API response structure for grammar explanation:", data);
+            throw new Error("Unexpected API response structure for grammar explanation");
+        }
+
+        let explanationMarkdown = data.candidates[0].content.parts[0].text;
         console.log("Received Markdown explanation:", explanationMarkdown);
 
         // Convert Markdown to HTML using marked.js
@@ -1716,7 +1792,6 @@ Your response should be ONLY the chat message text. Do not include your name or 
 document.addEventListener('DOMContentLoaded', () => {
     loadPreferences();
     loadMyInfo();
-    updateModelButtons(); // Initialize model selector
 
     // My Info event listeners
     document.getElementById('toggleMyInfo').addEventListener('click', () => {
@@ -2639,7 +2714,25 @@ Keep your response concise but helpful (2-3 sentences max). Respond in ${userNat
 
 Available grammar topics include: ${grammarData[targetLanguage] ? grammarData[targetLanguage].slice(0, 10).map(topic => topic.title).join(', ') : 'basic grammar topics'}`;
 
-        let studyRecommendations = await callGeminiAPI(studyGuidancePrompt);
+        const guidanceResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: studyGuidancePrompt }] }]
+            })
+        });
+
+        if (!guidanceResponse.ok) {
+            console.error('[StudyGuide] API call failed:', guidanceResponse.status);
+            return null;
+        }
+
+        const guidanceData = await guidanceResponse.json();
+        let studyRecommendations = guidanceData.candidates[0].content.parts[0].text.trim();
+
+        if (studyRecommendations.startsWith('"') && studyRecommendations.endsWith('"')) {
+            studyRecommendations = studyRecommendations.slice(1, -1);
+        }
 
         console.log(`[StudyGuide] Generated recommendations: "${studyRecommendations.substring(0, 100)}..."`);
         return studyRecommendations;
