@@ -521,16 +521,22 @@
 
                 // Log each stat value for debugging
                 console.log('Stats breakdown:', {
-                    totalCalls: stats.totalCalls,
-                    todayCalls: stats.todayCalls,
+                    totalApiCalls: stats.totalApiCalls,
+                    todayApiCalls: stats.todayApiCalls,
                     activeUsers: stats.activeUsers,
                     errorRate: stats.errorRate
                 });
 
-                document.getElementById('totalCalls').textContent = stats.totalCalls || '0';
-                document.getElementById('todayCalls').textContent = stats.todayCalls || '0';
-                document.getElementById('activeUsers').textContent = stats.activeUsers || '0';
-                document.getElementById('errorRate').textContent = stats.errorRate || '0%';
+                // Ensure proper field mapping and number conversion
+                const totalCalls = parseInt(stats.totalApiCalls) || 0;
+                const todayCalls = parseInt(stats.todayApiCalls) || 0;
+                const activeUsers = parseInt(stats.activeUsers) || 0;
+                const errorRate = stats.errorRate || 0;
+
+                document.getElementById('totalCalls').textContent = totalCalls.toString();
+                document.getElementById('todayCalls').textContent = todayCalls.toString();
+                document.getElementById('activeUsers').textContent = activeUsers.toString();
+                document.getElementById('errorRate').textContent = `${errorRate}%`;
             } catch (error) {
                 console.error('Error loading stats:', error);
             }
