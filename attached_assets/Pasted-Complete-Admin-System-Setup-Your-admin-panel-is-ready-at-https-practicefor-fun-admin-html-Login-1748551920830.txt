@@ -1,0 +1,66 @@
+Complete Admin System Setup
+Your admin panel is ready at: https://practicefor.fun/admin.html
+Login password: PracticeFun2024!
+
+API Endpoints Available:
+POST https://langcamp.us/api/exchange-admin/log-gemini-usage - For logging API usage
+POST https://langcamp.us/api/exchange-admin/login - Admin authentication
+GET https://langcamp.us/api/exchange-admin/stats - Dashboard statistics
+GET https://langcamp.us/api/exchange-admin/api-logs - Recent API logs
+Integration Code for practicefor.fun
+Add this logging function to your practicefor.fun application:
+
+// Add this to your Gemini API wrapper
+async function logGeminiUsage(logData) {
+  try {
+    await fetch('https://langcamp.us/api/exchange-admin/log-gemini-usage', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: logData.username || 'anonymous',
+        action: logData.action, // e.g., 'chat_response', 'translation', 'grammar_check'
+        model: logData.model, // e.g., 'gemini-pro', 'gemini-pro-vision'
+        inputTokens: logData.inputTokens,
+        outputTokens: logData.outputTokens,
+        requestPreview: logData.requestPreview?.substring(0, 200),
+        responsePreview: logData.responsePreview?.substring(0, 200),
+        success: logData.success,
+        error: logData.error,
+        duration: logData.duration,
+        ipAddress: logData.ipAddress,
+        userAgent: logData.userAgent
+      })
+    });
+  } catch (error) {
+    console.error('Failed to log API usage:', error);
+  }
+}
+// Example usage in your Gemini API calls:
+const startTime = Date.now();
+try {
+  const response = await geminiAPI.generateContent(prompt);
+  await logGeminiUsage({
+    username: currentUser?.username,
+    action: 'chat_response',
+    model: 'gemini-pro',
+    inputTokens: response.inputTokens,
+    outputTokens: response.outputTokens,
+    requestPreview: prompt,
+    responsePreview: response.text,
+    success: true,
+    duration: Date.now() - startTime,
+    ipAddress: getUserIP(),
+    userAgent: navigator.userAgent
+  });
+} catch (error) {
+  await logGeminiUsage({
+    username: currentUser?.username,
+    action: 'chat_response',
+    model: 'gemini-pro',
+    success: false,
+    error: error.message,
+    duration: Date.now() - startTime
+  });
+}
