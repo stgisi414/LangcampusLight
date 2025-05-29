@@ -366,12 +366,29 @@
         });
 
         async function login() {
-            const password = document.getElementById('password').value;
-            const service = document.getElementById('service').value;
+            const passwordField = document.getElementById('password');
+            const serviceField = document.getElementById('service');
             const loginBtn = document.getElementById('loginBtn');
+
+            if (!passwordField || !serviceField) {
+                showError('Form fields not found');
+                return;
+            }
+
+            const password = passwordField.value.trim();
+            const service = serviceField.value.trim();
+
+            console.log('Password field value:', password ? '[PASSWORD ENTERED]' : '[EMPTY]');
+            console.log('Service field value:', service);
 
             if (!password) {
                 showError('Please enter a password');
+                passwordField.focus();
+                return;
+            }
+
+            if (!service) {
+                showError('Service name is required');
                 return;
             }
 
