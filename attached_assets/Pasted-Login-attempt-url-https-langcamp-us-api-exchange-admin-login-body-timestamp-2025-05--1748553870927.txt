@@ -1,0 +1,56 @@
+Login attempt: {url: 'https://langcamp.us/api/exchange-admin/login', body: {…}, timestamp: '2025-05-29T21:24:07.072Z'}
+admin.html:393 
+            
+            
+           POST https://langcamp.us/api/exchange-admin/login 400 (Bad Request)
+login @ admin.html:393
+(anonymous) @ admin.html:589Understand this error
+admin.html:401 Response status: 400
+admin.html:402 Response headers: {content-length: '34', content-type: 'application/json; charset=utf-8'}
+admin.html:407 Response data: {message: 'Password is required'}
+admin.html:435 Login failed: HTTP 400:  {message: 'Password is required'}
+login @ admin.html:435
+await in login
+(anonymous) @ admin.html:589Understand this error
+admin.html:439 Login error: Error: HTTP 400: 
+    at login (admin.html:436:27)
+login @ admin.html:439
+await in login
+(anonymous) @ admin.html:589Understand this error
+admin.html:387 Login attempt: {url: 'https://langcamp.us/api/exchange-admin/login', body: {…}, timestamp: '2025-05-29T21:24:12.801Z'}
+admin.html:393 
+            
+            
+           POST https://langcamp.us/api/exchange-admin/login 429 (Too Many Requests)
+login @ admin.html:393
+(anonymous) @ admin.html:365Understand this error
+admin.html:401 Response status: 429
+admin.html:402 Response headers: {content-length: '62', content-type: 'application/json; charset=utf-8'}
+admin.html:407 Response data: {message: 'Too many login attempts. Please try again later.'}
+admin.html:435 Login failed: HTTP 429:  {message: 'Too many login attempts. Please try again later.'}
+login @ admin.html:435
+await in login
+(anonymous) @ admin.html:365Understand this error
+admin.html:439 Login error: Error: HTTP 429: 
+    at login (admin.html:436:27)
+    at async HTMLFormElement.<anonymous> (admin.html:365:13)
+login @ admin.html:439
+await in login
+(anonymous) @ admin.html:365Understand this error
+admin.html:387 Login attempt: {url: 'https://langcamp.us/api/exchange-admin/login', body: {…}, timestamp: '2025-05-29T21:24:18.628Z'}
+admin.html:393 
+            
+            
+           POST https://langcamp.us/api/exchange-admin/login 429 (Too Many Requests)
+login @ admin.html:393
+(anonymous) @ admin.html:365Understand this error
+admin.html:401 Response status: 429
+admin.html:402 Response headers: {content-length: '62', content-type: 'application/json; charset=utf-8'}
+admin.html:407 Response data: {message: 'Too many login attempts. Please try again later.'}
+admin.html:435 Login failed: HTTP 429:  {message: 'Too many login attempts. Please try again later.'}
+login @ admin.html:435
+await in login
+(anonymous) @ admin.html:365Understand this error
+admin.html:439 Login error: Error: HTTP 429: 
+    at login (admin.html:436:27)
+    at async HTMLFormElement.<anonymous> (admin.html:365:13)
