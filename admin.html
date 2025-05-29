@@ -563,15 +563,18 @@
                 const logs = await response.json();
                 lastLogsResponse = logs; // Store for debugging
                 console.log('Full logs response received:', JSON.stringify(logs, null, 2));
-                console.log('Number of logs returned:', (logs.logs || []).length);
                 
-                if (logs.logs && logs.logs.length > 0) {
-                    console.log('First log entry sample:', logs.logs[0]);
+                // Handle both array and object formats
+                const logsArray = Array.isArray(logs) ? logs : (logs.logs || []);
+                console.log('Number of logs returned:', logsArray.length);
+                
+                if (logsArray.length > 0) {
+                    console.log('First log entry sample:', logsArray[0]);
                 } else {
                     console.log('No logs found in response');
                 }
                 
-                displayLogs(logs.logs || []);
+                displayLogs(logsArray);
             } catch (error) {
                 console.error('Error loading logs:', error);
                 document.getElementById('logsContainer').innerHTML = '<div class="error-message">Failed to load logs</div>';
@@ -587,9 +590,17 @@
             }
 
             const logsHtml = logs.map(log => {
-                const time = new Date(log.timestamp).toLocaleString();
+                // Use createdAt or timestamp, whichever is available
+                const timestamp = log.createdAt || log.timestamp;
+                const time = timestamp ? new Date(timestamp).toLocaleString() : 'Unknown time';
                 const statusClass = log.success ? 'status-success' : 'status-error';
                 const statusText = log.success ? 'Success' : 'Error';
+
+                // Truncate previews for better display
+                const requestPreview = log.requestPreview ? 
+                    (log.requestPreview.length > 100 ? log.requestPreview.substring(0, 100) + '...' : log.requestPreview) : 'N/A';
+                const responsePreview = log.responsePreview ? 
+                    (log.responsePreview.length > 100 ? log.responsePreview.substring(0, 100) + '...' : log.responsePreview) : (log.error || 'N/A');
 
                 return `
                     <div class="log-entry">
@@ -599,11 +610,12 @@
                             <span class="log-status ${statusClass}">${statusText}</span>
                         </div>
                         <div class="log-preview">
-                            <strong>Request:</strong> ${log.requestPreview || 'N/A'}<br>
-                            <strong>Response:</strong> ${log.responsePreview || log.error || 'N/A'}<br>
-                            <strong>User:</strong> ${log.userInfo || 'Anonymous'} | 
+                            <strong>Request:</strong> ${requestPreview}<br>
+                            <strong>Response:</strong> ${responsePreview}<br>
+                            <strong>User:</strong> ${log.username || log.userInfo || 'Anonymous'} | 
                             <strong>Model:</strong> ${log.model || 'Unknown'} |
-                            <strong>Tokens:</strong> ${log.inputTokens || 0}/${log.outputTokens || 0}
+                            <strong>Tokens:</strong> ${log.inputTokens || 0}/${log.outputTokens || 0} |
+                            <strong>Duration:</strong> ${log.duration || 0}ms
                         </div>
                     </div>
                 `;
