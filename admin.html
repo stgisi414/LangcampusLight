@@ -396,9 +396,12 @@
             loginBtn.textContent = 'Logging in...';
 
             try {
+                // Try multiple potential request body formats
                 const requestBody = {
                     password: password,
-                    service: service
+                    service: service,
+                    serviceName: service, // Some APIs expect serviceName
+                    adminPassword: password // Some APIs expect adminPassword
                 };
 
                 console.log('Password length:', password.length);
@@ -414,13 +417,28 @@
                     timestamp: new Date().toISOString()
                 });
 
-                const response = await fetch(`${API_BASE}/login`, {
+                // First try with JSON (current approach)
+                let response = await fetch(`${API_BASE}/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: bodyString
                 });
+
+                // If that fails, try with form data
+                if (!response.ok && response.status === 400) {
+                    console.log('JSON request failed, trying form data...');
+                    const formData = new FormData();
+                    formData.append('password', password);
+                    formData.append('service', service);
+                    
+                    response = await fetch(`${API_BASE}/login`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    console.log('Form data attempt status:', response.status);
+                }
 
                 console.log('Response status:', response.status);
                 console.log('Response headers:', Object.fromEntries(response.headers.entries()));
