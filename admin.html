@@ -488,18 +488,26 @@
 
         async function loadStats() {
             try {
+                console.log('Loading stats with token:', authToken ? '[TOKEN_PRESENT]' : '[NO_TOKEN]');
                 const response = await fetch(`${API_BASE}/stats`, {
                     headers: {
-                        'Authorization': `Bearer ${authToken}`
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
                     }
                 });
 
+                console.log('Stats API response status:', response.status, response.statusText);
+
                 if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Stats API error response:', errorText);
+                    
                     if (response.status === 401) {
+                        console.log('Authentication failed, logging out');
                         logout();
                         return;
                     }
-                    throw new Error('Failed to load stats');
+                    throw new Error(`Failed to load stats: ${response.status} ${response.statusText}`);
                 }
 
                 const stats = await response.json();
@@ -515,18 +523,26 @@
 
         async function loadLogs() {
             try {
+                console.log('Loading logs with token:', authToken ? '[TOKEN_PRESENT]' : '[NO_TOKEN]');
                 const response = await fetch(`${API_BASE}/api-logs?limit=20`, {
                     headers: {
-                        'Authorization': `Bearer ${authToken}`
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
                     }
                 });
 
+                console.log('Logs API response status:', response.status, response.statusText);
+
                 if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Logs API error response:', errorText);
+                    
                     if (response.status === 401) {
+                        console.log('Authentication failed, logging out');
                         logout();
                         return;
                     }
-                    throw new Error('Failed to load logs');
+                    throw new Error(`Failed to load logs: ${response.status} ${response.statusText}`);
                 }
 
                 const logs = await response.json();
