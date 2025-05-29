@@ -140,6 +140,10 @@ async function logGeminiUsage(messageType, prompt) {
         const locationInfo = await getUserLocationInfo();
         const timestamp = new Date().toISOString();
         
+        // Get user's name from localStorage
+        const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+        const userName = myInfo.name || 'Unknown User';
+        
         // Prepare log entry
         const logEntry = {
             severity: 'INFO',
@@ -152,6 +156,7 @@ async function logGeminiUsage(messageType, prompt) {
             jsonPayload: {
                 message_type: messageType,
                 model: GEMINI_MODELS[currentModel] || 'unknown',
+                user_name: userName,
                 user_ip: locationInfo.ip,
                 user_country: locationInfo.country,
                 user_country_code: locationInfo.countryCode,
@@ -190,6 +195,7 @@ async function logGeminiUsage(messageType, prompt) {
         // Also log locally for debugging
         console.log('Gemini Usage Logged:', {
             type: messageType,
+            user_name: userName,
             time: timestamp,
             ip: locationInfo.ip,
             country: locationInfo.country,
@@ -198,9 +204,14 @@ async function logGeminiUsage(messageType, prompt) {
 
     } catch (error) {
         console.warn('Failed to log Gemini usage:', error);
+        // Get user's name for fallback logging
+        const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+        const userName = myInfo.name || 'Unknown User';
+        
         // Fallback local logging
         console.log('Gemini API Call:', {
             type: messageType,
+            user_name: userName,
             time: new Date().toISOString(),
             preview: messageType === 'chat_response' ? prompt.substring(0, 10) : 'N/A'
         });
