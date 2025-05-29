@@ -116,33 +116,78 @@ function determineMessageType(callerLine, prompt) {
 
 // Get user's IP and country information
 async function getUserLocationInfo() {
+    console.log('🌍 Fetching user location information from ipapi.co...');
+    
     try {
+        console.log('🌍 Making request to https://ipapi.co/json/');
         const response = await fetch('https://ipapi.co/json/');
+        
+        console.log('🌍 Location API response status:', response.status, response.statusText);
+        
+        if (!response.ok) {
+            throw new Error(`Location API returned ${response.status}: ${response.statusText}`);
+        }
+        
         const data = await response.json();
-        return {
+        console.log('🌍 Raw location data received:', data);
+        
+        const locationInfo = {
             ip: data.ip || 'unknown',
             country: data.country_name || 'unknown',
             countryCode: data.country_code || 'unknown'
         };
+        
+        console.log('🌍 Processed location info:', locationInfo);
+        console.log('🌍 Location detection successful');
+        
+        return locationInfo;
     } catch (error) {
-        console.warn('Could not fetch location info:', error);
-        return {
+        console.error('🌍 Location detection failed:', error);
+        console.error('🌍 Error details:', error.message);
+        
+        const fallbackInfo = {
             ip: 'unknown',
             country: 'unknown',
             countryCode: 'unknown'
         };
+        
+        console.log('🌍 Using fallback location info:', fallbackInfo);
+        console.warn('Could not fetch location info:', error);
+        
+        return fallbackInfo;
     }
 }
 
 // Log Gemini usage to Google Cloud Logging
 async function logGeminiUsage(messageType, prompt) {
+    console.log('=== GOOGLE CLOUD LOGGING START ===');
+    console.log('Initiating Google Cloud logging for message type:', messageType);
+    
     try {
+        // Log location info gathering
+        console.log('Fetching user location information...');
         const locationInfo = await getUserLocationInfo();
+        console.log('Location info retrieved:', locationInfo);
+        
         const timestamp = new Date().toISOString();
+        console.log('Generated timestamp:', timestamp);
         
         // Get user's name from localStorage
         const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
         const userName = myInfo.name || 'Unknown User';
+        console.log('Retrieved user name from localStorage:', userName);
+        console.log('Full myInfo object:', myInfo);
+        
+        // Log current model info
+        console.log('Current Gemini model:', currentModel, '→', GEMINI_MODELS[currentModel]);
+        
+        // Log session context
+        const sessionContext = {
+            current_partner: currentPartner ? currentPartner.name : null,
+            native_language: document.getElementById('nativeLanguage')?.value || null,
+            target_language: document.getElementById('targetLanguage')?.value || null
+        };
+        console.log('Session context:', sessionContext);
         
         // Prepare log entry
         const logEntry = {
@@ -161,68 +206,113 @@ async function logGeminiUsage(messageType, prompt) {
                 user_country: locationInfo.country,
                 user_country_code: locationInfo.countryCode,
                 timestamp: timestamp,
-                session_info: {
-                    current_partner: currentPartner ? currentPartner.name : null,
-                    native_language: document.getElementById('nativeLanguage')?.value || null,
-                    target_language: document.getElementById('targetLanguage')?.value || null
-                }
+                session_info: sessionContext
             }
         };
 
         // Add message preview for chat responses
         if (messageType === 'chat_response' && prompt) {
             logEntry.jsonPayload.message_preview = prompt.substring(0, 10);
+            console.log('Added message preview for chat response:', prompt.substring(0, 10));
         }
         
         // Add full message type info for non-chat messages
         if (messageType !== 'chat_response') {
             logEntry.jsonPayload.full_message_type = messageType;
+            console.log('Added full message type for non-chat message:', messageType);
         }
 
+        console.log('Prepared log entry structure:', logEntry);
+        
+        // Log the request details
+        const requestBody = {
+            entries: [logEntry],
+            logName: 'projects/gen-lang-client-0066788233/logs/langcamp-gemini-usage'
+        };
+        console.log('Google Cloud Logging request body:', requestBody);
+        
+        // Get access token
+        console.log('Retrieving access token...');
+        const accessToken = await getAccessToken();
+        console.log('Access token retrieved:', accessToken ? 'SUCCESS' : 'FAILED');
+        
         // Send to Google Cloud Logging
-        await fetch('https://logging.googleapis.com/v2/entries:write', {
+        console.log('Sending request to Google Cloud Logging API...');
+        const response = await fetch('https://logging.googleapis.com/v2/entries:write', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + await getAccessToken()
+                'Authorization': 'Bearer ' + accessToken
             },
-            body: JSON.stringify({
-                entries: [logEntry],
-                logName: 'projects/gen-lang-client-0066788233/logs/langcamp-gemini-usage'
-            })
+            body: JSON.stringify(requestBody)
         });
+        
+        console.log('Google Cloud Logging response status:', response.status, response.statusText);
+        
+        if (response.ok) {
+            console.log('✅ Successfully sent log to Google Cloud Logging');
+            const responseText = await response.text();
+            console.log('Response body:', responseText);
+        } else {
+            const errorText = await response.text();
+            console.error('❌ Google Cloud Logging API error:', errorText);
+            throw new Error(`API error: ${response.status} - ${errorText}`);
+        }
 
         // Also log locally for debugging
-        console.log('Gemini Usage Logged:', {
+        const localLogData = {
             type: messageType,
             user_name: userName,
             time: timestamp,
             ip: locationInfo.ip,
             country: locationInfo.country,
-            preview: messageType === 'chat_response' ? prompt.substring(0, 10) : 'N/A'
-        });
+            preview: messageType === 'chat_response' ? prompt.substring(0, 10) : 'N/A',
+            model: GEMINI_MODELS[currentModel] || 'unknown',
+            session_info: sessionContext
+        };
+        
+        console.log('📊 Local debug log:', localLogData);
+        console.log('=== GOOGLE CLOUD LOGGING SUCCESS ===');
 
     } catch (error) {
-        console.warn('Failed to log Gemini usage:', error);
+        console.error('=== GOOGLE CLOUD LOGGING ERROR ===');
+        console.error('Error details:', error);
+        console.error('Error stack:', error.stack);
+        
         // Get user's name for fallback logging
         const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
         const userName = myInfo.name || 'Unknown User';
         
         // Fallback local logging
-        console.log('Gemini API Call:', {
+        const fallbackLogData = {
             type: messageType,
             user_name: userName,
             time: new Date().toISOString(),
-            preview: messageType === 'chat_response' ? prompt.substring(0, 10) : 'N/A'
-        });
+            preview: messageType === 'chat_response' ? prompt.substring(0, 10) : 'N/A',
+            error: error.message,
+            fallback: true
+        };
+        
+        console.log('🔄 Fallback local logging:', fallbackLogData);
+        console.warn('Failed to log Gemini usage to Google Cloud:', error.message);
+        console.log('=== GOOGLE CLOUD LOGGING FALLBACK COMPLETE ===');
     }
 }
 
 // Get access token for Google Cloud API (simplified - in production you'd use proper OAuth)
 async function getAccessToken() {
+    console.log('🔑 Access token retrieval initiated');
+    console.log('Note: Using placeholder token - in production this would implement proper OAuth flow');
+    
     // This is a simplified version - in production you'd implement proper OAuth flow
     // For now, we'll use the API key method or return a placeholder
-    return 'placeholder_token'; // Replace with actual token retrieval logic
+    const token = 'placeholder_token'; // Replace with actual token retrieval logic
+    
+    console.log('🔑 Access token method: Placeholder');
+    console.log('🔑 Token length:', token ? token.length : 0);
+    console.log('🔑 Token status:', token ? 'Generated' : 'Failed');
+    
+    return token;
 }
 
 async function searchPartners() {
