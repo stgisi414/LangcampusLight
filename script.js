@@ -1082,8 +1082,9 @@ Respond in a friendly, encouraging, and informal chat style. Keep your response 
 
 ${enableCorrections ? `
 IMPORTANT: The user wants corrections. If their last message (sender: 'You') contains grammar or spelling errors in ${partner.nativeLanguage}, provide a brief, friendly correction AFTER your main conversational reply.
-Format the correction clearly, like this:
+Format the correction clearly in ${partner.targetLanguage} (the user's native language), like this:
 "By the way, a slightly more natural way to say that in ${partner.nativeLanguage} is: [Corrected Sentence]"
+Provide the correction explanation in ${partner.targetLanguage} so the user can understand it clearly.
 Only provide a correction if you identify a clear error in ${partner.nativeLanguage} in the user's *last* message. If there are no errors, just give your conversational reply.
 ` : `
 The user does not currently want corrections. Just provide a natural conversational reply.
