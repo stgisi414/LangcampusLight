@@ -96,7 +96,7 @@ ${exampleJson}`;
 
 async function generatePartnerProfiles(prompt) {
     try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -389,7 +389,7 @@ Your response must be ONLY the chat message text itself in ${partner.nativeLangu
 
             let introMessageText;
             try {
-                const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, { // Ensure API_KEY is defined
+                const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, { // Ensure API_KEY is defined
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', },
                     body: JSON.stringify({ contents: [{ parts: [{ text: introPrompt }] }] })
@@ -482,7 +482,7 @@ async function assessLanguageLevel(messages) {
     const assessmentPrompt = `Analyze the following chat messages from a language learner and assess their proficiency level in the target language (1-5 stars, 1 being beginner, 5 being advanced):\n\n${messages.map(msg => `${msg.sender}: ${msg.text}`).join('\n')}\n\nProvide ONLY a single number representing the star rating (e.g., 3).`;
 
     try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ contents: [{ parts: [{ text: assessmentPrompt }] }] })
@@ -824,7 +824,7 @@ Include:
 
 Format the response in Markdown with clear sections and examples.`;
 
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -911,7 +911,7 @@ Format as valid JSON with this structure:
 Each question must have exactly 4 options. Do not include backticks or markdown formatting.`;
 
     try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1092,7 +1092,7 @@ The user does not currently want corrections. Just provide a natural conversatio
 Your response should be ONLY the chat message text. Do not include your name or any other prefix.`;
 
     try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1229,7 +1229,7 @@ Your response must be valid JSON structured like this example:
 
     Make sure to generate varied and challenging questions suitable for the specified level. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it. In all just make sure multiple answers cannot be correct and the answers must be completely separate from the question example.`;
 
-    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1602,7 +1602,7 @@ Format your entire response using Markdown. Use headings, bullet points, bold te
 Do NOT include any text before or after the Markdown content.`;
 
     try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1754,7 +1754,7 @@ ${enableCorrections ? `
 Your response should be ONLY the chat message text. Do not include your name or any other prefix.`;
 
     try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -2714,7 +2714,7 @@ Keep your response concise but helpful (2-3 sentences max). Respond in ${userNat
 
 Available grammar topics include: ${grammarData[targetLanguage] ? grammarData[targetLanguage].slice(0, 10).map(topic => topic.title).join(', ') : 'basic grammar topics'}`;
 
-        const guidanceResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=' + API_KEY, {
+        const guidanceResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
