@@ -74,8 +74,8 @@ async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
                 username: 'practicefor_fun_user',
                 action: callType,
                 model: GEMINI_MODELS[currentModel],
-                inputTokens: prompt.length, // Approximate
-                outputTokens: generatedText.length, // Approximate
+                inputTokens: Math.ceil(prompt.length / 4), // Better token approximation
+                outputTokens: Math.ceil(generatedText.length / 4), // Better token approximation
                 requestPreview: prompt.substring(0, 200),
                 responsePreview: generatedText.substring(0, 200),
                 success: true,
@@ -94,6 +94,10 @@ async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
                 username: 'practicefor_fun_user',
                 action: callType,
                 model: GEMINI_MODELS[currentModel],
+                inputTokens: Math.ceil(prompt.length / 4),
+                outputTokens: 0,
+                requestPreview: prompt.substring(0, 200),
+                responsePreview: '',
                 success: false,
                 error: error.message,
                 duration: Date.now() - startTime,
@@ -155,7 +159,8 @@ async function logGeminiUsage(logData) {
 // Helper function to get user IP (simplified)
 function getUserIP() {
     // In a real implementation, you might want to use a service to get the actual IP
-    return 'unknown';
+    // For now, we'll use a placeholder that indicates the source
+    return 'practicefor_fun_user';
 }
 
 async function searchPartners() {
