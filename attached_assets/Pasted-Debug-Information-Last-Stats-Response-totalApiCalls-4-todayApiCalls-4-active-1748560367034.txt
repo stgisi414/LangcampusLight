@@ -1,0 +1,72 @@
+Debug Information:
+Last Stats Response:
+{
+  "totalApiCalls": 4,
+  "todayApiCalls": 4,
+  "activeUsers": 1,
+  "errorRate": 0
+}
+
+Last Logs Response:
+[
+  {
+    "id": 16,
+    "username": "practicefor_fun_user",
+    "action": "grammar_explanation",
+    "model": "gemini-2.0-flash-thinking-exp-01-21",
+    "inputTokens": 205,
+    "outputTokens": 661,
+    "requestPreview": "You are a Japanese language teacher explaining grammar to a student whose native language is Korean. \n\nExplain the grammar topic \"Hiragana & Katakana Writing Systems\" for a learner of Japanese (assume",
+    "responsePreview": "# 히라가나와 가타카나\n\n안녕하세요! 오늘은 일본어의 기본적인 두 가지 문자 체계인 히라가나와 가타카나에 대해 함께 알아보겠습니다. 일본어 학습의 첫걸음이니 잘 익혀두는 것이 중요해요!\n\n## 1. 히라가나와 가타카나란 무엇인가요?\n\n히라가나와 가타카나는 일본어의 **음절 문자**입니다. 한국어의 자음과 모음이 합쳐져 하나의 글자가 되듯이, 히라가나와 가타",
+    "success": true,
+    "error": null,
+    "duration": 11000,
+    "ipAddress": "practicefor_fun_user",
+    "createdAt": "2025-05-29T23:12:08.688Z"
+  },
+  {
+    "id": 15,
+    "username": "practicefor_fun_user",
+    "action": "chat_response",
+    "model": "gemini-2.0-flash-thinking-exp-01-21",
+    "inputTokens": 340,
+    "outputTokens": 4,
+    "requestPreview": "You are Yuki Tanaka, a language exchange partner on the website http://practicefor.fun. Your native language is Japanese and you are learning Korean. Your interests are K-dramas, travel, learning abou",
+    "responsePreview": "Hi！よろしくお願いします！",
+    "success": true,
+    "error": null,
+    "duration": 8483,
+    "ipAddress": "practicefor_fun_user",
+    "createdAt": "2025-05-29T22:45:16.195Z"
+  },
+  {
+    "id": 14,
+    "username": "practicefor_fun_user",
+    "action": "intro_message",
+    "model": "gemini-2.0-flash-thinking-exp-01-21",
+    "inputTokens": 576,
+    "outputTokens": 39,
+    "requestPreview": "You are Yuki Tanaka. Your native language is Japanese, and you are roleplaying as if you live in a country where it's spoken. You're enthusiastic about learning Korean. Your interests are: K-dramas, t",
+    "responsePreview": "Stefanさん、こんにちは！そちらは午後とのこと、良い時間を過ごされていますか？日本のこちらはもう夜も遅くなりました。はじめまして、ユキと申します。韓国語の練習、そしてStefanさんの日本語学習のお手伝いができたら嬉しいです。言語交換、とても楽しみにしています！何か興味のある日本のことなどありますか？",
+    "success": true,
+    "error": null,
+    "duration": 9536,
+    "ipAddress": "practicefor_fun_user",
+    "createdAt": "2025-05-29T22:45:04.538Z"
+  },
+  {
+    "id": 13,
+    "username": "practicefor_fun_user",
+    "action": "partner_profile",
+    "model": "gemini-2.0-flash-thinking-exp-01-21",
+    "inputTokens": 363,
+    "outputTokens": 297,
+    "requestPreview": "Please generate a list of six distinct language exchange partner profiles.\nThe goal is to find partners for someone who speaks Korean and wants to learn Japanese.\nTherefore, each generated profile sho",
+    "responsePreview": "[\n  {\n    \"name\": \"Yuki Tanaka\",\n    \"age\": 23,\n    \"gender\": \"female\",\n    \"nativeLanguage\": \"Japanese\",\n    \"targetLanguage\": \"Korean\",\n    \"interests\": [\"K-dramas\", \"travel\", \"learning about cultur",
+    "success": true,
+    "error": null,
+    "duration": 7673,
+    "ipAddress": "practicefor_fun_user",
+    "createdAt": "2025-05-29T22:44:27.572Z"
+  }
+]
