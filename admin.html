@@ -379,20 +379,15 @@
             loginBtn.textContent = 'Logging in...';
 
             try {
-                // Create password hash with timestamp (client-side encryption)
-                const timestamp = Date.now();
-                const passwordHash = await hashPassword(password + timestamp);
-
                 const requestBody = {
-                    encryptedPassword: passwordHash,
-                    timestamp: timestamp,
+                    password: password,
                     service: service
                 };
 
                 console.log('Login attempt:', {
                     url: `${API_BASE}/login`,
-                    body: requestBody,
-                    timestamp: new Date(timestamp).toISOString()
+                    body: { service: service, password: '[HIDDEN]' },
+                    timestamp: new Date().toISOString()
                 });
 
                 const response = await fetch(`${API_BASE}/login`, {
