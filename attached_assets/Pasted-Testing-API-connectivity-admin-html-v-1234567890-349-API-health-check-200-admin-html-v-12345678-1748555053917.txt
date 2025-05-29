@@ -1,0 +1,42 @@
+Testing API connectivity...
+admin.html?v=1234567890:349 API health check: 200 
+admin.html?v=1234567890:381 Password field value: [PASSWORD ENTERED]
+admin.html?v=1234567890:382 Service field value: practicefor_fun
+admin.html?v=1234567890:413 Password length: 16
+admin.html?v=1234567890:414 Service length: 15
+admin.html?v=1234567890:415 Request body before stringify: {password: 'PractcieFun2024!', service: 'practicefor_fun', serviceName: 'practicefor_fun', adminPassword: 'PractcieFun2024!', pass: 'PractcieFun2024!', …}
+admin.html?v=1234567890:418 Stringified request body: {"password":"PractcieFun2024!","service":"practicefor_fun","serviceName":"practicefor_fun","adminPassword":"PractcieFun2024!","pass":"PractcieFun2024!","adminPass":"PractcieFun2024!","credential":"PractcieFun2024!","key":"PractcieFun2024!","token":"PractcieFun2024!","secret":"PractcieFun2024!"}
+admin.html?v=1234567890:420 Login attempt: {url: 'https://langcamp.us/api/exchange-admin/login', body: {…}, timestamp: '2025-05-29T21:43:45.600Z'}
+admin.html?v=1234567890:427 
+            
+            
+           POST https://langcamp.us/api/exchange-admin/login 400 (Bad Request)
+login @ admin.html?v=1234567890:427
+(anonymous) @ admin.html?v=1234567890:660Understand this error
+admin.html?v=1234567890:437 JSON request failed, trying form data...
+admin.html?v=1234567890:445 
+            
+            
+           POST https://langcamp.us/api/exchange-admin/login 400 (Bad Request)
+login @ admin.html?v=1234567890:445
+await in login
+(anonymous) @ admin.html?v=1234567890:660Understand this error
+admin.html?v=1234567890:449 Form data attempt status: 400
+admin.html?v=1234567890:453 FormData failed, trying URL-encoded...
+admin.html?v=1234567890:461 
+            
+            
+           POST https://langcamp.us/api/exchange-admin/login 400 (Bad Request)
+login @ admin.html?v=1234567890:461
+await in login
+(anonymous) @ admin.html?v=1234567890:660Understand this error
+admin.html?v=1234567890:468 URL-encoded attempt status: 400
+admin.html?v=1234567890:472 Response status: 400
+admin.html?v=1234567890:473 Response headers: {content-length: '34', content-type: 'application/json; charset=utf-8'}
+admin.html?v=1234567890:478 Response data: {message: 'Password is required'}
+admin.html?v=1234567890:506 Login failed: HTTP 400:  {message: 'Password is required'}
+login @ admin.html?v=1234567890:506
+await in login
+(anonymous) @ admin.html?v=1234567890:660Understand this error
+admin.html?v=1234567890:510 Login error: Error: HTTP 400: 
+    at login (admin.html?v=1234567890:507:27)
