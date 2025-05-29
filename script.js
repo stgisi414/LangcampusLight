@@ -31,6 +31,7 @@ let currentModel = 'super'; // Default to Super (gemini-2.0-flash)
 // Centralized Gemini API call function
 async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
     const modelName = GEMINI_MODELS[currentModel];
+    const startTime = Date.now(); // Define startTime at the beginning
 
     for (let attempt = 0; attempt < retries; attempt++) {
         try {
@@ -68,29 +69,28 @@ async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
                 generatedText = generatedText.substring(1, generatedText.length - 1);
             }
 
-            // Log the successful API call
-            const startTime = Date.now();
-            await logGeminiUsage({
+            // Log the successful API call (don't await to avoid blocking)
+            logGeminiUsage({
                 username: 'practicefor_fun_user',
                 action: callType,
                 model: GEMINI_MODELS[currentModel],
                 inputTokens: prompt.length, // Approximate
                 outputTokens: generatedText.length, // Approximate
-                requestPreview: prompt,
-                responsePreview: generatedText,
+                requestPreview: prompt.substring(0, 200),
+                responsePreview: generatedText.substring(0, 200),
                 success: true,
                 duration: Date.now() - startTime,
                 ipAddress: getUserIP(),
                 userAgent: navigator.userAgent
-            });
+            }).catch(err => console.warn('Logging failed:', err));
 
             return generatedText;
 
         } catch (error) {
             console.error(`Gemini API attempt ${attempt + 1} failed:`, error);
             
-            // Log the failed API call
-            await logGeminiUsage({
+            // Log the failed API call (don't await to avoid blocking)
+            logGeminiUsage({
                 username: 'practicefor_fun_user',
                 action: callType,
                 model: GEMINI_MODELS[currentModel],
@@ -99,7 +99,7 @@ async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
                 duration: Date.now() - startTime,
                 ipAddress: getUserIP(),
                 userAgent: navigator.userAgent
-            });
+            }).catch(err => console.warn('Error logging failed:', err));
 
             if (attempt === retries - 1) {
                 throw error;
@@ -114,13 +114,19 @@ async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
 // Function to log Gemini API usage to the admin system
 async function logGeminiUsage(logData) {
   try {
-    await fetch('https://langcamp.us/api/exchange-admin/log-gemini-usage', {
+    console.log('Attempting to log API usage:', {
+      action: logData.action,
+      model: logData.model,
+      success: logData.success
+    });
+
+    const response = await fetch('https://langcamp.us/api/exchange-admin/log-gemini-usage', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        username: logData.username || 'anonymous',
+        username: logData.username || 'practicefor_fun_user',
         action: logData.action, // e.g., 'chat_response', 'translation', 'grammar_check'
         model: logData.model, // e.g., 'gemini-pro', 'gemini-pro-vision'
         inputTokens: logData.inputTokens,
@@ -134,6 +140,12 @@ async function logGeminiUsage(logData) {
         userAgent: logData.userAgent
       })
     });
+
+    if (response.ok) {
+      console.log('API usage logged successfully');
+    } else {
+      console.error('Logging failed with status:', response.status, response.statusText);
+    }
   } catch (error) {
     console.error('Failed to log API usage:', error);
   }
