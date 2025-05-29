@@ -324,6 +324,11 @@
                         <div class="logs-header">
                             <h2>Recent API Logs</h2>
                             <button class="refresh-btn" onclick="loadLogs()">Refresh</button>
+                            <button class="refresh-btn" onclick="showDebugInfo()" style="margin-left: 10px;">Show Debug</button>
+                        </div>
+                        <div id="debugInfo" style="display: none; background: #f5f5f5; padding: 10px; margin-bottom: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;">
+                            <strong>Debug Information:</strong><br>
+                            <div id="debugContent">No debug data available</div>
                         </div>
                         <div id="logsContainer">
                             <div class="loading">Loading logs...</div>
@@ -511,6 +516,16 @@
                 }
 
                 const stats = await response.json();
+                lastStatsResponse = stats; // Store for debugging
+                console.log('Full stats response received:', JSON.stringify(stats, null, 2));
+
+                // Log each stat value for debugging
+                console.log('Stats breakdown:', {
+                    totalCalls: stats.totalCalls,
+                    todayCalls: stats.todayCalls,
+                    activeUsers: stats.activeUsers,
+                    errorRate: stats.errorRate
+                });
 
                 document.getElementById('totalCalls').textContent = stats.totalCalls || '0';
                 document.getElementById('todayCalls').textContent = stats.todayCalls || '0';
@@ -546,6 +561,16 @@
                 }
 
                 const logs = await response.json();
+                lastLogsResponse = logs; // Store for debugging
+                console.log('Full logs response received:', JSON.stringify(logs, null, 2));
+                console.log('Number of logs returned:', (logs.logs || []).length);
+                
+                if (logs.logs && logs.logs.length > 0) {
+                    console.log('First log entry sample:', logs.logs[0]);
+                } else {
+                    console.log('No logs found in response');
+                }
+                
                 displayLogs(logs.logs || []);
             } catch (error) {
                 console.error('Error loading logs:', error);
@@ -617,6 +642,39 @@
         function hideMessages() {
             document.getElementById('errorMessage').classList.add('hidden');
             document.getElementById('successMessage').classList.add('hidden');
+        }
+
+        // Store last API responses for debugging
+        let lastStatsResponse = null;
+        let lastLogsResponse = null;
+
+        function showDebugInfo() {
+            const debugDiv = document.getElementById('debugInfo');
+            const debugContent = document.getElementById('debugContent');
+            
+            if (debugDiv.style.display === 'none') {
+                debugDiv.style.display = 'block';
+                
+                let debugText = '';
+                if (lastStatsResponse) {
+                    debugText += '<strong>Last Stats Response:</strong><br>';
+                    debugText += JSON.stringify(lastStatsResponse, null, 2).replace(/\n/g, '<br>').replace(/ /g, '&nbsp;');
+                    debugText += '<br><br>';
+                }
+                
+                if (lastLogsResponse) {
+                    debugText += '<strong>Last Logs Response:</strong><br>';
+                    debugText += JSON.stringify(lastLogsResponse, null, 2).replace(/\n/g, '<br>').replace(/ /g, '&nbsp;');
+                }
+                
+                if (!debugText) {
+                    debugText = 'No API responses captured yet. Click Refresh to capture data.';
+                }
+                
+                debugContent.innerHTML = debugText;
+            } else {
+                debugDiv.style.display = 'none';
+            }
         }
 
         // Handle enter key in password field
