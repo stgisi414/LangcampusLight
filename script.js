@@ -128,26 +128,27 @@ async function logGeminiUsage(logData) {
       body: JSON.stringify({
         username: logData.username || 'practicefor_fun_user',
         action: logData.action, // e.g., 'chat_response', 'translation', 'grammar_check'
-        model: logData.model, // e.g., 'gemini-pro', 'gemini-pro-vision'
-        inputTokens: logData.inputTokens,
-        outputTokens: logData.outputTokens,
-        requestPreview: logData.requestPreview?.substring(0, 200),
-        responsePreview: logData.responsePreview?.substring(0, 200),
-        success: logData.success,
-        error: logData.error,
-        duration: logData.duration,
-        ipAddress: logData.ipAddress,
-        userAgent: logData.userAgent
+        model: logData.model,
+        inputTokens: logData.inputTokens || 0,
+        outputTokens: logData.outputTokens || 0,
+        requestPreview: logData.requestPreview?.substring(0, 200) || '',
+        responsePreview: logData.responsePreview?.substring(0, 200) || '',
+        success: logData.success !== false, // Default to true unless explicitly false
+        error: logData.error || null,
+        duration: logData.duration || 0,
+        ipAddress: logData.ipAddress || 'unknown',
+        userAgent: logData.userAgent || navigator.userAgent
       })
     });
 
     if (response.ok) {
-      console.log('API usage logged successfully');
+      console.log('API usage logged successfully to admin system');
     } else {
-      console.error('Logging failed with status:', response.status, response.statusText);
+      const errorText = await response.text();
+      console.error('Logging failed with status:', response.status, response.statusText, errorText);
     }
   } catch (error) {
-    console.error('Failed to log API usage:', error);
+    console.error('Failed to log API usage to admin system:', error);
   }
 }
 
