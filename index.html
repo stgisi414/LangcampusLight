@@ -367,6 +367,68 @@
             display: none;
         }
 
+        /* --- Model Selector --- */
+        .model-selector {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .model-button {
+            padding: 0.6rem 1.2rem;
+            border: 2px solid transparent;
+            border-radius: calc(var(--border-radius) / 1.5);
+            font-size: 0.9rem;
+            font-family: var(--font-family-headings);
+            font-weight: 600;
+            background-color: transparent;
+            color: var(--text-light-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .model-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .model-button:hover::before {
+            left: 100%;
+        }
+
+        .model-button:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+        }
+
+        .model-button.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover-color));
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .model-button.active:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 123, 255, 0.3);
+        }
+
         /* --- Forms: Select, Button, Input --- */
         select,
         input[type="text"],
@@ -1475,6 +1537,12 @@
             </div>
         </div>
         <div class="search-container">
+            <div class="model-selector">
+                <button class="model-button active" data-model="ultra">Ultra</button>
+                <button class="model-button" data-model="super">Super</button>
+                <button class="model-button" data-model="pro">Pro</button>
+                <button class="model-button" data-model="lite">Lite</button>
+            </div>
             <div class="search-filters">
                 <select id="nativeLanguage">
                     <option value="">I speak...</option>
