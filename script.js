@@ -32,6 +32,14 @@ let currentModel = 'super'; // Default to Super (gemini-2.0-flash)
 async function callGeminiAPI(prompt, retries = 3) {
     const modelName = GEMINI_MODELS[currentModel];
     
+    // Get caller information for logging
+    const stack = new Error().stack;
+    const callerLine = stack.split('\n')[2] || 'unknown';
+    const messageType = determineMessageType(callerLine, prompt);
+    
+    // Log the API call
+    await logGeminiUsage(messageType, prompt);
+    
     for (let attempt = 0; attempt < retries; attempt++) {
         try {
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`, {
@@ -81,6 +89,129 @@ async function callGeminiAPI(prompt, retries = 3) {
             await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
         }
     }
+}
+
+// Determine message type based on caller function
+function determineMessageType(callerLine, prompt) {
+    if (callerLine.includes('getGeminiChatResponse')) {
+        return 'chat_response';
+    } else if (callerLine.includes('generatePartnerProfiles')) {
+        return 'partner_generation';
+    } else if (callerLine.includes('getGrammarExplanation')) {
+        return 'grammar_explanation';
+    } else if (callerLine.includes('startQuiz') || callerLine.includes('startVocabularyQuiz')) {
+        return 'quiz_generation';
+    } else if (callerLine.includes('loadVocabularyContent')) {
+        return 'vocabulary_content';
+    } else if (callerLine.includes('studyGuideMiddleware')) {
+        return 'study_guide';
+    } else if (callerLine.includes('assessLanguageLevel')) {
+        return 'language_assessment';
+    } else if (prompt.includes('intro') || prompt.includes('greeting')) {
+        return 'intro_message';
+    } else {
+        return 'general_query';
+    }
+}
+
+// Get user's IP and country information
+async function getUserLocationInfo() {
+    try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        return {
+            ip: data.ip || 'unknown',
+            country: data.country_name || 'unknown',
+            countryCode: data.country_code || 'unknown'
+        };
+    } catch (error) {
+        console.warn('Could not fetch location info:', error);
+        return {
+            ip: 'unknown',
+            country: 'unknown',
+            countryCode: 'unknown'
+        };
+    }
+}
+
+// Log Gemini usage to Google Cloud Logging
+async function logGeminiUsage(messageType, prompt) {
+    try {
+        const locationInfo = await getUserLocationInfo();
+        const timestamp = new Date().toISOString();
+        
+        // Prepare log entry
+        const logEntry = {
+            severity: 'INFO',
+            timestamp: timestamp,
+            labels: {
+                service: 'langcamp-exchange',
+                user_email: 'langcampus-exchange@gen-lang-client-0066788233.iam.gserviceaccount.com',
+                user_id: '116740993832760952327'
+            },
+            jsonPayload: {
+                message_type: messageType,
+                model: GEMINI_MODELS[currentModel] || 'unknown',
+                user_ip: locationInfo.ip,
+                user_country: locationInfo.country,
+                user_country_code: locationInfo.countryCode,
+                timestamp: timestamp,
+                session_info: {
+                    current_partner: currentPartner ? currentPartner.name : null,
+                    native_language: document.getElementById('nativeLanguage')?.value || null,
+                    target_language: document.getElementById('targetLanguage')?.value || null
+                }
+            }
+        };
+
+        // Add message preview for chat responses
+        if (messageType === 'chat_response' && prompt) {
+            logEntry.jsonPayload.message_preview = prompt.substring(0, 10);
+        }
+        
+        // Add full message type info for non-chat messages
+        if (messageType !== 'chat_response') {
+            logEntry.jsonPayload.full_message_type = messageType;
+        }
+
+        // Send to Google Cloud Logging
+        await fetch('https://logging.googleapis.com/v2/entries:write', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getAccessToken()
+            },
+            body: JSON.stringify({
+                entries: [logEntry],
+                logName: 'projects/gen-lang-client-0066788233/logs/langcamp-gemini-usage'
+            })
+        });
+
+        // Also log locally for debugging
+        console.log('Gemini Usage Logged:', {
+            type: messageType,
+            time: timestamp,
+            ip: locationInfo.ip,
+            country: locationInfo.country,
+            preview: messageType === 'chat_response' ? prompt.substring(0, 10) : 'N/A'
+        });
+
+    } catch (error) {
+        console.warn('Failed to log Gemini usage:', error);
+        // Fallback local logging
+        console.log('Gemini API Call:', {
+            type: messageType,
+            time: new Date().toISOString(),
+            preview: messageType === 'chat_response' ? prompt.substring(0, 10) : 'N/A'
+        });
+    }
+}
+
+// Get access token for Google Cloud API (simplified - in production you'd use proper OAuth)
+async function getAccessToken() {
+    // This is a simplified version - in production you'd implement proper OAuth flow
+    // For now, we'll use the API key method or return a placeholder
+    return 'placeholder_token'; // Replace with actual token retrieval logic
 }
 
 async function searchPartners() {
