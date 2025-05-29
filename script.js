@@ -1102,43 +1102,6 @@ document.getElementById('corrections-toggle').addEventListener('change', (event)
 });
 
 // --- Update API Call Functions ---
-
-// Modified getGeminiChatResponse to include corrections instruction
-async function getGeminiChatResponse(partner, history) {
-    console.log("Getting Gemini Response. History:", history);
-    const prompt = `You are ${partner.name}, a language exchange partner on the website https://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
-You are chatting with someone whose native language is ${partner.targetLanguage} and who is learning your language (${partner.nativeLanguage}).
-
-Here is the recent chat history (last 50 messages) with timestamps:
-${history.map(msg => `[${new Date(msg.timestamp).toLocaleTimeString()}] ${msg.sender}: ${msg.text}`).join('\n')}
-
-Consider the timestamps when crafting your response. If there has been a long gap between messages, you may acknowledge it naturally in your response.
-
-Respond naturally to the last message in the chat.
-Respond in a friendly, encouraging, and informal chat style. Keep your response relatively short, like a typical chat message (1-3 sentences), unless directly asked to explain something in detail or to provide a long story or explanation. The max amount of sentences should be 4-7 for special messages. In all, the most important thing is that you engage directly and positively with the user and do not by any means parrot what they're saying unless appropriate for the context.
-
-${enableCorrections ? `
-IMPORTANT: The user wants corrections. If their last message (sender: 'You') contains grammar or spelling errors in ${partner.nativeLanguage}, provide a brief, friendly correction AFTER your main conversational reply.
-The correction MUST be clearly displayed in ${partner.targetLanguage} (the user's native language).
-Provide the correction explanation in ${partner.targetLanguage} so the user can understand it clearly.
-Only provide a correction if you identify a clear error in ${partner.nativeLanguage} in the user's *last* message. If there are no errors, just give your conversational reply.
-` : `
-The user does not currently want corrections. Just provide a natural conversational reply.
-`}
-
-Your response should be ONLY the chat message text. Do not include your name or any other prefix.`;
-
-    try {
-        console.log("Getting Gemini Response. History:", history);
-        const generatedText = await callGeminiAPI(prompt, 3, 'chat_response');
-        console.log("Extracted Gemini text:", generatedText);
-        return generatedText;
-    } catch (error) {
-        console.error('Error calling Gemini API:', error);
-        throw error;
-    }
-}
-
 // New function to get grammar explanation
 let quizActive = false;
 let currentQuiz = {};
