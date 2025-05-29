@@ -29,9 +29,9 @@ const GEMINI_MODELS = {
 let currentModel = 'super'; // Default to Super (gemini-2.0-flash)
 
 // Centralized Gemini API call function
-async function callGeminiAPI(prompt, retries = 3) {
+async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
     const modelName = GEMINI_MODELS[currentModel];
-    
+
     for (let attempt = 0; attempt < retries; attempt++) {
         try {
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`, {
@@ -62,24 +62,60 @@ async function callGeminiAPI(prompt, retries = 3) {
 
             let generatedText = data.candidates[0].content.parts[0].text;
             generatedText = generatedText.trim();
-            
+
             // Remove quotes if present
             if (generatedText.startsWith('"') && generatedText.endsWith('"')) {
                 generatedText = generatedText.substring(1, generatedText.length - 1);
             }
-            
+
+            // Log the API call
+            logGeminiApiCall(callType, attempt + 1, prompt, generatedText, response.status);
+
             return generatedText;
 
         } catch (error) {
             console.error(`Gemini API attempt ${attempt + 1} failed:`, error);
-            
+            logGeminiApiCall(callType, attempt + 1, prompt, null, error.message);
+
             if (attempt === retries - 1) {
                 throw error;
             }
-            
+
             // Wait before retrying (exponential backoff)
             await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
         }
+    }
+}
+
+// Function to log Gemini API calls to the admin system
+async function logGeminiApiCall(callType, attempt, prompt, response, status) {
+    try {
+        const logData = {
+            timestamp: new Date().toISOString(),
+            callType: callType,
+            attempt: attempt,
+            model: currentModel,
+            prompt: prompt,
+            response: response,
+            status: status
+        };
+
+        // Send the log data to your admin system endpoint
+        const logResponse = await fetch('/admin/api/gemini_logs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(logData)
+        });
+
+        if (!logResponse.ok) {
+            console.error('Failed to log Gemini API call:', logResponse.status, logResponse.statusText);
+        } else {
+            console.log('Gemini API call logged successfully.');
+        }
+    } catch (error) {
+        console.error('Error logging Gemini API call:', error);
     }
 }
 
@@ -161,7 +197,7 @@ ${exampleJson}`;
 
 async function generatePartnerProfiles(prompt) {
     try {
-        let generatedText = await callGeminiAPI(prompt);
+        let generatedText = await callGeminiAPI(prompt, 3, 'partner_profile');
 
         // Attempt to strip markdown code fences if present
         const jsonRegex = /```json\n?(\[.*\]|\[[\s\S]*?\])\n?```/;
@@ -428,7 +464,7 @@ Your response must be ONLY the chat message text itself in ${partner.nativeLangu
 
             let introMessageText;
             try {
-                introMessageText = await callGeminiAPI(introPrompt);
+                introMessageText = await callGeminiAPI(introPrompt, 3, 'intro_message');
             } catch (error) {
                 console.error('Error generating custom intro:', error);
                 introMessageText = `Hi! I'm ${partner.name}. It's nice to meet you! I see you're learning ${partner.nativeLanguage}. How's it going so far?`; // Fallback
@@ -501,7 +537,7 @@ function loadModelPreference() {
     if (savedModel && GEMINI_MODELS[savedModel]) {
         currentModel = savedModel;
         console.log(`Loaded model preference: ${currentModel} (${GEMINI_MODELS[currentModel]})`);
-        
+
         // Update UI to reflect saved model
         document.querySelectorAll('.model-button').forEach(btn => btn.classList.remove('active'));
         const savedButton = document.querySelector(`[data-model="${savedModel}"]`);
@@ -534,7 +570,7 @@ async function assessLanguageLevel(messages) {
     const assessmentPrompt = `Analyze the following chat messages from a language learner and assess their proficiency level in the target language (1-5 stars, 1 being beginner, 5 being advanced):\n\n${messages.map(msg => `${msg.sender}: ${msg.text}`).join('\n')}\n\nProvide ONLY a single number representing the star rating (e.g., 3).`;
 
     try {
-        const assessmentResult = await callGeminiAPI(assessmentPrompt);
+        const assessmentResult = await callGeminiAPI(assessmentPrompt, 3, 'language_assessment');
         const rating = parseInt(assessmentResult);
 
         if (isNaN(rating) || rating < 1 || rating > 5) {
@@ -859,7 +895,7 @@ Include:
 
 Format the response in Markdown with clear sections and examples.`;
 
-        const content = await callGeminiAPI(prompt);
+        const content = await callGeminiAPI(prompt, 3, 'vocabulary_content');
 
         // Convert markdown to HTML and display
         container.innerHTML = `
@@ -929,7 +965,7 @@ Format as valid JSON with this structure:
 Each question must have exactly 4 options. Do not include backticks or markdown formatting.`;
 
     try {
-        let quizText = await callGeminiAPI(quizPrompt);
+        let quizText = await callGeminiAPI(quizPrompt, 3, 'vocabulary_quiz');
 
         try {
             // Clean the response text by removing markdown code fences and any extra whitespace
@@ -1094,7 +1130,7 @@ Your response should be ONLY the chat message text. Do not include your name or 
 
     try {
         console.log("Getting Gemini Response. History:", history);
-        const generatedText = await callGeminiAPI(prompt);
+        const generatedText = await callGeminiAPI(prompt, 3, 'chat_response');
         console.log("Extracted Gemini text:", generatedText);
         return generatedText;
     } catch (error) {
@@ -1195,7 +1231,7 @@ Your response must be valid JSON structured like this example:
 
     Make sure to generate varied and challenging questions suitable for the specified level. Do not always use the same question structure or options. Randomize the order the content appears in the questions making it not the same order as you would typically learn it. In all just make sure multiple answers cannot be correct and the answers must be completely separate from the question example.`;
 
-    callGeminiAPI(quizPrompt)
+    callGeminiAPI(quizPrompt, 3, 'grammar_quiz')
         .then(quizText => {
             console.log("Quiz API response:");
             console.log(quizText);
@@ -1207,7 +1243,7 @@ Your response must be valid JSON structured like this example:
 
             try {
                 // Clean and validate the response text
-                let cleanText = quizText.replace(/```json\s*|\s*```/g, '').trim();
+                let cleanText = quizText.replace(/```json\s*|\s*code\s*|\s*```/g, '').trim();
 
                 // Ensure it starts with [ and ends with ]
                 if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
@@ -1557,7 +1593,7 @@ Format your entire response using Markdown. Use headings, bullet points, bold te
 Do NOT include any text before or after the Markdown content.`;
 
     try {
-        let explanationMarkdown = await callGeminiAPI(prompt);
+        let explanationMarkdown = await callGeminiAPI(prompt, 3, 'grammar_explanation');
         console.log("Received Markdown explanation:", explanationMarkdown);
 
         // Convert Markdown to HTML using marked.js
@@ -1684,7 +1720,7 @@ Your response should be ONLY the chat message text. Do not include your name or 
 
     try {
         console.log("Getting Gemini Response. History:", history);
-        const generatedText = await callGeminiAPI(prompt);
+        const generatedText = await callGeminiAPI(prompt, 3, 'chat_response');
         console.log("Extracted Gemini text:", generatedText);
         return generatedText;
     } catch (error) {
@@ -1703,16 +1739,16 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', () => {
             // Remove active class from all buttons
             document.querySelectorAll('.model-button').forEach(btn => btn.classList.remove('active'));
-            
+
             // Add active class to clicked button
             button.classList.add('active');
-            
+
             // Update current model
             currentModel = button.dataset.model;
-            
+
             // Save to localStorage
             localStorage.setItem('selectedModel', currentModel);
-            
+
             console.log(`Model changed to: ${currentModel} (${GEMINI_MODELS[currentModel]})`);
         });
     });
@@ -2599,29 +2635,29 @@ document.addEventListener('mousedown', (event) => {
 // Simplified study guide middleware function
 async function studyGuideMiddleware(message, chatContext) {
     console.log(`[StudyGuide] Checking message: "${message}"`);
-    
+
     // Simple keyword detection first - if any study-related keywords are found, trigger the study guide
     const studyKeywords = [
         'teach me', 'help me learn', 'study', 'grammar', 'vocabulary', 'pronouns', 'verbs',
         'what should i study', 'recommend', 'learn', 'practice', 'explain', 'conjugation',
         'tense', 'adjective', 'noun', 'lesson', 'guide', 'how do i', 'tutorial'
     ];
-    
+
     const messageLC = message.toLowerCase();
     const hasStudyKeyword = studyKeywords.some(keyword => messageLC.includes(keyword));
-    
+
     console.log(`[StudyGuide] Keyword check result: ${hasStudyKeyword ? 'STUDY KEYWORDS FOUND' : 'NO STUDY KEYWORDS'}`);
-    
+
     if (!hasStudyKeyword) {
         return null; // Skip AI detection if no obvious study keywords
     }
-    
+
     try {
         // If keywords found, proceed with study guidance generation
         const targetLanguage = currentPartner ? currentPartner.nativeLanguage : 'the target language';
         const userNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
         const userLevel = localStorage.getItem('languageLevelRating') || '1';
-        
+
         console.log(`[StudyGuide] Generating study guidance for ${targetLanguage} (user level: ${userLevel})`);
 
         const studyGuidancePrompt = `You are a helpful language learning assistant. The user is learning ${targetLanguage} and their native language is ${userNativeLanguage}. Their current proficiency level is ${userLevel} out of 5.
@@ -2638,7 +2674,7 @@ Keep your response concise but helpful (2-3 sentences max). Respond in ${userNat
 
 Available grammar topics include: ${grammarData[targetLanguage] ? grammarData[targetLanguage].slice(0, 10).map(topic => topic.title).join(', ') : 'basic grammar topics'}`;
 
-        let studyRecommendations = await callGeminiAPI(studyGuidancePrompt);
+        let studyRecommendations = await callGeminiAPI(studyGuidancePrompt, 3, 'study_guide');
 
         console.log(`[StudyGuide] Generated recommendations: "${studyRecommendations.substring(0, 100)}..."`);
         return studyRecommendations;
@@ -2665,7 +2701,7 @@ document.getElementById('send-message').addEventListener('click', async () => {
 
     if (studyGuideMessage) {
         console.log(`[StudyGuide] TRIGGERED! Showing study guide response`);
-        
+
         const chatMessages = document.getElementById('chat-messages');
         const timestamp = new Date().toISOString();
         const studyGuideResponse = { sender: 'Study Guide', text: studyGuideMessage, timestamp };
