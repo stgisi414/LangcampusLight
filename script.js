@@ -42,7 +42,9 @@ async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
                 console.warn('Error parsing myInfo from localStorage:', parseError);
                 myInfo = {};
             }
-            
+
+            console.log('Attempting to retrieve username from myInfo:');
+            console.log(myInfo);
             const username = myInfo.name || 'practicefor_fun_user';
             console.log('Sending API request with username:', username);
 
@@ -116,6 +118,8 @@ async function logGeminiUsage(logData) {
 
     // Get user's name from My Info, fallback to provided username or default
     const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+    console.log('Attempting to retrieve username from myInfo:');
+    console.log(myInfo);
     const username = myInfo.name || logData.username || 'practicefor_fun_user';
 
     const response = await fetch('https://langcamp.us/api/exchange-admin/log-gemini-usage', {
