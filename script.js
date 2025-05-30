@@ -1686,7 +1686,7 @@ You are chatting with someone whose native language is ${partner.targetLanguage}
 Here is the recent chat history (last 10 messages) with timestamps:
 ${history.map(msg => `[${new Date(msg.timestamp).toLocaleTimeString()}] ${msg.sender}: ${msg.text}`).join('\n')}
 
-Consider the timestamps when crafting your response. If there has been a long gap between messages, you may acknowledge it naturally in your response.
+Consider the timestamps when crafting your response. If there has been a long gap between messages, you may acknowledge it naturally in your response. Do NOT apologize for delays though, because they're NOT your fault.
 
 Respond naturally to the last message in the chat.
 Keep your response relatively short, like a typical chat message (1-3 sentences), unless directly asked to explain something in detail.
