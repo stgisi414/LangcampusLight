@@ -105,19 +105,15 @@ async function logGeminiUsage(logData) {
       success: logData.success
     });
 
+    // Get user's name from My Info, fallback to provided username or default
+    const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+    const username = myInfo.name || logData.username || 'practicefor_fun_user';
+
     const response = await fetch('https://langcamp.us/api/exchange-admin/log-gemini-usage', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      // Get user's name from My Info, fallback to provided username or default
-      const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
-      const username = myInfo.name || logData.username || 'practicefor_fun_user';
-
-      // Get user's name from My Info, fallback to provided username or default
-      const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
-      const username = myInfo.name || logData.username || 'practicefor_fun_user';
-
       body: JSON.stringify({
         username: username,
         action: logData.action, // e.g., 'chat_response', 'translation', 'grammar_check'
