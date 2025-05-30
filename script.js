@@ -34,7 +34,7 @@ async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
 
     for (let attempt = 0; attempt < retries; attempt++) {
         try {
-            const response = await fetch('https://langcamp.us/api/gemini/generate', {
+            const response = await fetch('https://langcamp.us/api/exchange-admin/gemini-generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
