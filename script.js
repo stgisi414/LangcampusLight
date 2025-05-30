@@ -116,13 +116,13 @@ async function logGeminiUsage(logData) {
       },
       body: JSON.stringify({
         username: username,
-        action: logData.action, // e.g., 'chat_response', 'translation', 'grammar_check'
+        action: logData.action,
         model: logData.model,
         inputTokens: logData.inputTokens || 0,
         outputTokens: logData.outputTokens || 0,
         requestPreview: logData.requestPreview?.substring(0, 200) || '',
         responsePreview: logData.responsePreview?.substring(0, 200) || '',
-        success: logData.success !== false, // Default to true unless explicitly false
+        success: logData.success !== false,
         error: logData.error || null,
         duration: logData.duration || 0,
         ipAddress: logData.ipAddress || 'unknown',
