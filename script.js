@@ -34,6 +34,10 @@ async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
 
     for (let attempt = 0; attempt < retries; attempt++) {
         try {
+            // Get user's name from My Info, fallback to default if not set
+            const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+            const username = myInfo.name || 'practicefor_fun_user';
+
             const response = await fetch('https://langcamp.us/api/exchange-admin/gemini-generate', {
                 method: 'POST',
                 headers: {
@@ -44,7 +48,7 @@ async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
                     model: currentModel, // Send the model key (e.g., 'super', 'lite')
                     callType: callType,
                     source: 'practicefor_fun',
-                    username: 'practicefor_fun_user',
+                    username: username,
                     userAgent: navigator.userAgent,
                     requestPreview: prompt.substring(0, 200)
                 })
@@ -106,8 +110,12 @@ async function logGeminiUsage(logData) {
       headers: {
         'Content-Type': 'application/json',
       },
+      // Get user's name from My Info, fallback to provided username or default
+      const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+      const username = myInfo.name || logData.username || 'practicefor_fun_user';
+
       body: JSON.stringify({
-        username: logData.username || 'practicefor_fun_user',
+        username: username,
         action: logData.action, // e.g., 'chat_response', 'translation', 'grammar_check'
         model: logData.model,
         inputTokens: logData.inputTokens || 0,
