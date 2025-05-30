@@ -35,8 +35,16 @@ async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
     for (let attempt = 0; attempt < retries; attempt++) {
         try {
             // Get user's name from My Info, fallback to default if not set
-            const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+            let myInfo = {};
+            try {
+                myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+            } catch (parseError) {
+                console.warn('Error parsing myInfo from localStorage:', parseError);
+                myInfo = {};
+            }
+            
             const username = myInfo.name || 'practicefor_fun_user';
+            console.log('Sending API request with username:', username);
 
             const response = await fetch('https://langcamp.us/api/exchange-admin/gemini-generate', {
                 method: 'POST',
@@ -1682,10 +1690,19 @@ function addHobbyInput(value = '') {
 
 // Modified getGeminiChatResponse to include user info
 async function getGeminiChatResponse(partner, history) {
-    const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+    let myInfo = {};
+    try {
+        myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+    } catch (parseError) {
+        console.warn('Error parsing myInfo in getGeminiChatResponse:', parseError);
+        myInfo = {};
+    }
+    
     const userContext = myInfo.name ?
         `The user's name is ${myInfo.name}. ${myInfo.bio ? `Their bio: ${myInfo.bio}.` : ''} ${myInfo.hobbies?.length ? `Their hobbies: ${myInfo.hobbies.join(', ')}.` : ''}` :
         '';
+    
+    console.log('Chat response using myInfo:', { name: myInfo.name, hasContext: !!userContext });
 
     const prompt = `You are ${partner.name}, a language exchange partner on the website http://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
 ${userContext}
@@ -1815,6 +1832,7 @@ function saveMyInfo() {
 
     const myInfo = { name, bio, hobbies };
     localStorage.setItem('myInfo', JSON.stringify(myInfo));
+    console.log('Saved myInfo to localStorage:', myInfo);
 }
 
 function loadMyInfo() {
