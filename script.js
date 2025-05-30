@@ -114,6 +114,10 @@ async function logGeminiUsage(logData) {
       const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
       const username = myInfo.name || logData.username || 'practicefor_fun_user';
 
+      // Get user's name from My Info, fallback to provided username or default
+      const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
+      const username = myInfo.name || logData.username || 'practicefor_fun_user';
+
       body: JSON.stringify({
         username: username,
         action: logData.action, // e.g., 'chat_response', 'translation', 'grammar_check'
