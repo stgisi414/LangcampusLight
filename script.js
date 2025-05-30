@@ -16,7 +16,7 @@ async function retryLastMessage() {
     messageInput.value = '';
 }
 
-const API_KEY = 'AIzaSyDIFeql6HUpkZ8JJlr_kuN0WDFHUyOhijA';
+// API_KEY removed - now handled by langcamp.us backend
 
 // Model configuration
 const GEMINI_MODELS = {
@@ -28,40 +28,45 @@ const GEMINI_MODELS = {
 
 let currentModel = 'super'; // Default to Super (gemini-2.0-flash)
 
-// Centralized Gemini API call function
+// Centralized Gemini API call function - now uses langcamp.us backend
 async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
-    const modelName = GEMINI_MODELS[currentModel];
-    const startTime = Date.now(); // Define startTime at the beginning
+    const startTime = Date.now();
 
     for (let attempt = 0; attempt < retries; attempt++) {
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`, {
+            const response = await fetch('https://langcamp.us/api/gemini/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
-                    }]
+                    prompt: prompt,
+                    model: currentModel, // Send the model key (e.g., 'super', 'lite')
+                    callType: callType,
+                    source: 'practicefor_fun',
+                    username: 'practicefor_fun_user',
+                    userAgent: navigator.userAgent,
+                    requestPreview: prompt.substring(0, 200)
                 })
             });
 
             if (!response.ok) {
                 const errorBody = await response.text();
-                throw new Error(`API request failed with status ${response.status}: ${response.statusText}. Body: ${errorBody}`);
+                throw new Error(`Backend API request failed with status ${response.status}: ${response.statusText}. Body: ${errorBody}`);
             }
 
             const data = await response.json();
 
-            if (!data || !data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
-                console.error("Unexpected API response structure:", data);
-                throw new Error("Unexpected API response structure");
+            if (!data || !data.success) {
+                console.error("Backend API error:", data);
+                throw new Error(data.error || "Backend API returned unsuccessful response");
             }
 
-            let generatedText = data.candidates[0].content.parts[0].text;
+            let generatedText = data.text;
+            if (!generatedText) {
+                throw new Error("No text returned from backend API");
+            }
+
             generatedText = generatedText.trim();
 
             // Remove quotes if present
@@ -69,41 +74,13 @@ async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
                 generatedText = generatedText.substring(1, generatedText.length - 1);
             }
 
-            // Log the successful API call (don't await to avoid blocking)
-            logGeminiUsage({
-                username: 'practicefor_fun_user',
-                action: callType,
-                model: GEMINI_MODELS[currentModel],
-                inputTokens: Math.ceil(prompt.length / 4), // Better token approximation
-                outputTokens: Math.ceil(generatedText.length / 4), // Better token approximation
-                requestPreview: prompt.substring(0, 200),
-                responsePreview: generatedText.substring(0, 200),
-                success: true,
-                duration: Date.now() - startTime,
-                ipAddress: getUserIP(),
-                userAgent: navigator.userAgent
-            }).catch(err => console.warn('Logging failed:', err));
+            // Backend handles logging automatically, so we don't need to call logGeminiUsage here
+            console.log(`Gemini API call successful via backend (${callType})`);
 
             return generatedText;
 
         } catch (error) {
-            console.error(`Gemini API attempt ${attempt + 1} failed:`, error);
-            
-            // Log the failed API call (don't await to avoid blocking)
-            logGeminiUsage({
-                username: 'practicefor_fun_user',
-                action: callType,
-                model: GEMINI_MODELS[currentModel],
-                inputTokens: Math.ceil(prompt.length / 4),
-                outputTokens: 0,
-                requestPreview: prompt.substring(0, 200),
-                responsePreview: '',
-                success: false,
-                error: error.message,
-                duration: Date.now() - startTime,
-                ipAddress: getUserIP(),
-                userAgent: navigator.userAgent
-            }).catch(err => console.warn('Error logging failed:', err));
+            console.error(`Gemini API backend attempt ${attempt + 1} failed:`, error);
 
             if (attempt === retries - 1) {
                 throw error;
