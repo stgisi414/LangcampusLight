@@ -61,7 +61,7 @@ async function callGeminiAPI(prompt, retries = 3, callType = 'unknown') {
                     username: username,
                     userInfo: username, // Send as userInfo to match admin log display
                     userAgent: navigator.userAgent,
-                    requestPreview: prompt.substring(0, 200)
+                    requestPreview: lastUserMessage || prompt.substring(0, 200)
                 })
             });
 
