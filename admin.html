@@ -272,23 +272,61 @@
             border-radius: 8px;
             padding: 20px;
             border: 1px solid #e1e5e9;
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 20px;
-            align-items: start;
         }
 
-        .user-info {
+        .user-header {
             display: flex;
-            flex-direction: column;
-            gap: 8px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
         }
 
         .user-name {
             font-size: 18px;
             font-weight: 600;
             color: #333;
-            margin-bottom: 8px;
+        }
+
+        .user-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .user-toggle:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+
+        .toggle-chevron {
+            font-size: 14px;
+            color: #667eea;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .user-details {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            align-items: start;
+            max-height: 1000px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .user-details.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .user-stat {
@@ -350,7 +388,7 @@
         }
 
         @media (max-width: 768px) {
-            .user-card {
+            .user-details {
                 grid-template-columns: 1fr;
                 gap: 15px;
             }
@@ -819,39 +857,48 @@
                 return;
             }
 
-            const usersHtml = users.map(user => {
+            const usersHtml = users.map((user, index) => {
                 const avgAssessment = user.languageAssessments && user.languageAssessments.length > 0 
                     ? (user.languageAssessments.reduce((sum, score) => sum + score, 0) / user.languageAssessments.length).toFixed(1)
                     : 'N/A';
+                
+                const userId = user.username?.replace(/[^a-zA-Z0-9]/g, '') || 'user' + Math.random().toString(36).substr(2, 9);
 
                 return `
                     <div class="user-card">
-                        <div class="user-info">
+                        <div class="user-header">
                             <div class="user-name">${user.username || user.userInfo || 'Anonymous User'}</div>
-                            <div class="user-stat">
-                                <span class="stat-label">Total API Calls:</span>
-                                <span class="stat-value">${user.totalCalls || 0}</span>
-                            </div>
-                            <div class="user-stat">
-                                <span class="stat-label">Successful Calls:</span>
-                                <span class="stat-value">${user.successfulCalls || 0}</span>
-                            </div>
-                            <div class="user-stat">
-                                <span class="stat-label">Error Rate:</span>
-                                <span class="stat-value">${user.errorRate || 0}%</span>
-                            </div>
-                            <div class="user-stat">
-                                <span class="stat-label">Avg Assessment Score:</span>
-                                <span class="stat-value">${avgAssessment}${avgAssessment !== 'N/A' ? '/5' : ''}</span>
-                            </div>
-                            <div class="user-stat">
-                                <span class="stat-label">Last Active:</span>
-                                <span class="stat-value">${user.lastActive ? new Date(user.lastActive).toLocaleDateString() : 'Never'}</span>
-                            </div>
+                            <button class="user-toggle" onclick="toggleUserCard('${userId}')">
+                                <span class="toggle-chevron">▼</span>
+                            </button>
                         </div>
-                        <div class="pie-chart-container">
-                            <div class="pie-chart-title">Message Types</div>
-                            <div id="chart-${user.username?.replace(/[^a-zA-Z0-9]/g, '') || 'user' + Math.random().toString(36).substr(2, 9)}"></div>
+                        <div class="user-details" id="details-${userId}">
+                            <div class="user-info">
+                                <div class="user-stat">
+                                    <span class="stat-label">Total API Calls:</span>
+                                    <span class="stat-value">${user.totalCalls || 0}</span>
+                                </div>
+                                <div class="user-stat">
+                                    <span class="stat-label">Successful Calls:</span>
+                                    <span class="stat-value">${user.successfulCalls || 0}</span>
+                                </div>
+                                <div class="user-stat">
+                                    <span class="stat-label">Error Rate:</span>
+                                    <span class="stat-value">${user.errorRate || 0}%</span>
+                                </div>
+                                <div class="user-stat">
+                                    <span class="stat-label">Avg Assessment Score:</span>
+                                    <span class="stat-value">${avgAssessment}${avgAssessment !== 'N/A' ? '/5' : ''}</span>
+                                </div>
+                                <div class="user-stat">
+                                    <span class="stat-label">Last Active:</span>
+                                    <span class="stat-value">${user.lastActive ? new Date(user.lastActive).toLocaleDateString() : 'Never'}</span>
+                                </div>
+                            </div>
+                            <div class="pie-chart-container">
+                                <div class="pie-chart-title">Message Types</div>
+                                <div id="chart-${userId}"></div>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -859,11 +906,33 @@
 
             container.innerHTML = `<div class="user-list-container">${usersHtml}</div>`;
 
-            // Create pie charts for each user
+            // Initialize all cards as collapsed and create pie charts
             users.forEach((user, index) => {
-                const chartId = `chart-${user.username?.replace(/[^a-zA-Z0-9]/g, '') || 'user' + Math.random().toString(36).substr(2, 9)}`;
-                createPieChart(chartId, user.messageTypes || {});
+                const userId = user.username?.replace(/[^a-zA-Z0-9]/g, '') || 'user' + Math.random().toString(36).substr(2, 9);
+                
+                // Initialize as collapsed
+                const details = document.getElementById(`details-${userId}`);
+                const chevron = document.querySelector(`[onclick="toggleUserCard('${userId}')"] .toggle-chevron`);
+                if (details && chevron) {
+                    details.classList.add('collapsed');
+                    chevron.textContent = '▶';
+                }
+                
+                createPieChart(`chart-${userId}`, user.messageTypes || {});
             });
+        }
+
+        function toggleUserCard(userId) {
+            const details = document.getElementById(`details-${userId}`);
+            const chevron = document.querySelector(`[onclick="toggleUserCard('${userId}')"] .toggle-chevron`);
+            
+            if (details.classList.contains('collapsed')) {
+                details.classList.remove('collapsed');
+                chevron.textContent = '▼';
+            } else {
+                details.classList.add('collapsed');
+                chevron.textContent = '▶';
+            }
         }
 
         function createPieChart(containerId, messageTypes) {
