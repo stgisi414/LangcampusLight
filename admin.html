@@ -894,11 +894,19 @@
                                     <span class="stat-label">Last Active:</span>
                                     <span class="stat-value">${user.lastActive ? new Date(user.lastActive).toLocaleDateString() : 'Never'}</span>
                                 </div>
+                                <div style="margin-top: 15px;">
+                                    <button class="refresh-btn analyze-user-btn" onclick="analyzeUser('${user.username?.replace(/'/g, "\\'")}', '${userId}')" style="width: 100%; background: #764ba2;">
+                                        Analyze User
+                                    </button>
+                                    <div id="analysis-${userId}" class="user-analysis" style="margin-top: 10px; display: none; padding: 10px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #764ba2;">
+                                        <div class="analysis-content"></div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="pie-chart-container">
                                 <div class="pie-chart-title">Message Types</div>
                                 <div id="chart-${userId}"></div>
-                            </div>
+                            </div></div>
                         </div>
                     </div>
                 `;
@@ -1145,6 +1153,97 @@
                 login();
             }
         });
+
+        // Analyze user function
+        async function analyzeUser(username, userId) {
+            const button = document.querySelector(`[onclick="analyzeUser('${username.replace(/'/g, "\\'")}', '${userId}')"]`);
+            const analysisDiv = document.getElementById(`analysis-${userId}`);
+            const analysisContent = analysisDiv.querySelector('.analysis-content');
+
+            if (!button || !analysisDiv || !analysisContent) {
+                console.error('Required elements not found for user analysis');
+                return;
+            }
+
+            try {
+                // Show loading state
+                button.disabled = true;
+                button.textContent = 'Analyzing...';
+                analysisDiv.style.display = 'block';
+                analysisContent.innerHTML = '<em>Analyzing user chat responses...</em>';
+
+                // Get user's chat logs (last 250 responses)
+                const logsResponse = await fetch(`${API_BASE}/api-logs?limit=250&username=${encodeURIComponent(username)}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!logsResponse.ok) {
+                    throw new Error(`Failed to load user logs: ${logsResponse.status}`);
+                }
+
+                const logs = await logsResponse.json();
+                const logsArray = Array.isArray(logs) ? logs : (logs.logs || []);
+
+                // Filter for chat responses and extract user messages
+                const chatResponses = logsArray
+                    .filter(log => log.action === 'chat_response' && log.requestPreview)
+                    .slice(0, 250)
+                    .map(log => log.requestPreview)
+                    .join('\n\n');
+
+                if (!chatResponses) {
+                    analysisContent.innerHTML = '<em>No chat responses found for this user.</em>';
+                    return;
+                }
+
+                // Send to Gemini for analysis using the same API structure as script.js
+                const analysisPrompt = `Analyze the following language learning chat interactions from a student. Provide a concise 2-3 sentence student feedback analysis report focusing on their language progress, communication patterns, and areas for improvement.
+
+Chat interactions:
+${chatResponses.substring(0, 8000)}`; // Limit to prevent token overflow
+
+                const analysisResponse = await fetch('https://langcamp.us/api/exchange-admin/gemini-generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: analysisPrompt,
+                        model: 'super',
+                        callType: 'user_analysis',
+                        source: 'admin_panel',
+                        username: 'admin_user',
+                        userInfo: 'admin_user',
+                        userAgent: navigator.userAgent,
+                        requestPreview: `User analysis for ${username}`
+                    })
+                });
+
+                if (!analysisResponse.ok) {
+                    const errorBody = await analysisResponse.text();
+                    throw new Error(`Analysis API request failed: ${analysisResponse.status} ${errorBody}`);
+                }
+
+                const analysisData = await analysisResponse.json();
+
+                if (!analysisData || !analysisData.success) {
+                    throw new Error(analysisData.error || "Analysis API returned unsuccessful response");
+                }
+
+                // Display the analysis
+                analysisContent.innerHTML = `<strong>Student Analysis:</strong><br>${analysisData.text}`;
+
+            } catch (error) {
+                console.error('Error analyzing user:', error);
+                analysisContent.innerHTML = `<em style="color: red;">Failed to analyze user: ${error.message}</em>`;
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Analyze User';
+            }
+        }
     </script>
 </body>
 </html>
