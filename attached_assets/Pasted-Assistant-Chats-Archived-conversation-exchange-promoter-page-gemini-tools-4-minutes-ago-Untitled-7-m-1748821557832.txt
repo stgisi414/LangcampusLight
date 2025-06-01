@@ -1,0 +1,59 @@
+Assistant
+Chats
+Archived
+conversation exchange promoter page gemini tools
+4 minutes ago
+Untitled
+7 minutes ago
+chatbot time zone language context handling
+5 hours ago
+chatbot time zone language context handling
+5 hours ago
+Untitled
+5 hours ago
+admin panel user analysis feature request
+20 hours ago
+admin panel user stats visualization breakdown
+20 hours ago
+admin panel user stats language usage breakdown
+20 hours ago
+admin log info name api issue
+2 days ago
+User Info Tab Logging Problem
+2 days ago
+Fetch API Migration Backend Endpoint Development
+3 days ago
+App Introduction App Features Startup Pitch Concise Description
+3 days ago
+logging system langcamp us data storage configuration
+3 days ago
+Logging System Troubleshooting Guide
+3 days ago
+Logging System Troubleshooting Guide
+3 days ago
+Logging System Troubleshooting Guide
+3 days ago
+admin login system gemini api logging access details
+3 days ago
+Logging Gemini Messages with Unique Details
+3 days ago
+Gemini Flash Model Switcher UI Design
+3 days ago
+Language Learning App Localization Feedback
+4 days ago
+Build a conversation exchange Promoter html page that has a built in iframe that has different tools in the page that help automate the promotion of practicefor.fun to users with english mistakes in their profiles. The page should not show any tools until the user is logged in. The tools should be powered by Gemini for analyzing profiles automatically with errors and drafting messages according to these system instructions:
+
+Greet the user by name.
+ * Say, "Hey, I noticed that you made a mistake in your profile."
+
+ * Analyze the provided profile text for English grammar errors.
+
+ * Create a message pointing out the errors with ❌ and ✅ emojis.
+
+ * Include a link to https://practicefor.fun at the end.
+
+For non English messages just analyze the text and respond with a good message that they want to hear and how they'll be able to get instantaneous language exchange practice at https://practicefor.fun.
+
+Don't forget the valediction in my name, Stefan.
+
+For short messages I will paste, just respond politely and promote if no errors are present.

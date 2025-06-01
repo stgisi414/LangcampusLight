@@ -1,0 +1,63 @@
+Project Title: Automated Promotion Tool for practicefor.fun
+
+I. Objective:
+Build a single HTML page that serves as a "Promoter Tool". This tool will help a logged-in user (Stefan) analyze text snippets (user profiles or messages) and generate personalized promotional messages for practicefor.fun. The message generation logic will be guided by specific system instructions detailed below (intended for an AI like Gemini).
+
+II. Page Structure & Functionality:
+
+Authentication Gate:
+
+The page initially should only show a login interface (e.g., a simple password input field. If a more complex login is needed, please specify or indicate if this will be handled by an existing system).
+The promoter tools (described below) must only be visible after successful login.
+Promoter Tools Interface (Visible after login):
+
+Input Area: A large text area where Stefan can paste the "Profile Text" or "Short Message" to be analyzed.
+Action Buttons:
+Button 1: "Analyze & Draft for English Errors"
+Button 2: "Draft for Non-English Text"
+Button 3: "Draft for Short/Error-Free Text"
+Output Area: A text area to display the AI-generated message, allowing Stefan to copy it.
+III. AI-Powered Message Generation (System Instructions for Gemini or similar AI):
+
+You will need to define functions or logic that an AI (like Gemini) can execute based on which button Stefan clicks.
+
+A. Tool 1: Analyze & Draft for English Errors
+* Trigger: Stefan pastes text and clicks "Analyze & Draft for English Errors".
+* Input for AI: The "Profile Text" provided by Stefan.
+* AI Instructions:
+1.  Greet the user by name (if a name can be clearly identified from the profile text, otherwise use a generic greeting like "Hello").
+2.  Add the phrase: "Hey, I noticed you made a few mistakes in your profile."
+3.  Analyze the provided "Profile Text" for English grammar, spelling, and punctuation errors.
+4.  Construct a message that clearly and politely points out the identified errors. For each error:
+* Quote or refer to the part of the text with the error.
+* Show the error with a ❌ emoji.
+* Provide the correction with a ✅ emoji.
+* Example: "In your profile, you wrote 'I enjoys practice english' ❌. It should be 'I enjoy practicing English' ✅."
+5.  Conclude the message with: "If you're looking to improve your English and get instant practice with native speakers, check out https://practicefor.fun!"
+6.  Sign off with the valediction: "Best regards,\nStefan"
+
+B. Tool 2: Draft for Non-English Text
+* Trigger: Stefan pastes text and clicks "Draft for Non-English Text".
+* Input for AI: The non-English "Profile Text" provided by Stefan.
+* AI Instructions:
+1.  Analyze the provided text to understand its main topic or sentiment.
+2.  Craft a positive and encouraging message in English. This message should:
+* Acknowledge their interest (e.g., "It's great that you're interested in [topic inferred from their profile, if possible]!").
+* Smoothly transition to the promotion.
+* Highlight that they can find partners for instantaneous language exchange practice in their native language (or to practice English if they wish) at practicefor.fun.
+* Example phrasing: "You can connect with people from all over the world to practice [User's Language, if identifiable, otherwise 'your language'] or improve your English. Check it out at https://practicefor.fun!"
+3.  Sign off with the valediction: "Best regards,\nStefan"
+
+C. Tool 3: Draft for Short/Error-Free Text
+* Trigger: Stefan pastes text (likely a short message they received or an error-free profile) and clicks "Draft for Short/Error-Free Text".
+* Input for AI: The "Short Message" or "Profile Text" provided by Stefan.
+* AI Instructions:
+1.  If the text is a question or requires a simple polite acknowledgment, provide one briefly. (e.g., "Thanks for your message!" or "That's a great profile!").
+2.  If no specific errors are present or the text is very short, append a general promotional message: "If you're ever looking to practice languages with people from around the world, https://practicefor.fun is a great place for instant language exchange!"
+3.  Sign off with the valediction: "Best regards,\nStefan"
+
+IV. Technical Considerations (Assumptions for Red Blood Assistant):
+
+The page should be a single HTML file, potentially using JavaScript for the login visibility toggle and for handling button clicks (which would then call the AI logic).
+The "AI powered by Gemini" implies that the Red Blood Assistant either is Gemini, can generate code that calls a Gemini API, or can simulate this logic. The system instructions above should be used to guide the text generation part of the tool.
+The initial prompt mentioned an iframe with tools. For simplicity and to ensure functionality, this revised prompt suggests building the tools directly into the main HTML page. If an iframe is still a critical requirement, please specify its exact purpose and what content it should display (e.g., should it load practicefor.fun after a message is drafted, or is it meant to host these tools separately?).
