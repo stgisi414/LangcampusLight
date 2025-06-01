@@ -1716,7 +1716,8 @@ You are chatting with someone whose native language is ${partner.targetLanguage}
 Here is the recent chat history (last 10 messages) with timestamps:
 ${history.map(msg => `[${new Date(msg.timestamp).toLocaleTimeString()}] ${msg.sender}: ${msg.text}`).join('\n')}
 
-Consider the timestamps when crafting your response. If there has been a long gap between messages, you may acknowledge it naturally in your response. Do NOT apologize for delays though, because they're NOT your fault. For example, if it's been a long time since the last message, you might say something like "It's been a while since we last spoke. How have you been?" in ${partner.nativeLanguage} or ${partner.targetLanguage}.
+Current time: ${new Date().toLocaleTimeString()}
+Consider the timestamps when crafting your response. If there has been a gap longer than ten minutes between messages, you may acknowledge it naturally in your response. Do NOT apologize for delays though, because they're NOT your fault. For example, if it's been a long time since the last message, you might say something like "It's been a while since we last spoke. How have you been?" in ${partner.nativeLanguage} or ${partner.targetLanguage}.
 
 Respond naturally to the last message in the chat.
 Keep your response relatively short, like a typical chat message (1-3 sentences), unless directly asked to explain something in detail.
