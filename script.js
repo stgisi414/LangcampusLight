@@ -469,66 +469,18 @@ async function openChat(partner) { // Now accepts the full partner object
             // For brevity, I'm not pasting all of it, but it should be within this timeout.
             // The critical part for the intro message generation:
             const myInfo = JSON.parse(localStorage.getItem('myInfo') || '{}');
-        const userLocalDateTime = new Date();
-        const currentUserTimeOfDay = userLocalDateTime.getHours() < 12 ? 'morning' : (userLocalDateTime.getHours() < 18 ? 'afternoon' : 'evening');
+            const userLocalDateTime = new Date(); // Renamed from timeOfDay to avoid conflict
+            const currentUserTimeOfDay = userLocalDateTime.getHours() < 12 ? 'morning' : (userLocalDateTime.getHours() < 18 ? 'afternoon' : 'evening');
 
-        // Function to get partner's local time based on their language
-        function getPartnerTimeContext(language) {
-            const languageTimezones = {
-                'Spanish': 'Europe/Madrid', // Spain timezone as primary
-                'French': 'Europe/Paris',
-                'Italian': 'Europe/Rome', 
-                'German': 'Europe/Berlin',
-                'Portuguese': 'Europe/Lisbon',
-                'Russian': 'Europe/Moscow',
-                'Chinese': 'Asia/Shanghai',
-                'Japanese': 'Asia/Tokyo',
-                'Korean': 'Asia/Seoul',
-                'Vietnamese': 'Asia/Ho_Chi_Minh',
-                'Thai': 'Asia/Bangkok',
-                'Hindi': 'Asia/Kolkata',
-                'Arabic': 'Asia/Riyadh',
-                'Polish': 'Europe/Warsaw',
-                'Mongolian': 'Asia/Ulaanbaatar',
-                'English': 'Europe/London' // Default to UK English
-            };
+            const partnerNativeLangForIntro = partner.nativeLanguage; // Use a distinct variable
+            let timezoneHintForIntro = `It is currently ${currentUserTimeOfDay} for the user you are about to greet.`;
+            const asianLanguagesForIntro = ['Chinese', 'Japanese', 'Korean', 'Vietnamese', 'Mongolian'];
 
-            const timezone = languageTimezones[language] || 'UTC';
-
-            try {
-                const partnerTime = new Date().toLocaleString('en-US', { 
-                    timeZone: timezone,
-                    hour12: false,
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                const partnerHour = parseInt(partnerTime.split(':')[0]);
-                const partnerTimeOfDay = partnerHour < 12 ? 'morning' : (partnerHour < 18 ? 'afternoon' : 'evening');
-
-                return {
-                    timezone: timezone,
-                    timeOfDay: partnerTimeOfDay,
-                    hour: partnerHour,
-                    timeString: partnerTime
-                };
-            } catch (error) {
-                console.warn(`Could not get timezone for ${language}, using UTC`);
-                const utcHour = new Date().getUTCHours();
-                return {
-                    timezone: 'UTC',
-                    timeOfDay: utcHour < 12 ? 'morning' : (utcHour < 18 ? 'afternoon' : 'evening'),
-                    hour: utcHour,
-                    timeString: new Date().toISOString().substr(11, 5)
-                };
+            if (asianLanguagesForIntro.includes(partnerNativeLangForIntro)) {
+                timezoneHintForIntro += ` You, ${partner.name}, are from a country in Asia where ${partnerNativeLangForIntro} is spoken. This means it's likely a very different time for you (e.g., if it's the user's morning, it might be your evening or night).`;
+            } else {
+                timezoneHintForIntro += ` You, ${partner.name}, are from a country where ${partnerNativeLangForIntro} is spoken. Your time of day will also be different from the user's, though the specific difference can vary.`;
             }
-        }
-
-        const partnerNativeLangForIntro = partner.nativeLanguage;
-        const partnerTimeContext = getPartnerTimeContext(partnerNativeLangForIntro);
-
-        let timezoneHintForIntro = `It is currently ${currentUserTimeOfDay} for the user you are about to greet (their local time). `;
-        timezoneHintForIntro += `For you, ${partner.name}, as someone from a ${partnerNativeLangForIntro}-speaking region, it is currently ${partnerTimeContext.timeOfDay} (around ${partnerTimeContext.timeString} in your timezone: ${partnerTimeContext.timezone}). `;
-        timezoneHintForIntro += `When discussing time or making time-related references, always refer to YOUR local time in the ${partnerNativeLangForIntro}-speaking region, not the user's time.`;
 
             const introPrompt = `You are ${partner.name}. Your native language is ${partner.nativeLanguage}, and you are roleplaying as if you live in a country where it's spoken. You're enthusiastic about learning ${partner.targetLanguage}. Your interests are: ${partner.interests.join(', ')}.
 
@@ -720,7 +672,346 @@ document.getElementById('send-message').addEventListener('click', async () => { 
         if (messageCountForAssessment % ASSESSMENT_INTERVAL === 0 &&
             timeSinceLastAssessment > ASSESSMENT_COOLDOWN) {
             // Get last 40 messages or all if less than 40, in multiples of 4
-            const maxMessages = Math.min(40, chatHistory.lengthjson\s*|\s*```/g, '').trim();
+            const maxMessages = Math.min(40, chatHistory.length);
+            const messagesToAnalyze = Math.floor(maxMessages / 4) * 4;
+            const recentMessages = chatHistory.slice(-messagesToAnalyze);
+
+            // Perform assessment in background
+            assessLanguageLevel(recentMessages);
+        }
+
+        // Add a thinking indicator (optional)
+        const thinkingIndicator = document.createElement('p');
+        thinkingIndicator.id = 'thinking-indicator';
+        thinkingIndicator.innerHTML = `<em>${currentPartnerName} is typing...</em>`;
+        chatMessages.appendChild(thinkingIndicator);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        try {
+            // Get response from Gemini
+            const partnerResponseText = await getGeminiChatResponse(currentPartner, chatHistory);
+
+            // Remove thinking indicator
+            const thinkingIndicatorToRemove = document.getElementById('thinking-indicator');
+            if (thinkingIndicatorToRemove) {
+                thinkingIndicatorToRemove.remove();
+            }
+
+            // Add partner's response to UI and history
+            if (partnerResponseText) {
+                const timestamp = new Date().toISOString();
+                const partnerResponse = { sender: currentPartnerName, text: partnerResponseText, timestamp };
+                chatHistory.push(partnerResponse);
+                chatMessages.innerHTML += `
+                  <p class="partner-message">
+                    <strong>${currentPartnerName}:</strong> ${partnerResponseText}
+                    <span class="message-time" style="font-size: 0.8em; color: #666; margin-left: 8px;">
+                      ${new Date(timestamp).toLocaleTimeString()}
+                    </span>
+                  </p>`;
+            } else {
+                chatMessages.innerHTML += `<p><em>Sorry, ${currentPartnerName} couldn't respond right now.</em></p>`;
+            }
+        } catch (error) {
+            console.error("Error getting Gemini response:", error);
+            // Remove thinking indicator on error
+            const thinkingIndicatorToRemove = document.getElementById('thinking-indicator');
+            if (thinkingIndicatorToRemove) {
+                thinkingIndicatorToRemove.remove();
+            }
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `
+                <p><em>Error getting response.</em></p>
+                <button onclick="retryLastMessage()" class="chat-button small-button" style="margin-top: 8px;">Retry</button>
+            `;
+            chatMessages.appendChild(errorDiv);
+        } finally {
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll down after response/error
+        }
+    }
+});
+
+// Add event listener for Enter key on message input
+document.getElementById('message-input')?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.keyCode === 13) {
+        event.preventDefault();
+        document.getElementById('send-message')?.click();
+    }
+});
+
+// Text selection handler - Removed redundant code
+
+// --- Teach Me Modal Logic ---
+const teachMeModal = document.getElementById('teach-me-modal');
+const teachMeButton = document.getElementById('teach-me-button');
+const teachMeCloseBtn = teachMeModal.querySelector('.teach-me-close');
+const grammarTopicList = document.getElementById('grammar-topic-list');
+const vocabularyTopicList = document.getElementById('vocabulary-topic-list');
+
+//Reloading lists
+function reloadGrammarTopicsList() {
+    if (!currentPartner || !currentPartner.nativeLanguage) {
+        console.error("Cannot reload grammar topics: Partner context is missing.");
+        if (grammarTopicList) {
+            grammarTopicList.innerHTML = '<p style="color: red;">Error: Partner language not set. Please close and reopen "Teach Me".</p>';
+        }
+        return;
+    }
+    const targetLang = currentPartner.nativeLanguage;
+
+    if (!grammarTopicList) return;
+    grammarTopicList.innerHTML = ''; // Clear current content (explanation/quiz)
+
+    if (grammarData && grammarData[targetLang]) {
+        const topics = grammarData[targetLang];
+        if (topics && topics.length > 0) {
+            topics.sort((a, b) => a.level - b.level);
+            topics.forEach(topic => {
+                const button = document.createElement('button');
+                button.dataset.title = topic.title;
+                button.innerHTML = `${topic.title} <span style="font-size: 0.8em; color: #777; margin-left: 10px; background-color: #eee; padding: 2px 6px; border-radius: 3px;">Level ${topic.level}</span>`;
+                // The existing event listener on grammarTopicList (added via event delegation)
+                // will handle clicks on these dynamically created buttons.
+                grammarTopicList.appendChild(button);
+            });
+        } else {
+            grammarTopicList.innerHTML = `<p>No grammar topics available for ${targetLang} yet.</p>`;
+        }
+    } else {
+        grammarTopicList.innerHTML = `<p>Grammar data for ${targetLang} not found.</p>`;
+    }
+    quizActive = false; // Reset quiz state
+    currentQuiz = {};
+}
+
+function reloadVocabularyTopicsList() {
+    if (!vocabularyTopicList) return;
+    vocabularyTopicList.innerHTML = ''; // Clear current content (explanation/quiz)
+
+    if (!currentPartner || !currentPartner.nativeLanguage) {
+        console.error("Cannot reload vocabulary topics: Partner context is missing.");
+        vocabularyTopicList.innerHTML = '<p style="color: red;">Error: Partner language not set. Please close and reopen "Teach Me".</p>';
+        return;
+    }
+    const targetLangForVocab = currentPartner.nativeLanguage;
+
+    if (vocabData && vocabData.length > 0) {
+        vocabData.sort((a, b) => a.level - b.level);
+        vocabData.forEach(topic => {
+            const button = document.createElement('button');
+            button.dataset.title = topic.title;
+            // Apply styles consistent with initial populationbutton.style.display= 'block';
+            button.style.width = '100%';
+            button.style.padding = '0.8rem';
+            button.style.marginBottom = '0.5rem';
+            button.style.textAlign = 'left';
+            button.style.backgroundColor = '#f9f9f9';
+            button.style.border = '1px solid #eee';
+            button.style.cursor = 'pointer';
+            button.style.borderRadius = '4px';
+            button.style.transition = 'background-color 0.2s';
+            button.style.color = '#333';
+            button.innerHTML = `${topic.title} <span style="font-size: 0.8em; color: #777; margin-left: 10px; background-color: #eee; padding: 2px 6px; border-radius: 3px;">Level ${topic.level}</span>`;
+
+            button.onclick = () => loadVocabularyContent(topic, targetLangForVocab);
+
+            button.onmouseover = () => button.style.backgroundColor = '#e9e9e9';
+            button.onmouseout = () => button.style.backgroundColor = '#f9f9f9';
+
+            vocabularyTopicList.appendChild(button);
+        });
+    } else {
+        vocabularyTopicList.innerHTML = `<p>No vocabulary topics available yet.</p>`;
+    }
+    quizActive = false; // Reset quiz state
+    currentQuiz = {};
+}
+
+// Tab switching functionality
+document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', () => {
+        // Remove active class from all tabs and contents
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        // Add active class to clicked tab and corresponding content
+        button.classList.add('active');
+        const tabId = button.getAttribute('data-tab');
+        document.getElementById(`${tabId}-section`).classList.add('active');
+    });
+});
+
+teachMeButton.addEventListener('click', () => {
+    if (!currentPartner) {
+        console.error("Partner not available.");
+        return;
+    }
+
+    const targetLang = currentPartner.nativeLanguage; // User is learning partner's native language
+
+    // Load Grammar Topics
+    if (grammarData && grammarData[targetLang]) {
+        const topics = grammarData[targetLang];
+        grammarTopicList.innerHTML = ''; // Clear previous list
+
+        if (topics && topics.length > 0) {
+            topics.sort((a, b) => a.level - b.level); // Sort by level
+            topics.forEach(topic => {
+                const button = document.createElement('button');
+                button.dataset.title = topic.title;
+                button.innerHTML = `${topic.title} <span>Level ${topic.level}</span>`;
+                grammarTopicList.appendChild(button);
+            });
+        } else {
+            grammarTopicList.innerHTML = `<p>No grammar topics available for ${targetLang} yet.</p>`;
+        }
+    }
+
+    // Load Vocabulary Topics
+    if (vocabData) {
+        vocabularyTopicList.innerHTML = ''; // Clear previous list
+        vocabData.sort((a, b) => a.level - b.level); // Sort by level
+
+        vocabData.forEach(topic => {
+            const button = document.createElement('button');
+            button.dataset.title = topic.title;
+            button.dataset.type = 'vocabulary';
+            button.style.display = 'block';
+            button.style.width = '100%';
+            button.style.padding = '0.8rem';
+            button.style.marginBottom = '0.5rem';
+            button.style.textAlign = 'left';
+            button.style.backgroundColor = '#f9f9f9';
+            button.style.border = '1px solid #eee';
+            button.style.cursor = 'pointer';
+            button.style.borderRadius = '4px';
+            button.style.transition = 'background-color 0.2s';
+            button.style.color = '#333';
+            button.innerHTML = `${topic.title} <span style="font-size: 0.8em; color: #777; margin-left: 10px; background-color = #eee; padding: 2px 6px; border-radius: 3px;">Level ${topic.level}</span>`;
+            button.onclick = () => loadVocabularyContent(topic, targetLang);
+            button.onmouseover = () => button.style.backgroundColor = '#e9e9e9';
+            button.onmouseout = () => button.style.backgroundColor = '#f9f9f9';
+            vocabularyTopicList.appendChild(button);
+        });
+    }
+
+    teachMeModal.style.setProperty('display', 'flex', 'important');
+});
+
+async function loadVocabularyContent(topic, targetLang) {
+    console.log('Starting loadVocabularyContent:', { topic, targetLang });
+    const vocabTopicList = document.getElementById('vocabulary-topic-list');
+    if (!vocabTopicList) {
+        console.error('Vocabulary topic list element not found');
+        return;
+    }
+    vocabTopicList.innerHTML = `
+        <h2>${topic.title}</h2>
+        <div id="vocabulary-content">
+            <p>Loading vocabulary content...</p>
+        </div>
+    `;
+    const container = document.getElementById('vocabulary-content');
+    if (!container) {
+        console.error('Vocabulary content container not found');
+        return;
+    }
+
+    try {
+        // Get the user's native language for explanations
+        const userNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
+
+        const prompt = `You are a ${targetLang} language teacher creating a vocabulary study guide for a student whose native language is ${userNativeLanguage}.
+
+Create a comprehensive vocabulary study guide for "${topic.title}" in ${targetLang}.
+
+IMPORTANT: Write all explanations, definitions, and instructions in ${userNativeLanguage} so the student can understand clearly. Use ${targetLang} only for the vocabulary words, phrases, and example sentences.
+
+Include:
+1. Key vocabulary words and phrases related to ${topic.title} (in ${targetLang}) with definitions in ${userNativeLanguage}
+2. Example sentences in ${targetLang} with ${userNativeLanguage} translations
+3. Common expressions or idioms related to this topic (in ${targetLang}) with explanations in ${userNativeLanguage}
+4. Cultural notes (explained in ${userNativeLanguage}) if relevant
+5. Usage tips and memory aids (in ${userNativeLanguage})
+
+Format the response in Markdown with clear sections and examples.`;
+
+        const content = await callGeminiAPI(prompt, 3, 'vocabulary_content');
+
+        // Convert markdown to HTML and display
+        container.innerHTML = `
+               ${marked.parse(content)}
+               <div class="topic-actions" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                   <button class="chat-button" onclick="startVocabularyQuiz('${topic.title.replace(/'/g, "\\'")}', '${targetLang.replace(/'/g, "\\'")}')">Quiz Me</button>
+                   <button class="chat-button secondary-button" onclick="reloadVocabularyTopicsList()">Return to Topics</button>
+               </div>
+           `;
+
+    } catch (error) {
+        console.error('Error loading vocabulary content:', error);
+        container.innerHTML = `
+            <p style="color: red;">Failed to load vocabulary content. Please try again.</p>
+            <button onclick="loadVocabularyContent('${topic.title}', '${targetLang}')" class="chat-button">
+                Retry
+            </button>
+        `;
+    }
+}
+
+async function startVocabularyQuiz(topicTitle, language) {
+    console.log('Starting vocabulary quiz:', { topicTitle, language });
+    currentTopicTitle = topicTitle;
+    const container = document.getElementById('vocabulary-content');
+    if (!container) {
+        console.error('Quiz container not found');
+        return;
+    }
+    container.innerHTML = '<p>Loading quiz...</p>';
+
+    quizActive = true;
+    currentQuiz = {
+        questions: [],
+        currentQuestion: 0,
+        score: 0,
+        total: 16
+    };
+
+    // Get the quiz taker's native language from currentPartner
+    const quizTakerNativeLanguage = currentPartner ? currentPartner.targetLanguage : 'English';
+
+    const quizPrompt = `Create a multiple-choice vocabulary quiz (16 questions) about "${topicTitle}" in ${language}. 
+
+IMPORTANT CONTEXT: The quiz taker's native language is ${quizTakerNativeLanguage}. Please create the quiz entirely IN ${quizTakerNativeLanguage} so they can understand the questions and answer options clearly.
+
+- Write all questions in ${quizTakerNativeLanguage}
+- Write all answer choices in ${quizTakerNativeLanguage}
+- Test their knowledge of ${language} vocabulary through ${quizTakerNativeLanguage} explanations
+- When showing ${language} words, always provide ${quizTakerNativeLanguage} context or translations
+
+Questions should test vocabulary understanding through:
+1. Word definitions
+2. Usage in context
+3. Synonyms/antonyms
+4. Appropriate word choice
+
+Format as valid JSON with this structure:
+[
+  {
+    "question": "What is the meaning of [word] in ${language}?",
+    "options": ["definition1", "definition2", "definition3", "definition4"],
+    "correctIndex": 0
+  }
+]
+
+Each question must have exactly 4 options. Do not include backticks or markdown formatting.`;
+
+    try {
+        let quizText = await callGeminiAPI(quizPrompt, 3, 'vocabulary_quiz');
+
+        try {
+            // Clean the response text by removing markdown code fences and any extra whitespace
+            let cleanText = quizText.replace(/```json\s*|\s*```/g, '').trim();
 
             // Ensure it starts with [ and ends with ]
             if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
@@ -957,7 +1248,7 @@ Your response must be valid JSON structured like this example:
 
             try {
                 // Clean and validate the response text
-                let cleanText = quizText.replace(/```json\s*|\s*code\s*|\s*code\s*|\s*```/g, '').trim();
+                let cleanText = quizText.replace(/```json\s*|\s*code\s*|\s*```/g, '').trim();
 
                 // Ensure it starts with [ and ends with ]
                 if (!cleanText.startsWith('[') || !cleanText.endsWith(']')) {
@@ -1411,11 +1702,11 @@ async function getGeminiChatResponse(partner, history) {
         console.warn('Error parsing myInfo in getGeminiChatResponse:', parseError);
         myInfo = {};
     }
-
+    
     const userContext = myInfo.name ?
         `The user's name is ${myInfo.name}. ${myInfo.bio ? `Their bio: ${myInfo.bio}.` : ''} ${myInfo.hobbies?.length ? `Their hobbies: ${myInfo.hobbies.join(', ')}.` : ''}` :
         '';
-
+    
     console.log('Chat response using myInfo:', { name: myInfo.name, hasContext: !!userContext });
 
     const prompt = `You are ${partner.name}, a language exchange partner on the website http://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
@@ -1769,8 +2060,7 @@ document.getElementById('save-partner-btn').addEventListener('click', () => {
             successMsg.style.color = 'white';
             successMsg.style.padding = '10px 20px';
             successMsg.style.borderRadius = '5px';
-            ```text
-successMsg.style.zIndex = '10000';
+            successMsg.style.zIndex = '10000';
             successMsg.textContent = 'Partner saved successfully!';
 
             document.body.appendChild(successMsg);
