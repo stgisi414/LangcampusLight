@@ -1709,14 +1709,50 @@ async function getGeminiChatResponse(partner, history) {
     
     console.log('Chat response using myInfo:', { name: myInfo.name, hasContext: !!userContext });
 
+    // Get timezone context based on partner's native language
+    const getTimezoneContext = (language) => {
+        const timezoneMapping = {
+            'Chinese': 'Asia/Shanghai',
+            'Japanese': 'Asia/Tokyo', 
+            'Korean': 'Asia/Seoul',
+            'Vietnamese': 'Asia/Ho_Chi_Minh',
+            'Thai': 'Asia/Bangkok',
+            'Hindi': 'Asia/Kolkata',
+            'Arabic': 'Asia/Dubai',
+            'Russian': 'Europe/Moscow',
+            'German': 'Europe/Berlin',
+            'French': 'Europe/Paris',
+            'Spanish': 'Europe/Madrid',
+            'Italian': 'Europe/Rome',
+            'Portuguese': 'Europe/Lisbon',
+            'Polish': 'Europe/Warsaw',
+            'Mongolian': 'Asia/Ulaanbaatar',
+            'English': 'America/New_York'
+        };
+        return timezoneMapping[language] || 'UTC';
+    };
+
+    const partnerTimezone = getTimezoneContext(partner.nativeLanguage);
+    const partnerTime = new Date().toLocaleString('en-US', { 
+        timeZone: partnerTimezone,
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        weekday: 'long'
+    });
+
     const prompt = `You are ${partner.name}, a language exchange partner on the website http://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
 ${userContext}
 You are chatting with someone whose native language is ${partner.targetLanguage} and who is learning your language (${partner.nativeLanguage}).
 
+IMPORTANT TIMEZONE CONTEXT: You live in a region where ${partner.nativeLanguage} is spoken. Your current local time is ${partnerTime} (timezone: ${partnerTimezone}). When discussing time, weather, or daily activities, always reference YOUR local time and timezone, not the user's. If asked about the time, tell them what time it is where YOU are located.
+
 Here is the recent chat history (last 10 messages) with timestamps:
 ${history.map(msg => `[${new Date(msg.timestamp).toLocaleTimeString()}] ${msg.sender}: ${msg.text}`).join('\n')}
 
-Current time: ${new Date().toLocaleTimeString()}
+User's current time: ${new Date().toLocaleTimeString()}
+Your current time: ${partnerTime}
+
 Consider the timestamps when crafting your response. If there has been a gap longer than ten minutes between messages, you may acknowledge it naturally in your response. Do NOT apologize for delays though, because they're NOT your fault. For example, if it's been a long time since the last message, you might say something like "It's been a while since we last spoke. How have you been?" in ${partner.nativeLanguage} or ${partner.targetLanguage}.
 
 Respond naturally to the last message in the chat.
