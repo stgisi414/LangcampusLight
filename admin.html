@@ -741,7 +741,7 @@
                 console.log('Loading user list with token:', authToken ? '[TOKEN_PRESENT]' : '[NO_TOKEN]');
                 
                 // First try to get logs to generate user analytics
-                const logsResponse = await fetch(`${API_BASE}/api-logs?limit=100`, {
+                const logsResponse = await fetch(`${API_BASE}/api-logs?limit=1000`, {
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
                         'Content-Type': 'application/json'
