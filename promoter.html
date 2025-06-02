@@ -18,84 +18,175 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
             padding: 20px;
         }
 
-        .container {
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
+        .header {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
-        .login-card, .promoter-card {
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .status.waiting {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status.connected {
+            background: #d1edff;
+            color: #004085;
+            border: 1px solid #bee5eb;
+        }
+
+        .status.ready {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .iframe-container {
+            flex: 1;
             background: white;
             border-radius: 12px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            position: relative;
+            min-height: 600px;
         }
 
-        .login-card {
-            max-width: 400px;
-            margin: 0 auto;
+        #conversationExchange {
+            width: 100%;
+            height: 100%;
+            border: none;
+            min-height: 600px;
         }
 
-        .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
+        .tools-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 350px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .tools-panel.visible {
+            display: block;
+        }
+
+        .tools-header {
+            margin-bottom: 20px;
             text-align: center;
         }
 
-        .card-header h1 {
-            font-size: 24px;
-            margin-bottom: 8px;
+        .tools-header h2 {
+            color: #333;
+            margin-bottom: 5px;
         }
 
-        .card-header p {
-            opacity: 0.9;
-            font-size: 14px;
+        .profile-analysis {
+            margin-bottom: 20px;
         }
 
-        .card-body {
-            padding: 30px;
+        .profile-item {
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-item.error-prone {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .profile-item.selected {
+            border-color: #007bff;
+            background: #d1ecf1;
+        }
+
+        .profile-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-score {
+            font-weight: bold;
+            float: right;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .score-high {
+            background: #dc3545;
+            color: white;
+        }
+
+        .score-medium {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .score-low {
+            background: #28a745;
+            color: white;
+        }
+
+        .message-builder {
+            margin-top: 20px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             font-weight: 600;
             color: #333;
         }
 
-        .form-group input, .form-group textarea {
+        .form-group textarea {
             width: 100%;
-            padding: 12px 16px;
+            padding: 12px;
             border: 2px solid #e1e5e9;
             border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-            font-family: inherit;
+            font-size: 14px;
             resize: vertical;
+            font-family: inherit;
         }
 
-        .form-group input:focus, .form-group textarea:focus {
+        .form-group textarea:focus {
             outline: none;
             border-color: #667eea;
-        }
-
-        .input-area {
-            min-height: 150px;
-        }
-
-        .output-area {
-            min-height: 200px;
-            background-color: #f8f9fa;
         }
 
         .btn {
@@ -105,7 +196,7 @@
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s ease;
@@ -130,68 +221,26 @@
             background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
         }
 
-        .action-buttons {
+        .stats {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: 10px;
             margin-bottom: 20px;
         }
 
-        @media (min-width: 768px) {
-            .action-buttons {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        .error-message {
-            background: #fee;
-            color: #c33;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #c33;
-        }
-
-        .success-message {
-            background: #efe;
-            color: #3c3;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #3c3;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .logout-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.2);
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
         }
 
-        .copy-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-top: 10px;
-            width: auto;
-        }
-
-        .copy-btn:hover {
-            background: #5a6268;
+        .stat-number {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 2px;
         }
 
         .loading {
@@ -217,195 +266,518 @@
             100% { transform: rotate(360deg); }
         }
 
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #333;
+            z-index: 10;
         }
 
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.9;
+        @media (max-width: 768px) {
+            .tools-panel {
+                position: fixed;
+                top: 0;
+                right: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                max-height: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Login Form -->
-        <div id="loginForm" class="login-card">
-            <div class="card-header">
-                <h1>Promoter Tool</h1>
-                <p>practicefor.fun - Marketing Assistant</p>
-            </div>
-            <div class="card-body">
-                <div id="errorMessage" class="error-message hidden"></div>
-                <div id="successMessage" class="success-message hidden"></div>
+    <div class="header">
+        <h1>Promoter Tool</h1>
+        <p>practicefor.fun - Automated Profile Analysis & Message Generation</p>
+    </div>
 
-                <form id="loginFormElement">
-                    <div class="form-group">
-                        <label for="password">Access Password</label>
-                        <input type="password" id="password" placeholder="Enter promoter password" required>
-                    </div>
-                    <button type="submit" class="btn" id="loginBtn">
-                        Login
-                    </button>
-                </form>
+    <div id="status" class="status waiting">
+        ⏳ Waiting for Conversation Exchange login...
+    </div>
+
+    <div class="iframe-container">
+        <div id="overlay" class="overlay">
+            <div>
+                <h3>Loading Conversation Exchange...</h3>
+                <p>Please log in to access the promoter tools</p>
+            </div>
+        </div>
+        <iframe id="conversationExchange" src="https://www.conversationexchange.com/"></iframe>
+    </div>
+
+    <!-- Tools Panel -->
+    <div id="toolsPanel" class="tools-panel">
+        <div class="tools-header">
+            <h2>🤖 AI Promoter Tools</h2>
+            <p>Profile Analysis & Message Generation</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="profilesAnalyzed">0</div>
+                <div>Profiles Analyzed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="errorProneFound">0</div>
+                <div>Error-Prone Found</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="messagesGenerated">0</div>
+                <div>Messages Generated</div>
             </div>
         </div>
 
-        <!-- Promoter Tools -->
-        <div id="promoterTools" class="promoter-card hidden">
-            <button class="logout-btn" onclick="logout()">Logout</button>
-
-            <div class="card-header">
-                <h1>Promotion Assistant</h1>
-                <p>AI-powered message generation for practicefor.fun</p>
+        <!-- Profile Analysis -->
+        <div class="profile-analysis">
+            <h3>📊 Profile Analysis</h3>
+            <div id="profileList">
+                <div class="loading" id="analysisLoading" style="display: none;">
+                    Analyzing profiles...
+                </div>
+                <p id="noProfiles">No profiles detected yet. Navigate to search results on Conversation Exchange.</p>
             </div>
-            <div class="card-body">
-                <!-- Stats -->
-                <div class="stats">
-                    <div class="stat-card">
-                        <div class="stat-number" id="messagesGenerated">0</div>
-                        <div class="stat-label">Messages Generated</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="errorsFound">0</div>
-                        <div class="stat-label">Errors Corrected</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="languagesDetected">0</div>
-                        <div class="stat-label">Languages Detected</div>
-                    </div>
-                </div>
+        </div>
 
-                <!-- Input Area -->
-                <div class="form-group">
-                    <label for="inputText">Profile Text or Message to Analyze</label>
-                    <textarea id="inputText" class="input-area" placeholder="Paste the user's profile text or message here..."></textarea>
-                </div>
+        <!-- Message Builder -->
+        <div class="message-builder" id="messageBuilder" style="display: none;">
+            <h3>✉️ Message Builder</h3>
+            <div class="form-group">
+                <label for="selectedProfile">Selected Profile:</label>
+                <div id="selectedProfileInfo" style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-size: 12px;"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="profileText">Profile Text to Analyze:</label>
+                <textarea id="profileText" rows="4" placeholder="Paste the user's profile text here..."></textarea>
+            </div>
 
-                <!-- Action Buttons -->
-                <div class="action-buttons">
-                    <button class="btn" onclick="analyzeErrors()">
-                        📝 Analyze & Draft for English Errors
-                    </button>
-                    <button class="btn btn-secondary" onclick="draftNonEnglish()">
-                        🌍 Draft for Non-English Text
-                    </button>
-                    <button class="btn btn-tertiary" onclick="draftShortText()">
-                        ✨ Draft for Short/Error-Free Text
-                    </button>
-                </div>
+            <button class="btn" onclick="analyzeForErrors()">
+                📝 Analyze & Draft for English Errors
+            </button>
+            <button class="btn btn-secondary" onclick="draftNonEnglish()">
+                🌍 Draft for Non-English Text
+            </button>
+            <button class="btn btn-tertiary" onclick="draftShortText()">
+                ✨ Draft for Short/Error-Free Text
+            </button>
 
-                <!-- Loading Indicator -->
-                <div id="loadingIndicator" class="loading hidden">
-                    Generating personalized message...
-                </div>
-
-                <!-- Output Area -->
-                <div class="form-group">
-                    <label for="outputText">Generated Promotional Message</label>
-                    <textarea id="outputText" class="output-area" readonly placeholder="Your AI-generated message will appear here..."></textarea>
-                    <button class="copy-btn" onclick="copyToClipboard()" id="copyBtn" style="display: none;">
-                        📋 Copy Message
-                    </button>
-                </div>
+            <div class="form-group">
+                <label for="generatedMessage">Generated Message:</label>
+                <textarea id="generatedMessage" rows="6" readonly placeholder="Your AI-generated message will appear here..."></textarea>
+                <button class="btn" onclick="copyMessage()" id="copyBtn" style="display: none;">
+                    📋 Copy Message
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        // Session tracking
-        let messagesGenerated = parseInt(localStorage.getItem('messagesGenerated') || '0');
-        let errorsFound = parseInt(localStorage.getItem('errorsFound') || '0');
-        let languagesDetected = parseInt(localStorage.getItem('languagesDetected') || '0');
+        // Configuration
+        const CONVERSATION_EXCHANGE_URL = 'https://www.conversationexchange.com/';
+        
+        // State management
+        let isLoggedIn = false;
+        let currentProfiles = [];
+        let selectedProfile = null;
+        let stats = {
+            profilesAnalyzed: 0,
+            errorProneFound: 0,
+            messagesGenerated: 0
+        };
 
-        // Password for access (in production, this should be more secure)
-        const PROMOTER_PASSWORD = 'PromoteForFun2024';
+        // DOM elements
+        const iframe = document.getElementById('conversationExchange');
+        const overlay = document.getElementById('overlay');
+        const status = document.getElementById('status');
+        const toolsPanel = document.getElementById('toolsPanel');
+        const profileList = document.getElementById('profileList');
+        const messageBuilder = document.getElementById('messageBuilder');
 
-        // Initialize page
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
             updateStats();
-            
-            // Check if already logged in
-            if (localStorage.getItem('promoterLoggedIn') === 'true') {
-                showPromoterTools();
-            }
+            setupIframeListeners();
+            startProfileDetection();
         });
 
-        // Login form submission
-        document.getElementById('loginFormElement').addEventListener('submit', function(e) {
-            e.preventDefault();
-            login();
-        });
-
-        function login() {
-            const password = document.getElementById('password').value.trim();
-            
-            if (password === PROMOTER_PASSWORD) {
-                localStorage.setItem('promoterLoggedIn', 'true');
-                showSuccess('Login successful!');
-                setTimeout(() => {
-                    showPromoterTools();
-                }, 1000);
-            } else {
-                showError('Invalid password. Please try again.');
-                document.getElementById('password').value = '';
+        // Load saved stats
+        function loadStats() {
+            const savedStats = localStorage.getItem('promoterStats');
+            if (savedStats) {
+                stats = { ...stats, ...JSON.parse(savedStats) };
             }
         }
 
-        function logout() {
-            localStorage.removeItem('promoterLoggedIn');
-            document.getElementById('promoterTools').classList.add('hidden');
-            document.getElementById('loginForm').classList.remove('hidden');
-            document.getElementById('password').value = '';
-            hideMessages();
-        }
-
-        function showPromoterTools() {
-            document.getElementById('loginForm').classList.add('hidden');
-            document.getElementById('promoterTools').classList.remove('hidden');
-            updateStats();
-        }
-
+        // Save and update stats
         function updateStats() {
-            document.getElementById('messagesGenerated').textContent = messagesGenerated;
-            document.getElementById('errorsFound').textContent = errorsFound;
-            document.getElementById('languagesDetected').textContent = languagesDetected;
+            localStorage.setItem('promoterStats', JSON.stringify(stats));
+            document.getElementById('profilesAnalyzed').textContent = stats.profilesAnalyzed;
+            document.getElementById('errorProneFound').textContent = stats.errorProneFound;
+            document.getElementById('messagesGenerated').textContent = stats.messagesGenerated;
         }
 
-        function saveStats() {
-            localStorage.setItem('messagesGenerated', messagesGenerated.toString());
-            localStorage.setItem('errorsFound', errorsFound.toString());
-            localStorage.setItem('languagesDetected', languagesDetected.toString());
+        // Setup iframe event listeners
+        function setupIframeListeners() {
+            iframe.addEventListener('load', function() {
+                console.log('Iframe loaded');
+                overlay.style.display = 'none';
+                checkLoginStatus();
+            });
+
+            // Listen for iframe navigation changes
+            setInterval(checkLoginStatus, 2000);
+        }
+
+        // Check if user is logged into Conversation Exchange
+        function checkLoginStatus() {
+            try {
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                
+                // Check for login indicators
+                const loginIndicators = [
+                    'logout',
+                    'my account',
+                    'profile',
+                    'dashboard',
+                    'settings'
+                ];
+
+                const pageContent = iframeDoc.body.innerText.toLowerCase();
+                const hasLoginIndicator = loginIndicators.some(indicator => 
+                    pageContent.includes(indicator)
+                );
+
+                if (hasLoginIndicator && !isLoggedIn) {
+                    onLoginDetected();
+                } else if (!hasLoginIndicator && isLoggedIn) {
+                    onLogoutDetected();
+                }
+            } catch (error) {
+                // Cross-origin restrictions - use alternative detection
+                console.log('Cross-origin iframe access restricted');
+                
+                // Check URL changes as a proxy for login
+                if (iframe.contentWindow.location.href.includes('member') || 
+                    iframe.contentWindow.location.href.includes('profile')) {
+                    if (!isLoggedIn) {
+                        onLoginDetected();
+                    }
+                }
+            }
+        }
+
+        // Handle login detection
+        function onLoginDetected() {
+            console.log('Login detected!');
+            isLoggedIn = true;
+            
+            status.className = 'status connected';
+            status.innerHTML = '✅ Connected to Conversation Exchange - Tools activated!';
+            
+            toolsPanel.classList.add('visible');
+            
+            // Start enhanced profile detection
+            startProfileDetection();
+        }
+
+        // Handle logout detection
+        function onLogoutDetected() {
+            console.log('Logout detected');
+            isLoggedIn = false;
+            
+            status.className = 'status waiting';
+            status.innerHTML = '⏳ Please log in to Conversation Exchange to access tools';
+            
+            toolsPanel.classList.remove('visible');
+            currentProfiles = [];
+            updateProfileList();
+        }
+
+        // Start profile detection
+        function startProfileDetection() {
+            if (!isLoggedIn) return;
+
+            setInterval(detectProfiles, 3000);
+        }
+
+        // Detect profiles on the current page
+        function detectProfiles() {
+            if (!isLoggedIn) return;
+
+            try {
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                
+                // Look for profile elements (adjust selectors based on actual site structure)
+                const profileElements = iframeDoc.querySelectorAll([
+                    '.profile',
+                    '.member',
+                    '.user-profile',
+                    '[class*="profile"]',
+                    '[class*="member"]'
+                ].join(','));
+
+                if (profileElements.length > 0) {
+                    analyzeDetectedProfiles(profileElements);
+                }
+            } catch (error) {
+                console.log('Cannot access iframe content for profile detection');
+                // Use alternative detection methods
+                simulateProfileDetection();
+            }
+        }
+
+        // Simulate profile detection (when cross-origin restrictions apply)
+        function simulateProfileDetection() {
+            // Check if we're on a search results page by URL
+            try {
+                const currentUrl = iframe.contentWindow.location.href;
+                if (currentUrl.includes('search') || currentUrl.includes('results') || currentUrl.includes('members')) {
+                    // Simulate finding profiles
+                    const mockProfiles = generateMockProfiles();
+                    analyzeProfiles(mockProfiles);
+                }
+            } catch (error) {
+                console.log('Cannot access iframe URL');
+            }
+        }
+
+        // Generate mock profiles for demonstration
+        function generateMockProfiles() {
+            return [
+                {
+                    id: '1',
+                    name: 'Maria Santos',
+                    text: 'I enjoys to practice english language. I am student from spain and I wants improve my speaking. Please contact to me if you want practice spanish.',
+                    language: 'Spanish',
+                    errors: ['enjoys → enjoy', 'wants → want', 'contact to me → contact me']
+                },
+                {
+                    id: '2',
+                    name: 'Jean Pierre',
+                    text: 'Bonjour! Je suis français et je voudrais améliorer mon anglais. J\'aime le cinéma et la musique.',
+                    language: 'French',
+                    errors: []
+                },
+                {
+                    id: '3',
+                    name: 'Ahmed Hassan',
+                    text: 'Hello I am from Egypt. I study english since 2 years. I like to make friends and practice conversation. My english is not perfect but I try my best.',
+                    language: 'Arabic',
+                    errors: ['since 2 years → for 2 years']
+                }
+            ];
+        }
+
+        // Analyze detected profiles
+        function analyzeDetectedProfiles(profileElements) {
+            const profiles = Array.from(profileElements).map((element, index) => {
+                return {
+                    id: index.toString(),
+                    name: extractName(element),
+                    text: extractText(element),
+                    element: element
+                };
+            });
+
+            analyzeProfiles(profiles);
+        }
+
+        // Extract name from profile element
+        function extractName(element) {
+            const nameSelectors = ['.name', '.username', '.title', 'h1', 'h2', 'h3'];
+            for (const selector of nameSelectors) {
+                const nameElement = element.querySelector(selector);
+                if (nameElement) {
+                    return nameElement.textContent.trim();
+                }
+            }
+            return 'Unknown User';
+        }
+
+        // Extract text from profile element
+        function extractText(element) {
+            // Remove script and style elements
+            const clone = element.cloneNode(true);
+            const scriptsAndStyles = clone.querySelectorAll('script, style');
+            scriptsAndStyles.forEach(el => el.remove());
+            
+            return clone.textContent.trim().substring(0, 500);
+        }
+
+        // Analyze profiles for errors using AI
+        async function analyzeProfiles(profiles) {
+            if (profiles.length === 0) return;
+
+            document.getElementById('analysisLoading').style.display = 'block';
+            document.getElementById('noProfiles').style.display = 'none';
+
+            const analyzedProfiles = [];
+
+            for (const profile of profiles) {
+                try {
+                    const analysis = await analyzeProfileWithAI(profile.text);
+                    analyzedProfiles.push({
+                        ...profile,
+                        errorScore: analysis.errorScore,
+                        errors: analysis.errors,
+                        isErrorProne: analysis.errorScore > 3
+                    });
+                } catch (error) {
+                    console.error('Error analyzing profile:', error);
+                    analyzedProfiles.push({
+                        ...profile,
+                        errorScore: 0,
+                        errors: [],
+                        isErrorProne: false
+                    });
+                }
+            }
+
+            currentProfiles = analyzedProfiles;
+            stats.profilesAnalyzed += profiles.length;
+            stats.errorProneFound += analyzedProfiles.filter(p => p.isErrorProne).length;
+            
             updateStats();
+            updateProfileList();
+            
+            document.getElementById('analysisLoading').style.display = 'none';
         }
 
-        async function analyzeErrors() {
-            const inputText = document.getElementById('inputText').value.trim();
-            if (!inputText) {
-                showError('Please enter some text to analyze.');
+        // Analyze profile text with AI
+        async function analyzeProfileWithAI(text) {
+            const prompt = `Analyze the following profile text for English language errors. Provide a JSON response with:
+1. errorScore (0-10, where 10 = many errors)
+2. errors (array of specific error corrections)
+
+Profile text: "${text}"
+
+Respond with only valid JSON in this format:
+{
+  "errorScore": 5,
+  "errors": ["error1 → correction1", "error2 → correction2"]
+}`;
+
+            try {
+                const response = await callGeminiAPI(prompt, 'profile_analysis');
+                return JSON.parse(response);
+            } catch (error) {
+                console.error('AI analysis failed:', error);
+                return { errorScore: 0, errors: [] };
+            }
+        }
+
+        // Update profile list display
+        function updateProfileList() {
+            if (currentProfiles.length === 0) {
+                profileList.innerHTML = '<p id="noProfiles">No profiles detected yet. Navigate to search results on Conversation Exchange.</p>';
                 return;
             }
 
-            showLoading();
+            // Sort by error score (highest first)
+            const sortedProfiles = [...currentProfiles].sort((a, b) => b.errorScore - a.errorScore);
 
-            const prompt = `You are Stefan, a helpful language learning assistant for practicefor.fun. Analyze the following profile text for English grammar, spelling, and punctuation errors.
+            profileList.innerHTML = sortedProfiles.map(profile => {
+                const scoreClass = profile.errorScore > 6 ? 'score-high' : 
+                                 profile.errorScore > 3 ? 'score-medium' : 'score-low';
+                
+                return `
+                    <div class="profile-item ${profile.isErrorProne ? 'error-prone' : ''}" 
+                         onclick="selectProfile('${profile.id}')">
+                        <div class="profile-score ${scoreClass}">
+                            ${profile.errorScore}/10
+                        </div>
+                        <strong>${profile.name}</strong>
+                        <p style="font-size: 12px; margin-top: 5px;">
+                            ${profile.text.substring(0, 100)}...
+                        </p>
+                        ${profile.errors.length > 0 ? 
+                            `<p style="font-size: 11px; color: #dc3545; margin-top: 5px;">
+                                ${profile.errors.length} errors detected
+                            </p>` : ''
+                        }
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Select a profile for messaging
+        function selectProfile(profileId) {
+            selectedProfile = currentProfiles.find(p => p.id === profileId);
+            if (!selectedProfile) return;
+
+            // Update UI
+            document.querySelectorAll('.profile-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+
+            // Show message builder
+            messageBuilder.style.display = 'block';
+            document.getElementById('selectedProfileInfo').innerHTML = `
+                <strong>${selectedProfile.name}</strong><br>
+                Error Score: ${selectedProfile.errorScore}/10<br>
+                ${selectedProfile.errors.length > 0 ? 
+                    `Errors: ${selectedProfile.errors.join(', ')}` : 'No errors detected'
+                }
+            `;
+            
+            // Pre-fill profile text
+            document.getElementById('profileText').value = selectedProfile.text;
+        }
+
+        // AI message generation functions
+        async function analyzeForErrors() {
+            const profileText = document.getElementById('profileText').value.trim();
+            if (!profileText) {
+                alert('Please enter profile text to analyze.');
+                return;
+            }
+
+            await generateMessage('error_analysis', profileText);
+        }
+
+        async function draftNonEnglish() {
+            const profileText = document.getElementById('profileText').value.trim();
+            if (!profileText) {
+                alert('Please enter profile text to analyze.');
+                return;
+            }
+
+            await generateMessage('non_english_draft', profileText);
+        }
+
+        async function draftShortText() {
+            const profileText = document.getElementById('profileText').value.trim();
+            if (!profileText) {
+                alert('Please enter profile text to analyze.');
+                return;
+            }
+
+            await generateMessage('short_text_draft', profileText);
+        }
+
+        // Generate message using AI
+        async function generateMessage(type, profileText) {
+            const buttons = document.querySelectorAll('.message-builder button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            let prompt = '';
+            
+            switch (type) {
+                case 'error_analysis':
+                    prompt = `You are Stefan, a helpful language learning assistant for practicefor.fun. Analyze the following profile text for English grammar, spelling, and punctuation errors.
 
 Instructions:
 1. Greet the user by name if identifiable, otherwise use "Hello"
@@ -419,39 +791,11 @@ Instructions:
 6. Sign off with: "Best regards,\\nStefan"
 
 Profile text to analyze:
-${inputText}`;
+${profileText}`;
+                    break;
 
-            try {
-                const response = await callGeminiAPI(prompt, 'error_analysis');
-                document.getElementById('outputText').value = response;
-                
-                // Count errors found (rough estimate based on ❌ symbols)
-                const errorCount = (response.match(/❌/g) || []).length;
-                if (errorCount > 0) {
-                    errorsFound += errorCount;
-                }
-                
-                messagesGenerated++;
-                saveStats();
-                showCopyButton();
-            } catch (error) {
-                showError('Failed to generate message. Please try again.');
-                console.error('Error:', error);
-            } finally {
-                hideLoading();
-            }
-        }
-
-        async function draftNonEnglish() {
-            const inputText = document.getElementById('inputText').value.trim();
-            if (!inputText) {
-                showError('Please enter some text to analyze.');
-                return;
-            }
-
-            showLoading();
-
-            const prompt = `You are Stefan, a helpful language learning assistant for practicefor.fun. The user has provided text that appears to be in a non-English language or mixed languages.
+                case 'non_english_draft':
+                    prompt = `You are Stefan, a helpful language learning assistant for practicefor.fun. The user has provided text that appears to be in a non-English language or mixed languages.
 
 Instructions:
 1. Analyze the text to understand its main topic or sentiment
@@ -463,34 +807,11 @@ Instructions:
 4. Sign off with: "Best regards,\\nStefan"
 
 Text to respond to:
-${inputText}`;
+${profileText}`;
+                    break;
 
-            try {
-                const response = await callGeminiAPI(prompt, 'non_english_draft');
-                document.getElementById('outputText').value = response;
-                
-                languagesDetected++;
-                messagesGenerated++;
-                saveStats();
-                showCopyButton();
-            } catch (error) {
-                showError('Failed to generate message. Please try again.');
-                console.error('Error:', error);
-            } finally {
-                hideLoading();
-            }
-        }
-
-        async function draftShortText() {
-            const inputText = document.getElementById('inputText').value.trim();
-            if (!inputText) {
-                showError('Please enter some text to analyze.');
-                return;
-            }
-
-            showLoading();
-
-            const prompt = `You are Stefan, a helpful language learning assistant for practicefor.fun. The user has provided a short message or error-free profile text.
+                case 'short_text_draft':
+                    prompt = `You are Stefan, a helpful language learning assistant for practicefor.fun. The user has provided a short message or error-free profile text.
 
 Instructions:
 1. If the text is a question or requires acknowledgment, provide a brief, polite response
@@ -500,23 +821,45 @@ Instructions:
 5. Sign off with: "Best regards,\\nStefan"
 
 Text to respond to:
-${inputText}`;
+${profileText}`;
+                    break;
+            }
 
             try {
-                const response = await callGeminiAPI(prompt, 'short_text_draft');
-                document.getElementById('outputText').value = response;
+                const message = await callGeminiAPI(prompt, type);
+                document.getElementById('generatedMessage').value = message;
+                document.getElementById('copyBtn').style.display = 'block';
                 
-                messagesGenerated++;
-                saveStats();
-                showCopyButton();
+                stats.messagesGenerated++;
+                updateStats();
             } catch (error) {
-                showError('Failed to generate message. Please try again.');
-                console.error('Error:', error);
+                console.error('Error generating message:', error);
+                alert('Failed to generate message. Please try again.');
             } finally {
-                hideLoading();
+                buttons.forEach(btn => btn.disabled = false);
             }
         }
 
+        // Copy message to clipboard
+        function copyMessage() {
+            const messageText = document.getElementById('generatedMessage');
+            messageText.select();
+            messageText.setSelectionRange(0, 99999);
+            
+            try {
+                document.execCommand('copy');
+                const copyBtn = document.getElementById('copyBtn');
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+            } catch (err) {
+                alert('Failed to copy to clipboard. Please select and copy manually.');
+            }
+        }
+
+        // Call Gemini API
         async function callGeminiAPI(prompt, callType) {
             const response = await fetch('https://langcamp.us/api/exchange-admin/gemini-generate', {
                 method: 'POST',
@@ -546,83 +889,8 @@ ${inputText}`;
                 throw new Error(data.error || "API returned unsuccessful response");
             }
 
-            let generatedText = data.text;
-            if (!generatedText) {
-                throw new Error("No text returned from API");
-            }
-
-            return generatedText.trim();
+            return data.text.trim();
         }
-
-        function showLoading() {
-            document.getElementById('loadingIndicator').classList.remove('hidden');
-            document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
-        }
-
-        function hideLoading() {
-            document.getElementById('loadingIndicator').classList.add('hidden');
-            document.querySelectorAll('.btn').forEach(btn => btn.disabled = false);
-        }
-
-        function showCopyButton() {
-            document.getElementById('copyBtn').style.display = 'inline-block';
-        }
-
-        function copyToClipboard() {
-            const outputText = document.getElementById('outputText');
-            outputText.select();
-            outputText.setSelectionRange(0, 99999); // For mobile devices
-            
-            try {
-                document.execCommand('copy');
-                showSuccess('Message copied to clipboard!');
-                
-                // Hide success message after 2 seconds
-                setTimeout(() => {
-                    hideMessages();
-                }, 2000);
-            } catch (err) {
-                showError('Failed to copy to clipboard. Please select and copy manually.');
-            }
-        }
-
-        function showError(message) {
-            const errorEl = document.getElementById('errorMessage');
-            if (errorEl) {
-                errorEl.textContent = message;
-                errorEl.classList.remove('hidden');
-            }
-            const successEl = document.getElementById('successMessage');
-            if (successEl) {
-                successEl.classList.add('hidden');
-            }
-        }
-
-        function showSuccess(message) {
-            const successEl = document.getElementById('successMessage');
-            if (successEl) {
-                successEl.textContent = message;
-                successEl.classList.remove('hidden');
-            }
-            const errorEl = document.getElementById('errorMessage');
-            if (errorEl) {
-                errorEl.classList.add('hidden');
-            }
-        }
-
-        function hideMessages() {
-            const errorEl = document.getElementById('errorMessage');
-            const successEl = document.getElementById('successMessage');
-            if (errorEl) errorEl.classList.add('hidden');
-            if (successEl) successEl.classList.add('hidden');
-        }
-
-        // Handle enter key in password field
-        document.getElementById('password').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                login();
-            }
-        });
     </script>
 </body>
 </html>
