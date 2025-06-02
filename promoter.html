@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -68,14 +67,56 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             position: relative;
-            min-height: 600px;
         }
 
-        #conversationExchange {
-            width: 100%;
+        .popup-container {
             height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .popup-content {
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .popup-content h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .open-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             border: none;
-            min-height: 600px;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: transform 0.2s;
+        }
+
+        .open-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        #statusIcon {
+            font-size: 18px;
         }
 
         .tools-panel {
@@ -306,13 +347,17 @@
     </div>
 
     <div class="iframe-container">
-        <div id="overlay" class="overlay">
-            <div>
-                <h3>Loading Conversation Exchange...</h3>
-                <p>Please log in to access the promoter tools</p>
+        <div id="popupContainer" class="popup-container">
+            <div class="popup-content">
+                <h3>🌐 Conversation Exchange Integration</h3>
+                <p>Click the button below to open Conversation Exchange in a new window. The promoter tool will automatically detect when you're logged in and start monitoring for profiles.</p>
+                <button id="openCEButton" class="open-button">Open Conversation Exchange</button>
+                <div id="connectionStatus" class="connection-status">
+                    <span id="statusIcon">⏳</span>
+                    <span id="statusText">Click button to connect</span>
+                </div>
             </div>
         </div>
-        <iframe id="conversationExchange" src="https://www.conversationexchange.com/"></iframe>
     </div>
 
     <!-- Tools Panel -->
@@ -356,7 +401,7 @@
                 <label for="selectedProfile">Selected Profile:</label>
                 <div id="selectedProfileInfo" style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-size: 12px;"></div>
             </div>
-            
+
             <div class="form-group">
                 <label for="profileText">Profile Text to Analyze:</label>
                 <textarea id="profileText" rows="4" placeholder="Paste the user's profile text here..."></textarea>
@@ -385,7 +430,7 @@
     <script>
         // Configuration
         const CONVERSATION_EXCHANGE_URL = 'https://www.conversationexchange.com/';
-        
+
         // State management
         let isLoggedIn = false;
         let currentProfiles = [];
@@ -397,20 +442,35 @@
         };
 
         // DOM elements
-        const iframe = document.getElementById('conversationExchange');
-        const overlay = document.getElementById('overlay');
+        const openCEButton = document.getElementById('openCEButton');
         const status = document.getElementById('status');
         const toolsPanel = document.getElementById('toolsPanel');
         const profileList = document.getElementById('profileList');
         const messageBuilder = document.getElementById('messageBuilder');
+        const statusIcon = document.getElementById('statusIcon');
+        const statusText = document.getElementById('statusText');
+
+        let conversationExchangeWindow = null;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             loadStats();
             updateStats();
-            setupIframeListeners();
+            setupButtonListeners();
             startProfileDetection();
         });
+
+        function setupButtonListeners() {
+            openCEButton.addEventListener('click', function() {
+                conversationExchangeWindow = window.open(CONVERSATION_EXCHANGE_URL, '_blank');
+                if (conversationExchangeWindow) {
+                    statusText.textContent = "Connecting...";
+                    statusIcon.textContent = "🔄";
+                } else {
+                    alert("Popup blocked! Please allow popups for this site to use the tool.");
+                }
+            });
+        }
 
         // Load saved stats
         function loadStats() {
@@ -428,53 +488,47 @@
             document.getElementById('messagesGenerated').textContent = stats.messagesGenerated;
         }
 
-        // Setup iframe event listeners
-        function setupIframeListeners() {
-            iframe.addEventListener('load', function() {
-                console.log('Iframe loaded');
-                overlay.style.display = 'none';
-                checkLoginStatus();
-            });
-
-            // Listen for iframe navigation changes
-            setInterval(checkLoginStatus, 2000);
-        }
-
         // Check if user is logged into Conversation Exchange
         function checkLoginStatus() {
-            try {
-                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                
-                // Check for login indicators
-                const loginIndicators = [
-                    'logout',
-                    'my account',
-                    'profile',
-                    'dashboard',
-                    'settings'
-                ];
+            if (conversationExchangeWindow && !conversationExchangeWindow.closed) {
+                try {
+                    const pageContent = conversationExchangeWindow.document.body.innerText.toLowerCase();
 
-                const pageContent = iframeDoc.body.innerText.toLowerCase();
-                const hasLoginIndicator = loginIndicators.some(indicator => 
-                    pageContent.includes(indicator)
-                );
+                    const loginIndicators = [
+                        'logout',
+                        'my account',
+                        'profile',
+                        'dashboard',
+                        'settings'
+                    ];
 
-                if (hasLoginIndicator && !isLoggedIn) {
-                    onLoginDetected();
-                } else if (!hasLoginIndicator && isLoggedIn) {
-                    onLogoutDetected();
-                }
-            } catch (error) {
-                // Cross-origin restrictions - use alternative detection
-                console.log('Cross-origin iframe access restricted');
-                
-                // Check URL changes as a proxy for login
-                if (iframe.contentWindow.location.href.includes('member') || 
-                    iframe.contentWindow.location.href.includes('profile')) {
-                    if (!isLoggedIn) {
+                    const hasLoginIndicator = loginIndicators.some(indicator =>
+                        pageContent.includes(indicator)
+                    );
+
+                    if (hasLoginIndicator && !isLoggedIn) {
                         onLoginDetected();
+                    } else if (!hasLoginIndicator && isLoggedIn) {
+                        onLogoutDetected();
+                    }
+                } catch (error) {
+                    // Cross-origin restrictions - use alternative detection
+                    console.log('Cross-origin window access restricted');
+
+                    // Check URL changes as a proxy for login
+                    try {
+                      if (conversationExchangeWindow.location.href.includes('member') ||
+                          conversationExchangeWindow.location.href.includes('profile')) {
+                          if (!isLoggedIn) {
+                              onLoginDetected();
+                          }
+                      }
+                    } catch(e) {
+                      console.log("Cannot access location of popup window.");
                     }
                 }
+            } else if (isLoggedIn) {
+                onLogoutDetected(); // Handle case where popup was closed manually after login
             }
         }
 
@@ -482,12 +536,15 @@
         function onLoginDetected() {
             console.log('Login detected!');
             isLoggedIn = true;
-            
+
             status.className = 'status connected';
             status.innerHTML = '✅ Connected to Conversation Exchange - Tools activated!';
-            
+
+            statusIcon.textContent = "✅";
+            statusText.textContent = "Connected to Conversation Exchange - Tools activated!";
+
             toolsPanel.classList.add('visible');
-            
+
             // Start enhanced profile detection
             startProfileDetection();
         }
@@ -496,10 +553,13 @@
         function onLogoutDetected() {
             console.log('Logout detected');
             isLoggedIn = false;
-            
+
             status.className = 'status waiting';
             status.innerHTML = '⏳ Please log in to Conversation Exchange to access tools';
-            
+
+            statusIcon.textContent = "⏳";
+            statusText.textContent = "Click button to connect";
+
             toolsPanel.classList.remove('visible');
             currentProfiles = [];
             updateProfileList();
@@ -510,31 +570,34 @@
             if (!isLoggedIn) return;
 
             setInterval(detectProfiles, 3000);
+            setInterval(checkLoginStatus, 2000); // Keep checking login status
         }
 
         // Detect profiles on the current page
         function detectProfiles() {
             if (!isLoggedIn) return;
 
-            try {
-                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                
-                // Look for profile elements (adjust selectors based on actual site structure)
-                const profileElements = iframeDoc.querySelectorAll([
-                    '.profile',
-                    '.member',
-                    '.user-profile',
-                    '[class*="profile"]',
-                    '[class*="member"]'
-                ].join(','));
+            if (conversationExchangeWindow && !conversationExchangeWindow.closed) {
+              try {
+                  const iframeDoc = conversationExchangeWindow.document;
 
-                if (profileElements.length > 0) {
-                    analyzeDetectedProfiles(profileElements);
-                }
-            } catch (error) {
-                console.log('Cannot access iframe content for profile detection');
-                // Use alternative detection methods
-                simulateProfileDetection();
+                  // Look for profile elements (adjust selectors based on actual site structure)
+                  const profileElements = iframeDoc.querySelectorAll([
+                      '.profile',
+                      '.member',
+                      '.user-profile',
+                      '[class*="profile"]',
+                      '[class*="member"]'
+                  ].join(','));
+
+                  if (profileElements.length > 0) {
+                      analyzeDetectedProfiles(profileElements);
+                  }
+              } catch (error) {
+                  console.log('Cannot access window content for profile detection');
+                  // Use alternative detection methods
+                  simulateProfileDetection();
+              }
             }
         }
 
@@ -542,11 +605,13 @@
         function simulateProfileDetection() {
             // Check if we're on a search results page by URL
             try {
-                const currentUrl = iframe.contentWindow.location.href;
-                if (currentUrl.includes('search') || currentUrl.includes('results') || currentUrl.includes('members')) {
-                    // Simulate finding profiles
-                    const mockProfiles = generateMockProfiles();
-                    analyzeProfiles(mockProfiles);
+                if (conversationExchangeWindow && !conversationExchangeWindow.closed) {
+                    const currentUrl = conversationExchangeWindow.location.href;
+                    if (currentUrl.includes('search') || currentUrl.includes('results') || currentUrl.includes('members')) {
+                        // Simulate finding profiles
+                        const mockProfiles = generateMockProfiles();
+                        analyzeProfiles(mockProfiles);
+                    }
                 }
             } catch (error) {
                 console.log('Cannot access iframe URL');
@@ -612,7 +677,7 @@
             const clone = element.cloneNode(true);
             const scriptsAndStyles = clone.querySelectorAll('script, style');
             scriptsAndStyles.forEach(el => el.remove());
-            
+
             return clone.textContent.trim().substring(0, 500);
         }
 
@@ -648,10 +713,10 @@
             currentProfiles = analyzedProfiles;
             stats.profilesAnalyzed += profiles.length;
             stats.errorProneFound += analyzedProfiles.filter(p => p.isErrorProne).length;
-            
+
             updateStats();
             updateProfileList();
-            
+
             document.getElementById('analysisLoading').style.display = 'none';
         }
 
@@ -689,11 +754,11 @@ Respond with only valid JSON in this format:
             const sortedProfiles = [...currentProfiles].sort((a, b) => b.errorScore - a.errorScore);
 
             profileList.innerHTML = sortedProfiles.map(profile => {
-                const scoreClass = profile.errorScore > 6 ? 'score-high' : 
+                const scoreClass = profile.errorScore > 6 ? 'score-high' :
                                  profile.errorScore > 3 ? 'score-medium' : 'score-low';
-                
+
                 return `
-                    <div class="profile-item ${profile.isErrorProne ? 'error-prone' : ''}" 
+                    <div class="profile-item ${profile.isErrorProne ? 'error-prone' : ''}"
                          onclick="selectProfile('${profile.id}')">
                         <div class="profile-score ${scoreClass}">
                             ${profile.errorScore}/10
@@ -702,7 +767,7 @@ Respond with only valid JSON in this format:
                         <p style="font-size: 12px; margin-top: 5px;">
                             ${profile.text.substring(0, 100)}...
                         </p>
-                        ${profile.errors.length > 0 ? 
+                        ${profile.errors.length > 0 ?
                             `<p style="font-size: 11px; color: #dc3545; margin-top: 5px;">
                                 ${profile.errors.length} errors detected
                             </p>` : ''
@@ -728,11 +793,11 @@ Respond with only valid JSON in this format:
             document.getElementById('selectedProfileInfo').innerHTML = `
                 <strong>${selectedProfile.name}</strong><br>
                 Error Score: ${selectedProfile.errorScore}/10<br>
-                ${selectedProfile.errors.length > 0 ? 
+                ${selectedProfile.errors.length > 0 ?
                     `Errors: ${selectedProfile.errors.join(', ')}` : 'No errors detected'
                 }
             `;
-            
+
             // Pre-fill profile text
             document.getElementById('profileText').value = selectedProfile.text;
         }
@@ -774,7 +839,7 @@ Respond with only valid JSON in this format:
             buttons.forEach(btn => btn.disabled = true);
 
             let prompt = '';
-            
+
             switch (type) {
                 case 'error_analysis':
                     prompt = `You are Stefan, a helpful language learning assistant for practicefor.fun. Analyze the following profile text for English grammar, spelling, and punctuation errors.
@@ -829,7 +894,7 @@ ${profileText}`;
                 const message = await callGeminiAPI(prompt, type);
                 document.getElementById('generatedMessage').value = message;
                 document.getElementById('copyBtn').style.display = 'block';
-                
+
                 stats.messagesGenerated++;
                 updateStats();
             } catch (error) {
@@ -845,7 +910,7 @@ ${profileText}`;
             const messageText = document.getElementById('generatedMessage');
             messageText.select();
             messageText.setSelectionRange(0, 99999);
-            
+
             try {
                 document.execCommand('copy');
                 const copyBtn = document.getElementById('copyBtn');
