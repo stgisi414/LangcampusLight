@@ -1744,8 +1744,15 @@ async function getGeminiChatResponse(partner, history) {
     // Analyze message timestamps to distinguish recent vs old messages
     const now = new Date();
     const last10Messages = history.slice(-10);
+    
+    // Check if this is a new conversation (less than 3 messages total)
+    const isNewConversation = history.length <= 3;
+    
     const messageAnalysis = last10Messages.map(msg => {
-        if (!msg.timestamp) return { ...msg, timeContext: 'recent' };
+        // For new conversations, treat everything as "just now"
+        if (isNewConversation || !msg.timestamp) {
+            return { ...msg, timeContext: 'just now' };
+        }
         
         const messageTime = new Date(msg.timestamp);
         const timeDiffMinutes = (now - messageTime) / (1000 * 60);
@@ -1770,7 +1777,7 @@ async function getGeminiChatResponse(partner, history) {
 
     // Create context-aware message history
     let historyContext = '';
-    if (olderMessages.length > 0) {
+    if (olderMessages.length > 0 && !isNewConversation) {
         historyContext += `PREVIOUS CONVERSATION CONTEXT (from an earlier chat session):\n`;
         historyContext += olderMessages.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
         historyContext += '\n\nCURRENT CONVERSATION (happening right now):\n';
@@ -1792,9 +1799,11 @@ CRITICAL TIMING RULES:
 - Pay attention to the distinction between "PREVIOUS CONVERSATION CONTEXT" and "CURRENT CONVERSATION"
 - Messages in the "CURRENT CONVERSATION" section are happening RIGHT NOW in real-time
 - Messages in the "PREVIOUS CONVERSATION CONTEXT" section are from a previous chat session
+- ${isNewConversation ? 'THIS IS A NEW CONVERSATION - treat this as your first interaction with this person' : 'This appears to be a continuing conversation'}
 - When referencing previous context messages, you can say things like "I remember you mentioned..." or "from our previous conversation..."
 - When referencing current conversation messages, use present-tense language like "you just said..." or "you mentioned..."
-- Always respond to the most recent message in the current conversation
+- ${isNewConversation ? 'Since this is a new conversation, greet naturally without referencing past time or previous interactions' : 'Always respond to the most recent message in the current conversation'}
+- Never say "it's been a while" or reference time gaps unless there's actual evidence of previous conversation context
 
 Respond naturally to the last message in the current conversation.
 Keep your response relatively short, like a typical chat message (1-3 sentences), unless directly asked to explain something in detail.
