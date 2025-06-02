@@ -1741,24 +1741,62 @@ async function getGeminiChatResponse(partner, history) {
         weekday: 'long'
     });
 
+    // Analyze message timestamps to distinguish recent vs old messages
+    const now = new Date();
+    const last10Messages = history.slice(-10);
+    const messageAnalysis = last10Messages.map(msg => {
+        if (!msg.timestamp) return { ...msg, timeContext: 'recent' };
+        
+        const messageTime = new Date(msg.timestamp);
+        const timeDiffMinutes = (now - messageTime) / (1000 * 60);
+        
+        let timeContext;
+        if (timeDiffMinutes < 30) {
+            timeContext = 'just now';
+        } else if (timeDiffMinutes < 180) { // 3 hours
+            timeContext = 'recent';
+        } else if (timeDiffMinutes < 1440) { // 24 hours
+            timeContext = 'earlier today';
+        } else {
+            timeContext = 'from previous session';
+        }
+        
+        return { ...msg, timeContext };
+    });
+
+    // Separate recent messages from older loaded messages
+    const recentMessages = messageAnalysis.filter(msg => msg.timeContext === 'just now' || msg.timeContext === 'recent');
+    const olderMessages = messageAnalysis.filter(msg => msg.timeContext !== 'just now' && msg.timeContext !== 'recent');
+
+    // Create context-aware message history
+    let historyContext = '';
+    if (olderMessages.length > 0) {
+        historyContext += `PREVIOUS CONVERSATION CONTEXT (from an earlier chat session):\n`;
+        historyContext += olderMessages.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
+        historyContext += '\n\nCURRENT CONVERSATION (happening right now):\n';
+        historyContext += recentMessages.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
+    } else {
+        historyContext = `CURRENT CONVERSATION (happening right now):\n`;
+        historyContext += messageAnalysis.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
+    }
+
     const prompt = `You are ${partner.name}, a language exchange partner on the website http://practicefor.fun. Your native language is ${partner.nativeLanguage} and you are learning ${partner.targetLanguage}. Your interests are ${partner.interests.join(', ')}.
 ${userContext}
 You are chatting with someone whose native language is ${partner.targetLanguage} and who is learning your language (${partner.nativeLanguage}).
 
 IMPORTANT TIMEZONE CONTEXT: You live in a region where ${partner.nativeLanguage} is spoken. Your current local time is ${partnerTime} (timezone: ${partnerTimezone}). When discussing time, weather, or daily activities, always reference YOUR local time and timezone, not the user's. If asked about the time, tell them what time it is where YOU are located.
 
-Here is the recent chat history (last 10 messages):
-${history.map(msg => `${msg.sender}: ${msg.text}`).join('\n')}
+${historyContext}
 
 CRITICAL TIMING RULES:
-- This is a real-time chat conversation happening RIGHT NOW
-- ALL messages shown above were sent recently in this current conversation session
-- Do NOT reference "yesterday", "earlier today", or any specific past timeframes
-- Do NOT assume any significant time has passed between messages
-- Respond as if you're having a natural, flowing conversation in the present moment
-- If you need to reference a previous message, simply say "you mentioned" or "you said" without any time reference
+- Pay attention to the distinction between "PREVIOUS CONVERSATION CONTEXT" and "CURRENT CONVERSATION"
+- Messages in the "CURRENT CONVERSATION" section are happening RIGHT NOW in real-time
+- Messages in the "PREVIOUS CONVERSATION CONTEXT" section are from a previous chat session
+- When referencing previous context messages, you can say things like "I remember you mentioned..." or "from our previous conversation..."
+- When referencing current conversation messages, use present-tense language like "you just said..." or "you mentioned..."
+- Always respond to the most recent message in the current conversation
 
-Respond naturally to the last message in the chat.
+Respond naturally to the last message in the current conversation.
 Keep your response relatively short, like a typical chat message (1-3 sentences), unless directly asked to explain something in detail.
 
 ${enableCorrections ? `
