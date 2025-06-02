@@ -1750,10 +1750,11 @@ IMPORTANT TIMEZONE CONTEXT: You live in a region where ${partner.nativeLanguage}
 Here is the recent chat history (last 10 messages) with timestamps:
 ${history.map(msg => `[${new Date(msg.timestamp).toLocaleTimeString()}] ${msg.sender}: ${msg.text}`).join('\n')}
 
-User's current time: ${new Date().toLocaleTimeString()}
-Your current time: ${partnerTime}
-
-Consider the timestamps when crafting your response. If there has been a gap longer than ten minutes between messages, you may acknowledge it naturally in your response. Do NOT apologize for delays though, because they're NOT your fault. For example, if it's been a long time since the last message, you might say something like "It's been a while since we last spoke. How have you been?" in ${partner.nativeLanguage} or ${partner.targetLanguage}.
+IMPORTANT TIMING CONTEXT: 
+- The last message was sent just now (within the last few seconds)
+- You should respond as if this is an active, ongoing conversation
+- Do NOT mention time gaps or delays unless there's actually been more than 30 minutes since the previous message
+- The conversation is flowing naturally in real-time
 
 Respond naturally to the last message in the chat.
 Keep your response relatively short, like a typical chat message (1-3 sentences), unless directly asked to explain something in detail.
