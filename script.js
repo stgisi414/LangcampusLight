@@ -208,7 +208,7 @@ async function searchPartners() {
 The goal is to find partners for someone who speaks ${nativeLanguage} and wants to learn ${targetLanguage}.
 Therefore, each generated profile should represent a person whose native language is ${targetLanguage} and who wants to learn ${nativeLanguage}.
 
-Generate profiles for people who are a mix of students, professionals, or artists, and give them varied personalities (e.g., patient, enthusiastic, humorous, studious).
+Generate profiles for people who are a mix of students, professionals, or artists, and give them varied personalities (e.g., patient, enthusiastic, humorous, studious, down to earth).
 
 Each profile must be a JSON object with the following fields:
 - 'name' (string)
