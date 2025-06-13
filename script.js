@@ -4,7 +4,7 @@ let lastUserMessage = '';
 // Function to retry last failed message
 async function retryLastMessage() {
     if (!lastUserMessage) return;
-
+l
     // Remove the error message
     const errorMessages = document.querySelectorAll('.error-message');
     errorMessages.forEach(msg => msg.remove());
