@@ -1,0 +1,196 @@
+Grammar data embedded.
+script.js:2262 TTS functionality initialized
+script.js:549 Attempting to load preferences from localStorage...
+script.js:552 Loaded nativeLanguage from localStorage: English
+script.js:553 Loaded targetLanguage from localStorage: Korean
+script.js:564 Setting nativeLanguage dropdown to: English
+script.js:570 Setting targetLanguage dropdown to: Korean
+script.js:581 Loaded model preference: pro (gemini-2.0-flash-thinking-exp-01-21)
+script.js:174 Search triggered with Native: English, Target: Korean
+script.js:228 Sending prompt: Please generate a list of six distinct language exchange partner profiles.
+The goal is to find partners for someone who speaks English and wants to learn Korean.
+Therefore, each generated profile should represent a person whose native language is Korean and who wants to learn English.
+
+Generate profiles for people who are a mix of students, professionals, or artists, and give them varied personalities (e.g., patient, enthusiastic, humorous, studious, down to earth).
+
+Each profile must be a JSON object with the following fields:
+- 'name' (string)
+- 'age' (integer between 20 and 45)
+- 'gender' (string, either 'male', 'female', or 'other')
+- 'nativeLanguage' (string, must be 'Korean')
+- 'targetLanguage' (string, must be 'English')
+- 'interests' (an array of exactly three distinct strings representing hobbies).
+
+Ensure the interests listed for each profile are varied and distinct from the other generated profiles. Ensure the profiles are realistic and diverse in terms of persona.
+
+Your entire response must be ONLY the JSON array, starting with [ and ending with ]. Do not include any text before or after the array, nor any Markdown formatting like ```json.
+
+Example of the required JSON array format (containing one profile for illustration):
+[
+  {
+    "name": "Example Partner Name", 
+    "age": 28,
+    "gender": "male", 
+    "nativeLanguage": "Korean", 
+    "targetLanguage": "English", 
+    "interests": ["hiking", "photography", "cooking"]
+  }
+]
+script.js:46 Attempting to retrieve username from myInfo:
+script.js:47 {name: 'Stefan', bio: 'I am a biracial African American and Caucasian Ame…nd studied in Korea, China and Japan for 8 years.', hobbies: Array(2)}
+script.js:49 Sending API request with username: Stefan
+script.js:51 
+            
+            
+           POST https://langcamp.us/api/exchange-admin/gemini-generate 500 (Internal Server Error)
+callGeminiAPI @ script.js:51
+generatePartnerProfiles @ script.js:242
+searchPartners @ script.js:229Understand this error
+script.js:98 Gemini API backend attempt 1 failed: Error: Backend API request failed with status 500: . Body: {"success":false,"error":"Gemini API request failed: Forbidden"}
+    at callGeminiAPI (script.js:70:23)
+    at async generatePartnerProfiles (script.js:242:29)
+    at async HTMLButtonElement.searchPartners (script.js:229:26)
+callGeminiAPI @ script.js:98
+await in callGeminiAPI
+generatePartnerProfiles @ script.js:242
+searchPartners @ script.js:229Understand this error
+script.js:46 Attempting to retrieve username from myInfo:
+script.js:47 {name: 'Stefan', bio: 'I am a biracial African American and Caucasian Ame…nd studied in Korea, China and Japan for 8 years.', hobbies: Array(2)}
+script.js:49 Sending API request with username: Stefan
+script.js:51 
+            
+            
+           POST https://langcamp.us/api/exchange-admin/gemini-generate 500 (Internal Server Error)
+callGeminiAPI @ script.js:51
+await in callGeminiAPI
+generatePartnerProfiles @ script.js:242
+searchPartners @ script.js:229Understand this error
+script.js:98 Gemini API backend attempt 2 failed: Error: Backend API request failed with status 500: . Body: {"success":false,"error":"Gemini API request failed: Forbidden"}
+    at callGeminiAPI (script.js:70:23)
+    at async generatePartnerProfiles (script.js:242:29)
+    at async HTMLButtonElement.searchPartners (script.js:229:26)
+callGeminiAPI @ script.js:98
+await in callGeminiAPI
+generatePartnerProfiles @ script.js:242
+searchPartners @ script.js:229Understand this error
+script.js:46 Attempting to retrieve username from myInfo:
+script.js:47 {name: 'Stefan', bio: 'I am a biracial African American and Caucasian Ame…nd studied in Korea, China and Japan for 8 years.', hobbies: Array(2)}
+script.js:49 Sending API request with username: Stefan
+script.js:51 
+            
+            
+           POST https://langcamp.us/api/exchange-admin/gemini-generate 500 (Internal Server Error)
+callGeminiAPI @ script.js:51
+await in callGeminiAPI
+generatePartnerProfiles @ script.js:242
+searchPartners @ script.js:229Understand this error
+script.js:98 Gemini API backend attempt 3 failed: Error: Backend API request failed with status 500: . Body: {"success":false,"error":"Gemini API request failed: Forbidden"}
+    at callGeminiAPI (script.js:70:23)
+    at async generatePartnerProfiles (script.js:242:29)
+    at async HTMLButtonElement.searchPartners (script.js:229:26)
+callGeminiAPI @ script.js:98
+await in callGeminiAPI
+generatePartnerProfiles @ script.js:242
+searchPartners @ script.js:229Understand this error
+script.js:322 Error generating profiles: Error: Backend API request failed with status 500: . Body: {"success":false,"error":"Gemini API request failed: Forbidden"}
+    at callGeminiAPI (script.js:70:23)
+    at async generatePartnerProfiles (script.js:242:29)
+    at async HTMLButtonElement.searchPartners (script.js:229:26)
+generatePartnerProfiles @ script.js:322
+await in generatePartnerProfiles
+searchPartners @ script.js:229Understand this error
+script.js:230 Generated Partners Data: []
+script.js:174 Search triggered with Native: English, Target: Korean
+script.js:228 Sending prompt: Please generate a list of six distinct language exchange partner profiles.
+The goal is to find partners for someone who speaks English and wants to learn Korean.
+Therefore, each generated profile should represent a person whose native language is Korean and who wants to learn English.
+
+Generate profiles for people who are a mix of students, professionals, or artists, and give them varied personalities (e.g., patient, enthusiastic, humorous, studious, down to earth).
+
+Each profile must be a JSON object with the following fields:
+- 'name' (string)
+- 'age' (integer between 20 and 45)
+- 'gender' (string, either 'male', 'female', or 'other')
+- 'nativeLanguage' (string, must be 'Korean')
+- 'targetLanguage' (string, must be 'English')
+- 'interests' (an array of exactly three distinct strings representing hobbies).
+
+Ensure the interests listed for each profile are varied and distinct from the other generated profiles. Ensure the profiles are realistic and diverse in terms of persona.
+
+Your entire response must be ONLY the JSON array, starting with [ and ending with ]. Do not include any text before or after the array, nor any Markdown formatting like ```json.
+
+Example of the required JSON array format (containing one profile for illustration):
+[
+  {
+    "name": "Example Partner Name", 
+    "age": 28,
+    "gender": "male", 
+    "nativeLanguage": "Korean", 
+    "targetLanguage": "English", 
+    "interests": ["hiking", "photography", "cooking"]
+  }
+]
+script.js:46 Attempting to retrieve username from myInfo:
+script.js:47 {name: 'Stefan', bio: 'I am a biracial African American and Caucasian Ame…nd studied in Korea, China and Japan for 8 years.', hobbies: Array(2)}
+script.js:49 Sending API request with username: Stefan
+script.js:51 
+            
+            
+           POST https://langcamp.us/api/exchange-admin/gemini-generate 500 (Internal Server Error)
+callGeminiAPI @ script.js:51
+generatePartnerProfiles @ script.js:242
+searchPartners @ script.js:229Understand this error
+script.js:98 Gemini API backend attempt 1 failed: Error: Backend API request failed with status 500: . Body: {"success":false,"error":"Gemini API request failed: Forbidden"}
+    at callGeminiAPI (script.js:70:23)
+    at async generatePartnerProfiles (script.js:242:29)
+    at async HTMLButtonElement.searchPartners (script.js:229:26)
+callGeminiAPI @ script.js:98
+await in callGeminiAPI
+generatePartnerProfiles @ script.js:242
+searchPartners @ script.js:229Understand this error
+script.js:46 Attempting to retrieve username from myInfo:
+script.js:47 {name: 'Stefan', bio: 'I am a biracial African American and Caucasian Ame…nd studied in Korea, China and Japan for 8 years.', hobbies: Array(2)}
+script.js:49 Sending API request with username: Stefan
+script.js:51 
+            
+            
+           POST https://langcamp.us/api/exchange-admin/gemini-generate 500 (Internal Server Error)
+callGeminiAPI @ script.js:51
+await in callGeminiAPI
+generatePartnerProfiles @ script.js:242
+searchPartners @ script.js:229Understand this error
+script.js:98 Gemini API backend attempt 2 failed: Error: Backend API request failed with status 500: . Body: {"success":false,"error":"Gemini API request failed: Forbidden"}
+    at callGeminiAPI (script.js:70:23)
+    at async generatePartnerProfiles (script.js:242:29)
+    at async HTMLButtonElement.searchPartners (script.js:229:26)
+callGeminiAPI @ script.js:98
+await in callGeminiAPI
+generatePartnerProfiles @ script.js:242
+searchPartners @ script.js:229Understand this error
+script.js:46 Attempting to retrieve username from myInfo:
+script.js:47 {name: 'Stefan', bio: 'I am a biracial African American and Caucasian Ame…nd studied in Korea, China and Japan for 8 years.', hobbies: Array(2)}
+script.js:49 Sending API request with username: Stefan
+script.js:51 
+            
+            
+           POST https://langcamp.us/api/exchange-admin/gemini-generate 500 (Internal Server Error)
+callGeminiAPI @ script.js:51
+await in callGeminiAPI
+generatePartnerProfiles @ script.js:242
+searchPartners @ script.js:229Understand this error
+script.js:98 Gemini API backend attempt 3 failed: Error: Backend API request failed with status 500: . Body: {"success":false,"error":"Gemini API request failed: Forbidden"}
+    at callGeminiAPI (script.js:70:23)
+    at async generatePartnerProfiles (script.js:242:29)
+    at async HTMLButtonElement.searchPartners (script.js:229:26)
+callGeminiAPI @ script.js:98
+await in callGeminiAPI
+generatePartnerProfiles @ script.js:242
+searchPartners @ script.js:229Understand this error
+script.js:322 Error generating profiles: Error: Backend API request failed with status 500: . Body: {"success":false,"error":"Gemini API request failed: Forbidden"}
+    at callGeminiAPI (script.js:70:23)
+    at async generatePartnerProfiles (script.js:242:29)
+    at async HTMLButtonElement.searchPartners (script.js:229:26)
+generatePartnerProfiles @ script.js:322
+await in generatePartnerProfiles
+searchPartners @ script.js:229Understand this error
+script.js:230 Generated Partners Data: []
